@@ -1,0 +1,53 @@
+/* Identidad visual propia de Frutopical: contenido corporativo y movimiento sutil. */
+.topbar{backdrop-filter:blur(12px);background:#fffffff2}.hero{position:relative;min-height:610px;background:linear-gradient(110deg,#f0f5ee 0%,#f8f8f2 55%,#dbeadb 55%)}.hero-copy{position:relative;z-index:2}.hero h1 i{color:#bd850f;font-style:normal}.hero-grain{position:absolute;inset:0;opacity:.22;background-image:radial-gradient(#1d573e 1px,transparent 1px);background-size:17px 17px;mask-image:linear-gradient(90deg,#0000 4%,#000 52%,#0000 96%);pointer-events:none}.hero-visual{position:absolute;right:12vw;top:100px;width:315px;height:330px;z-index:1}.orbit{position:absolute;border:1px solid #568668;border-radius:50%;animation:spin 20s linear infinite}.orbit-one{height:282px;width:282px;right:4px;top:30px}.orbit-two{height:210px;width:210px;right:40px;top:68px;border-style:dashed;animation-direction:reverse;animation-duration:15s}.sun{position:absolute;right:0;top:0;width:78px;height:78px;border-radius:50%;display:grid;place-items:center;background:#e9ac29;color:#fff;font-size:30px;box-shadow:0 12px 25px #b57f1129;animation:pulse 4s ease-in-out infinite}.leaf-shape{position:absolute;background:#2f7d56;border-radius:100% 0 100% 0;box-shadow:inset -12px -10px #1f603f;animation:float 5s ease-in-out infinite}.leaf-shape.one{height:210px;width:110px;bottom:0;right:58px;transform:rotate(30deg)}.leaf-shape.two{height:150px;width:78px;bottom:18px;right:168px;transform:rotate(-35deg);background:#74a76c;animation-delay:-1.6s}.leaf-shape.three{height:92px;width:48px;bottom:170px;right:136px;transform:rotate(130deg);background:#c79521;animation-delay:-3s}.visual-label{position:absolute;bottom:35px;left:-20px;border-left:3px solid #e7ae2c;padding:9px 0 9px 14px}.visual-label span{font-size:10px;letter-spacing:.16em;font-weight:700;color:#698074}.visual-label strong{display:block;font:600 21px/1.08 'Playfair Display';color:#1b4e37;margin-top:5px}.hero-panel{position:relative;z-index:2;animation:rise .8s .25s both}.ticker{overflow:hidden;white-space:nowrap;background:#e7aa25;color:#153f2f;padding:13px 0;font:700 12px 'DM Sans';letter-spacing:.13em}.ticker div{display:inline-block;animation:marquee 22s linear infinite}.ticker i{font-style:normal;margin:0 20px}
+.corporate{background:#fff}.corporate .section-heading{max-width:760px}.purpose-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.purpose-grid article{border:1px solid #e1e9e2;padding:26px;min-height:240px;transition:transform .25s,box-shadow .25s,border-color .25s}.purpose-grid article:hover{transform:translateY(-6px);border-color:#dba526;box-shadow:0 18px 34px #1a452116}.purpose-grid h3,.products h3{font:600 25px 'Playfair Display';margin:19px 0 12px}.purpose-grid p,.purpose-grid li{color:#61766a;font-size:14px;line-height:1.65}.purpose-grid ul{padding-left:18px;margin-top:0}.purpose-grid article>span{font-weight:700;color:#c88d14}.products{background:#153f2f;color:#fff;padding:83px max(8vw,48px);display:grid;grid-template-columns:46% 54%;gap:60px}.products h2{font:600 42px/1.1 'Playfair Display';margin:0 0 16px}.products>div>p:not(.eyebrow){max-width:510px;color:#c6d8cd;line-height:1.7;margin-bottom:28px}.product-list{display:grid;gap:1px;background:#47745f}.product-list article{background:#1e543c;padding:18px 22px;transition:background .2s,transform .2s}.product-list article:hover{background:#286847;transform:translateX(8px)}.product-list span{color:#e4aa28;font-size:12px;font-weight:700}.product-list h3{font-size:21px;margin:6px 0}.product-list p{margin:0;color:#c5d7cc;font-size:13px}.contact{padding:72px max(8vw,48px);display:grid;grid-template-columns:1fr 1fr;gap:40px;background:#fff}.contact h2{font:600 38px 'Playfair Display';margin:0 0 12px}.contact>div>p:not(.eyebrow){color:#60766a;line-height:1.7;max-width:540px}.contact-details{border-left:1px solid #d9e4da;padding-left:35px}.contact-details p{color:#5c7266;line-height:1.65}.contact-details b{color:#1d583f}
+.reveal{opacity:0;transform:translateY(35px);transition:opacity .7s ease,transform .7s ease}.reveal.visible{opacity:1;transform:translateY(0)}.opportunity{transition:transform .3s,box-shadow .3s,border-color .3s}.opportunity:hover{transform:translateY(-8px);border-color:#dca329;box-shadow:0 22px 35px #163d2419}.button b{display:inline-block;margin-left:8px;transition:transform .2s}.button:hover b{transform:translateX(4px)}@keyframes marquee{to{transform:translateX(-50%)}}@keyframes float{50%{translate:0 -11px}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{scale:1.09;box-shadow:0 16px 34px #b57f1150}}@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}@media(max-width:1080px){.hero-visual{right:5vw;opacity:.75}}@media(max-width:850px){.hero{grid-template-columns:1fr;background:#eef3eb;padding-bottom:35px}.hero-visual{position:relative;right:auto;top:auto;margin:25px 0 0 auto}.purpose-grid,.products,.contact{grid-template-columns:1fr}.products{gap:35px}.contact-details{border-left:0;border-top:1px solid #d9e4da;padding:22px 0 0}}@media(max-width:600px){.hero-visual{transform:scale(.75);transform-origin:right top;height:230px;margin-bottom:-55px}.hero h1 i{white-space:nowrap}.hero-panel{margin-top:10px}.ticker{font-size:10px}.orbit{display:none}.purpose-grid{grid-template-columns:1fr}.products,.contact{padding:60px 26px}.products h2,.contact h2{font-size:34px}}
+/* ====================================
+   INFORMACIÓN GENERAL
+   ==================================== */
+
+.info-table {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 32px;
+}
+
+.info-table > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(71, 105, 45, 0.14);
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+}
+
+.info-table span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6f7d68;
+}
+
+.info-table strong {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #263522;
+  font-weight: 600;
+}
+
+/* Adaptación para celular */
+
+@media (max-width: 760px) {
+  .info-table {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .info-table > div {
+    padding: 18px 20px;
+  }
+}

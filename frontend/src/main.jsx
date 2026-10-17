@@ -7,6 +7,16 @@ import './styles.css';
 import './corporate.css';
 import './motion.css';
 
+// Cambiar el título de la pestaña de forma formal
+document.title = "Frutopical | TalentHub";
+
+// Forzar el favicon apuntando directo a la carpeta public
+const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+link.type = 'image/png';
+link.rel = 'icon';
+link.href = '/logo-frutopical.png';
+document.head.appendChild(link);
+
 const api =
   import.meta.env.VITE_API_URL ??
   'http://localhost:3000/api/v1';
@@ -63,6 +73,35 @@ const emptyPqrs = {
   tipo_solicitud: 'PETICION',
   descripcion: '',
   acepta_datos: false
+};
+
+// DICCIONARIO CON DEFINICIONES Y PLAZOS SLA EXIGIDOS POR LA PROFESORA
+const INFORMACION_PQRSF = {
+  PETICION: {
+    nombre: 'Petición / Certificación Laboral',
+    definicion: 'Solicitud formal para consultar, requerir información o expedir documentos institucionales (ej. constancias laborales).',
+    plazo: 'Colaborador activo: 3 días hábiles | Extrabajador: hasta 5 días hábiles'
+  },
+  QUEJA: {
+    nombre: 'Queja',
+    definicion: 'Manifestación de inconformidad o descontento respecto a conductas, tratos o situaciones operativas en la empresa.',
+    plazo: 'Máximo 10 días hábiles'
+  },
+  RECLAMO: {
+    nombre: 'Reclamo',
+    definicion: 'Exigencia por una debida prestación de servicios, inconsistencias de pago o incumplimiento de compromisos.',
+    plazo: 'Máximo 10 días hábiles'
+  },
+  SUGERENCIA: {
+    nombre: 'Sugerencia',
+    definicion: 'Propuesta de mejora o aporte para optimizar procesos internos, clima laboral o bienestar en planta.',
+    plazo: 'Máximo 15 días hábiles'
+  },
+  FELICITACION: {
+    nombre: 'Felicitación',
+    definicion: 'Reconocimiento explícito al buen desempeño, atención oportuna o cumplimiento excepcional de un colaborador.',
+    plazo: 'Notificación y registro en 5 días hábiles'
+  }
 };
 
 const corporate = {
@@ -221,9 +260,7 @@ function App() {
           setConvocatorias(body.data);
           return;
         }
-      } catch {
-        // Fallback a almacenamiento local
-      }
+      } catch {}
 
       const localConvs = localStorage.getItem('frutopical_convocatorias');
       if (localConvs) {
@@ -250,6 +287,12 @@ function App() {
     e.preventDefault();
     if (!selected) return;
 
+    // Validación obligatoria: La hoja de vida debe haber sido cargada
+    if (!form.hoja_vida_nombre) {
+      alert('Debes adjuntar tu hoja de vida en formato PDF o Word para completar la postulación.');
+      return;
+    }
+
     if (!form.acepta_datos) {
       alert('Debes autorizar el tratamiento de datos personales conforme a la Ley 1581 de 2012 para postularte.');
       return;
@@ -275,9 +318,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-    } catch {
-      // Offline fallback
-    }
+    } catch {}
 
     const prevPost = JSON.parse(localStorage.getItem('frutopical_postulaciones') || '[]');
     localStorage.setItem('frutopical_postulaciones', JSON.stringify([payload, ...prevPost]));
@@ -313,9 +354,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-    } catch {
-      // Offline fallback
-    }
+    } catch {}
 
     const prevSol = JSON.parse(localStorage.getItem('frutopical_solicitudes') || '[]');
     localStorage.setItem('frutopical_solicitudes', JSON.stringify([payload, ...prevSol]));
@@ -478,8 +517,9 @@ function App() {
               </div>
 
               <h3 style={{ margin: '0 0 0.4rem 0', color: '#143c1d', fontSize: '1.35rem' }}>Ecosistema Digital TalentHub</h3>
+              {/* OBSERVACIÓN 1 DE LA PROFESORA: Texto formal completo */}
               <p style={{ fontSize: '0.85rem', color: '#526655', lineHeight: '1.5', margin: '0 0 1.5rem 0' }}>
-                Centralización técnica de selección por competencias, seguimiento archivístico SG-SST y canal oficial de PQRSF.
+                Centralización técnica de selección por competencias, vinculación de trabajadores, SG-SST, seguimiento gestión documental RR.HH y PQRSF.
               </p>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem', textAlign: 'center', marginBottom: '1.5rem' }}>
@@ -947,7 +987,7 @@ function App() {
         </div>
       </footer>
 
-      {/* MODAL PARA VER EL AFICHE OFICIAL (CON RESOLVEDOR DINÁMICO DE EXTENSIÓN Y PREVENCIÓN DE ERROR) */}
+      {/* MODAL PARA VER EL AFICHE OFICIAL */}
       {aficheModal && (
         <div className="modal-backdrop" onMouseDown={() => setAficheModal(null)}>
           <section
@@ -970,7 +1010,6 @@ function App() {
               src={getPublicUrl(aficheModal.imagen_afiche)}
               alt={aficheModal.titulo}
               onError={(e) => {
-                // Si falla .jpg, prueba automáticamente .jpeg o .png sin mostrar la [x] rota
                 const currentSrc = e.target.src;
                 if (currentSrc.endsWith('.jpg')) {
                   e.target.src = currentSrc.replace('.jpg', '.jpeg');
@@ -1043,7 +1082,7 @@ function App() {
         </div>
       )}
 
-      {/* MODAL PQRSF */}
+      {/* MODAL PQRSF (CON TARJETA DINÁMICA DE DEFINICIÓN Y TIEMPOS SLA) */}
       {showPqrsModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowPqrsModal(false)}>
           <section
@@ -1139,6 +1178,23 @@ function App() {
                 </label>
               </div>
 
+              {/* OBSERVACIÓN 2 DE LA PROFESORA: Tarjeta con definición y plazos SLA */}
+              {pqrsForm.tipo_solicitud && INFORMACION_PQRSF[pqrsForm.tipo_solicitud] && (
+                <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '8px', padding: '0.75rem 0.9rem', width: '100%', boxSizing: 'border-box' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.3rem', flexWrap: 'wrap', gap: '0.3rem' }}>
+                    <strong style={{ color: '#166534', fontSize: '0.82rem' }}>
+                      ℹ️ {INFORMACION_PQRSF[pqrsForm.tipo_solicitud].nombre}
+                    </strong>
+                    <span style={{ fontSize: '0.72rem', backgroundColor: '#dcfce7', color: '#166534', fontWeight: '800', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                      SLA: {INFORMACION_PQRSF[pqrsForm.tipo_solicitud].plazo}
+                    </span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.78rem', color: '#334155', lineHeight: '1.4' }}>
+                    {INFORMACION_PQRSF[pqrsForm.tipo_solicitud].definicion}
+                  </p>
+                </div>
+              )}
+
               <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', width: '100%', textTransform: 'none' }}>
                 Detalle del requerimiento *
                 <textarea
@@ -1197,7 +1253,7 @@ function App() {
         </div>
       )}
 
-      {/* MODAL POSTULACIÓN */}
+      {/* MODAL POSTULACIÓN (CON VALIDACIÓN OBLIGATORIA DE HOJA DE VIDA) */}
       {selected && (
         <div className="modal-backdrop" onMouseDown={() => setSelected(null)}>
           <section
@@ -1303,8 +1359,8 @@ function App() {
                     name="ciudad"
                     value={form.ciudad}
                     onChange={handleFormChange}
-                    placeholder="Ej: Sabanagrande"
                     required
+                    placeholder="Ej: Sabanagrande"
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box' }}
                   />
                 </label>
@@ -1317,9 +1373,11 @@ function App() {
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
+                  required
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     if (f) setForm((prev) => ({ ...prev, hoja_vida_nombre: f.name }));
+                    else setForm((prev) => ({ ...prev, hoja_vida_nombre: '' }));
                   }}
                   style={{ width: '100%', fontSize: '0.82rem', boxSizing: 'border-box' }}
                 />
@@ -1344,20 +1402,21 @@ function App() {
                 </label>
               </div>
 
+              {/* OBSERVACIÓN 3 DE LA PROFESORA: El botón se bloquea si no adjuntó archivo o no marcó el checkbox */}
               <button
                 className="button primary submit"
                 type="submit"
-                disabled={!form.acepta_datos}
+                disabled={!form.acepta_datos || !form.hoja_vida_nombre}
                 style={{
                   width: '100%',
                   marginTop: '0.2rem',
                   padding: '0.75rem',
-                  backgroundColor: form.acepta_datos ? '#2e7d32' : '#94a3b8',
+                  backgroundColor: (form.acepta_datos && form.hoja_vida_nombre) ? '#2e7d32' : '#94a3b8',
                   color: '#ffffff',
                   border: 'none',
                   borderRadius: '8px',
                   fontWeight: 'bold',
-                  cursor: form.acepta_datos ? 'pointer' : 'not-allowed',
+                  cursor: (form.acepta_datos && form.hoja_vida_nombre) ? 'pointer' : 'not-allowed',
                   boxSizing: 'border-box'
                 }}
               >

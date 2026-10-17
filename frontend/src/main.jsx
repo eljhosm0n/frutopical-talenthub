@@ -21,7 +21,7 @@ const api =
   import.meta.env.VITE_API_URL ??
   'http://localhost:3000/api/v1';
 
-// Función para resolver rutas seguras a la carpeta public sin problemas de URL
+// Función para resolver rutas seguras a la carpeta public
 function getPublicUrl(path) {
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   return `${import.meta.env.BASE_URL}${cleanPath}`;
@@ -67,40 +67,46 @@ const emptyForm = {
 
 const emptyPqrs = {
   nombre_remitente: '',
-  tipo_remitente: 'COLABORADOR_ACTIVO',
+  tipo_remitente: 'TRABAJADOR_ACTIVO',
   correo: '',
   telefono: '',
   tipo_solicitud: 'PETICION',
+  subtipo_solicitud: '',
   descripcion: '',
   acepta_datos: false
 };
 
-// DICCIONARIO CON DEFINICIONES Y PLAZOS SLA EXIGIDOS POR LA PROFESORA
-const INFORMACION_PQRSF = {
+// INFORMACIÓN OFICIAL SEGÚN OBSERVACIONES DE REVISIÓN Y LEY 1755 DE 2015
+const INFORMACION_PQRS = {
   PETICION: {
-    nombre: 'Petición / Certificación Laboral',
-    definicion: 'Solicitud formal para consultar, requerir información o expedir documentos institucionales (ej. constancias laborales).',
-    plazo: 'Colaborador activo: 3 días hábiles | Extrabajador: hasta 5 días hábiles'
+    letra: 'P – Petición',
+    titulo: 'Petición / Consulta General o Certificado Laboral',
+    definicion: 'Solicitud de información, orientación o consulta general sobre la empresa o sus procesos. Si eres trabajador activo o extrabajador, podrás tramitar tus solicitudes de certificados laborales a través del PQRS.',
+    sla: 'General: 15 días hábiles | Certificado Activo: 3 a 5 días hábiles | Certificado Inactivo: 8 días hábiles'
   },
   QUEJA: {
-    nombre: 'Queja',
-    definicion: 'Manifestación de inconformidad o descontento respecto a conductas, tratos o situaciones operativas en la empresa.',
-    plazo: 'Máximo 10 días hábiles'
+    letra: 'Q – Queja',
+    titulo: 'Queja',
+    definicion: 'Expresión de inconformidad respecto a la atención prestada por un funcionario o la calidad del servicio recibido.',
+    sla: '15 días hábiles (Ley 1755 de 2015)'
   },
   RECLAMO: {
-    nombre: 'Reclamo',
-    definicion: 'Exigencia por una debida prestación de servicios, inconsistencias de pago o incumplimiento de compromisos.',
-    plazo: 'Máximo 10 días hábiles'
+    letra: 'R – Reclamo',
+    titulo: 'Reclamo',
+    definicion: 'Manifestación de inconformidad por el incumplimiento o fallo en un servicio o relación contractual, que exige una solución o corrección específica.',
+    sla: '15 días hábiles (Ley 1755 de 2015)'
   },
   SUGERENCIA: {
-    nombre: 'Sugerencia',
-    definicion: 'Propuesta de mejora o aporte para optimizar procesos internos, clima laboral o bienestar en planta.',
-    plazo: 'Máximo 15 días hábiles'
+    letra: 'S – Sugerencia / Solicitud',
+    titulo: 'Sugerencia / Solicitud de Trámite Laboral',
+    definicion: 'Propuesta orientada a mejorar los servicios y procesos, o requerimiento formal de expedición de documentos institucionales (certificados laborales, desprendibles de pago, paz y salvos) por colaboradores activos o inactivos.',
+    sla: 'Sugerencia: 15 días hábiles | Certificado Activo: 3 a 5 días hábiles | Certificado Inactivo: 8 días hábiles'
   },
   FELICITACION: {
-    nombre: 'Felicitación',
-    definicion: 'Reconocimiento explícito al buen desempeño, atención oportuna o cumplimiento excepcional de un colaborador.',
-    plazo: 'Notificación y registro en 5 días hábiles'
+    letra: 'F – Felicitación',
+    titulo: 'Felicitación',
+    definicion: 'Reconocimiento o expresión de satisfacción por la labor, servicio o gestión realizada por la organización.',
+    sla: 'Registro institucional y acuse formal'
   }
 };
 
@@ -287,14 +293,14 @@ function App() {
     e.preventDefault();
     if (!selected) return;
 
-    // Validación obligatoria: La hoja de vida debe haber sido cargada
+    // Validación obligatoria de Hoja de Vida
     if (!form.hoja_vida_nombre) {
       alert('Debes adjuntar tu hoja de vida en formato PDF o Word para completar la postulación.');
       return;
     }
 
     if (!form.acepta_datos) {
-      alert('Debes autorizar el tratamiento de datos personales conforme a la Ley 1581 de 2012 para postularte.');
+      alert('Debes declarar la veracidad y autorizar el tratamiento de datos personales conforme a la Ley 1581 de 2012 para postularte.');
       return;
     }
 
@@ -461,7 +467,7 @@ function App() {
           <a href="#informacion" onClick={() => setMenu(false)}>Información general</a>
           <a href="#productos" onClick={() => setMenu(false)}>Portafolio de productos</a>
           <a href="#convocatorias" onClick={() => setMenu(false)}>Trabaja con nosotros</a>
-          <a href="#pqrsf" onClick={() => setMenu(false)}>PQRSF</a>
+          <a href="#pqrsf" onClick={() => setMenu(false)}>PQRS</a>
           <a className="login" href="#acceso" onClick={() => { setMenu(false); setShowLogin(true); }}>
             Acceso interno
           </a>
@@ -494,7 +500,7 @@ function App() {
                 Ver convocatorias activas <b>→</b>
               </a>
               <button className="button ghost" onClick={() => setShowPqrsModal(true)} style={{ padding: '0.85rem 1.6rem', fontWeight: '700', borderRadius: '8px' }}>
-                Radicar PQRSF
+                Radicar Solicitud PQRS
               </button>
             </div>
 
@@ -517,7 +523,7 @@ function App() {
               </div>
 
               <h3 style={{ margin: '0 0 0.4rem 0', color: '#143c1d', fontSize: '1.35rem' }}>Ecosistema Digital TalentHub</h3>
-              {/* OBSERVACIÓN 1 DE LA PROFESORA: Texto formal completo */}
+              {/* CORRECCIÓN EXACTA DE OBSERVACIÓN 1 */}
               <p style={{ fontSize: '0.85rem', color: '#526655', lineHeight: '1.5', margin: '0 0 1.5rem 0' }}>
                 Centralización técnica de selección por competencias, vinculación de trabajadores, SG-SST, seguimiento gestión documental RR.HH y PQRSF.
               </p>
@@ -532,8 +538,8 @@ function App() {
                   <span style={{ fontSize: '0.72rem', color: '#9a3412', fontWeight: '600' }}>Inocuidad BPM</span>
                 </div>
                 <div style={{ backgroundColor: '#eff6ff', padding: '0.8rem', borderRadius: '12px', border: '1px solid #bfdbfe' }}>
-                  <strong style={{ display: 'block', fontSize: '1.4rem', color: '#1d4ed8' }}>&lt; 48h</strong>
-                  <span style={{ fontSize: '0.72rem', color: '#1e40af', fontWeight: '600' }}>Respuesta SLA</span>
+                  <strong style={{ display: 'block', fontSize: '1.4rem', color: '#1d4ed8' }}>SLA</strong>
+                  <span style={{ fontSize: '0.72rem', color: '#1e40af', fontWeight: '600' }}>Ley 1755 / 2015</span>
                 </div>
               </div>
 
@@ -865,14 +871,14 @@ function App() {
           </div>
         </section>
 
-        {/* PQRSF */}
+        {/* PQRS (CANAL DIGITAL ACTUALIZADO CON LEY 1755 Y TRÁMITE LABORAL) */}
         <section id="pqrsf" className="pqrsf" style={{ opacity: 1, visibility: 'visible', padding: '4rem 1.5rem', backgroundColor: '#f8fafc' }}>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
               <p className="eyebrow" style={{ color: '#166534', fontWeight: '800' }}>ATENCIÓN AL CLIENTE INTERNO Y EXTERNO</p>
-              <h2 style={{ fontSize: '2rem', color: '#1e293b', margin: '0.4rem 0' }}>Canal Institucional de PQRSF</h2>
-              <p style={{ color: '#64748b', maxWidth: '650px', margin: '0 auto' }}>
-                Radica peticiones, felicitaciones o reclamos, o consulta el estado de tu trámite en tiempo real con tu número de radicado.
+              <h2 style={{ fontSize: '2rem', color: '#1e293b', margin: '0.4rem 0' }}>Canal Institucional de PQRS</h2>
+              <p style={{ color: '#64748b', maxWidth: '680px', margin: '0 auto', fontSize: '0.92rem', lineHeight: '1.6' }}>
+                Utiliza el canal del PQRS para registrar una petición, queja, reclamo, sugerencia y/o solicitud. Si eres trabajador activo o extrabajador, podrás tramitar tus solicitudes de certificados laborales a través del PQRS.
               </p>
             </div>
 
@@ -881,14 +887,14 @@ function App() {
                 <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>✍</span>
                 <h3 style={{ margin: '0 0 0.5rem 0', color: '#1e293b' }}>¿Deseas radicar una solicitud?</h3>
                 <p style={{ fontSize: '0.88rem', color: '#64748b', lineHeight: '1.5', margin: '0 0 1.5rem 0' }}>
-                  Identifícate como colaborador, extrabajador, aspirante o cliente y genera un código consecutivo oficial de seguimiento.
+                  Identifícate como trabajador activo, extrabajador, aspirante o cliente y genera un código consecutivo oficial de seguimiento bajo los términos de la Ley 1755 de 2015.
                 </p>
                 <button
                   className="button primary"
                   onClick={() => setShowPqrsModal(true)}
                   style={{ width: '100%', padding: '0.75rem', fontWeight: 'bold' }}
                 >
-                  Radicar Nuevo Requerimiento
+                  Radicar Requerimiento PQRS
                 </button>
               </div>
 
@@ -951,7 +957,7 @@ function App() {
         </section>
       </main>
 
-      {/* FOOTER */}
+      {/* FOOTER CON LEYENDA EXIGIDA POR LA FICHA 3167559 */}
       <footer style={{ backgroundColor: '#0c2210', color: '#ffffff', padding: '3.5rem 2rem 2rem 2rem', borderTop: '4px solid #ef6c00' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
@@ -971,13 +977,13 @@ function App() {
 
           <div style={{ backgroundColor: 'rgba(255,255,255,0.06)', padding: '1rem 1.4rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.15)', textAlign: 'right' }}>
             <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#fed7aa', display: 'block', fontWeight: '800' }}>
-              ARQUITECTURA & DESARROLLO DE SOFTWARE
+              SISTEMA DIGITAL DE GESTIÓN DE RECURSOS HUMANOS
             </span>
-            <strong style={{ fontSize: '1.05rem', color: '#ffffff', display: 'block', margin: '0.2rem 0' }}>
-              {corporate.developer}
-            </strong>
-            <span style={{ fontSize: '0.75rem', color: '#dcfce7' }}>
-              Ingeniería & Gestión del Talento Humano · 2026
+            <p style={{ fontSize: '0.82rem', color: '#ffffff', margin: '0.3rem 0', fontWeight: '600' }}>
+              Proyecto académico diseñado por la Ficha 3167559 – Técnicos en Recursos Humanos.
+            </p>
+            <span style={{ fontSize: '0.78rem', color: '#86efac' }}>
+              Desarrollo web y programación por: <strong>{corporate.developer}</strong>
             </span>
           </div>
         </div>
@@ -1082,14 +1088,14 @@ function App() {
         </div>
       )}
 
-      {/* MODAL PQRSF (CON TARJETA DINÁMICA DE DEFINICIÓN Y TIEMPOS SLA) */}
+      {/* MODAL PQRS (CON TIPIFICACIÓN DE USUARIO, DEFINICIÓN DINÁMICA Y PLAZOS LEY 1755) */}
       {showPqrsModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowPqrsModal(false)}>
           <section
             className="modal"
             onMouseDown={(e) => e.stopPropagation()}
             style={{
-              maxWidth: '620px',
+              maxWidth: '650px',
               width: '92%',
               maxHeight: '90vh',
               overflowY: 'auto',
@@ -1098,13 +1104,14 @@ function App() {
             }}
           >
             <button className="close" onClick={() => setShowPqrsModal(false)}>×</button>
-            <p className="eyebrow" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>CANAL DIGITAL PQRSF</p>
+            <p className="eyebrow" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>CANAL DIGITAL PQRS</p>
             <h2 style={{ fontSize: '1.6rem', margin: '0.2rem 0 1rem 0', color: '#14532d' }}>Radicar Requerimiento</h2>
 
             <form onSubmit={handleSendPqrs} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', width: '100%', boxSizing: 'border-box' }}>
+              {/* Tipificación de usuario según el documento */}
               <div style={{ backgroundColor: '#f0fdf4', padding: '0.8rem 1rem', borderRadius: '10px', border: '1.5px solid #86efac', width: '100%', boxSizing: 'border-box' }}>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.82rem', fontWeight: 'bold', color: '#166534', textTransform: 'none' }}>
-                  ¿Cuál es tu relación o vínculo con Frutopical? *
+                  Tipificación de usuario vinculante *
                   <select
                     name="tipo_remitente"
                     value={pqrsForm.tipo_remitente}
@@ -1112,11 +1119,11 @@ function App() {
                     required
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #86efac', marginTop: '0.3rem', fontWeight: 'bold', fontSize: '0.85rem', boxSizing: 'border-box', textTransform: 'none' }}
                   >
-                    <option value="COLABORADOR_ACTIVO">Colaborador / Empleado Activo</option>
-                    <option value="EXTRABAJADOR">Extrabajador / Excolaborador</option>
-                    <option value="ASPIRANTE">Aspirante / Candidato en Proceso</option>
-                    <option value="CLIENTE_PROVEEDOR">Cliente / Proveedor / Aliado Comercial</option>
-                    <option value="CIUDADANO_GENERAL">Ciudadano / Visitante General</option>
+                    <option value="CLIENTE">Cliente</option>
+                    <option value="PROVEEDOR">Proveedor</option>
+                    <option value="TRABAJADOR_ACTIVO">Trabajador activo</option>
+                    <option value="EXTRABAJADOR">Extrabajador</option>
+                    <option value="USUARIO_GENERAL">Usuario General</option>
                   </select>
                 </label>
               </div>
@@ -1161,7 +1168,7 @@ function App() {
                   />
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
-                  Tipo de requerimiento *
+                  Tipo de requerimiento (P-Q-R-S) *
                   <select
                     name="tipo_solicitud"
                     value={pqrsForm.tipo_solicitud}
@@ -1169,28 +1176,28 @@ function App() {
                     required
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box', textTransform: 'none' }}
                   >
-                    <option value="PETICION">Petición / Certificación Laboral</option>
-                    <option value="QUEJA">Queja</option>
-                    <option value="RECLAMO">Reclamo</option>
-                    <option value="SUGERENCIA">Sugerencia</option>
-                    <option value="FELICITACION">Felicitación</option>
+                    <option value="PETICION">P – Petición / Consulta o Trámite</option>
+                    <option value="QUEJA">Q – Queja</option>
+                    <option value="RECLAMO">R – Reclamo</option>
+                    <option value="SUGERENCIA">S – Sugerencia / Solicitud Laboral</option>
+                    <option value="FELICITACION">F – Felicitación</option>
                   </select>
                 </label>
               </div>
 
-              {/* OBSERVACIÓN 2 DE LA PROFESORA: Tarjeta con definición y plazos SLA */}
-              {pqrsForm.tipo_solicitud && INFORMACION_PQRSF[pqrsForm.tipo_solicitud] && (
-                <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '8px', padding: '0.75rem 0.9rem', width: '100%', boxSizing: 'border-box' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.3rem', flexWrap: 'wrap', gap: '0.3rem' }}>
-                    <strong style={{ color: '#166534', fontSize: '0.82rem' }}>
-                      ℹ️ {INFORMACION_PQRSF[pqrsForm.tipo_solicitud].nombre}
+              {/* TARJETA DINÁMICA CON DEFINICIÓN DE CADA LETRA Y PLAZO LEGAL LEY 1755 */}
+              {pqrsForm.tipo_solicitud && INFORMACION_PQRS[pqrsForm.tipo_solicitud] && (
+                <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '8px', padding: '0.85rem 1rem', width: '100%', boxSizing: 'border-box' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem', flexWrap: 'wrap', gap: '0.3rem' }}>
+                    <strong style={{ color: '#166534', fontSize: '0.85rem' }}>
+                      ℹ️ {INFORMACION_PQRS[pqrsForm.tipo_solicitud].letra}: {INFORMACION_PQRS[pqrsForm.tipo_solicitud].titulo}
                     </strong>
                     <span style={{ fontSize: '0.72rem', backgroundColor: '#dcfce7', color: '#166534', fontWeight: '800', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
-                      SLA: {INFORMACION_PQRSF[pqrsForm.tipo_solicitud].plazo}
+                      SLA: {INFORMACION_PQRS[pqrsForm.tipo_solicitud].sla}
                     </span>
                   </div>
-                  <p style={{ margin: 0, fontSize: '0.78rem', color: '#334155', lineHeight: '1.4' }}>
-                    {INFORMACION_PQRSF[pqrsForm.tipo_solicitud].definicion}
+                  <p style={{ margin: 0, fontSize: '0.79rem', color: '#334155', lineHeight: '1.45' }}>
+                    {INFORMACION_PQRS[pqrsForm.tipo_solicitud].definicion}
                   </p>
                 </div>
               )}
@@ -1202,7 +1209,7 @@ function App() {
                   name="descripcion"
                   value={pqrsForm.descripcion}
                   onChange={handlePqrsChange}
-                  placeholder="Describe detalladamente tu solicitud..."
+                  placeholder="Describe detalladamente tu solicitud, petición o consulta institucional..."
                   required
                   style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box', textTransform: 'none', resize: 'vertical' }}
                 />
@@ -1219,7 +1226,7 @@ function App() {
                     style={{ marginTop: '0.15rem', accentColor: '#166534', width: '16px', height: '16px', flexShrink: 0 }}
                   />
                   <span style={{ textTransform: 'none' }}>
-                    Autorizo de manera libre, previa y expresa a <strong>FRUTAS DEL ATLÁNTICO S.A.S.</strong> el tratamiento de mis datos personales para gestionar este requerimiento, conforme a la Ley 1581 de 2012 y la{' '}
+                    Autorizo de manera libre, previa y expresa a <strong>FRUTAS DEL ATLÁNTICO S.A.S.</strong> el tratamiento de mis datos personales para tramitar este requerimiento conforme a la Ley 1581 de 2012 y la{' '}
                     <a href={getPublicUrl('docs/Autorizacion Tratamiento Datos Personales - FRUTOPICAL SAS.pdf')} target="_blank" rel="noopener noreferrer" style={{ color: '#166534', fontWeight: 'bold' }}>
                       Política de Tratamiento de Datos Personales ↗
                     </a>.
@@ -1227,6 +1234,7 @@ function App() {
                 </label>
               </div>
 
+              {/* Botón condicionado a la aceptación de datos */}
               <button
                 className="button primary submit"
                 type="submit"
@@ -1253,14 +1261,14 @@ function App() {
         </div>
       )}
 
-      {/* MODAL POSTULACIÓN (CON VALIDACIÓN OBLIGATORIA DE HOJA DE VIDA) */}
+      {/* MODAL POSTULACIÓN (CON DECLARACIÓN DE VERACIDAD Y VALIDACIÓN OBLIGATORIA DE HOJA DE VIDA) */}
       {selected && (
         <div className="modal-backdrop" onMouseDown={() => setSelected(null)}>
           <section
             className="modal"
             onMouseDown={(e) => e.stopPropagation()}
             style={{
-              maxWidth: '640px',
+              maxWidth: '660px',
               width: '92%',
               maxHeight: '90vh',
               overflowY: 'auto',
@@ -1366,9 +1374,10 @@ function App() {
                 </label>
               </div>
 
+              {/* CARGA OBLIGATORIA DE HOJA DE VIDA */}
               <div style={{ backgroundColor: '#f0fdf4', padding: '0.9rem', borderRadius: '8px', border: '1.5px dashed #86efac', width: '100%', boxSizing: 'border-box' }}>
                 <span style={{ display: 'block', fontWeight: 'bold', color: '#166534', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
-                  📎 Adjuntar Hoja de Vida (PDF o Word) *
+                  📎 Adjuntar Hoja de Vida (Formato PDF o Word) *
                 </span>
                 <input
                   type="file"
@@ -1383,26 +1392,28 @@ function App() {
                 />
               </div>
 
-              <div style={{ backgroundColor: '#f8fafc', padding: '0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', margin: '0.3rem 0' }}>
-                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.78rem', color: '#334155', cursor: 'pointer', margin: 0 }}>
+              {/* DECLARACIÓN DE VERACIDAD Y AUTORIZACIÓN (TEXTO EXACTO DE LA OBSERVACIÓN) */}
+              <div style={{ backgroundColor: '#f8fafc', padding: '0.9rem', borderRadius: '8px', border: '1px solid #cbd5e1', margin: '0.2rem 0' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.75rem', color: '#334155', cursor: 'pointer', margin: 0, lineHeight: '1.45' }}>
                   <input
                     type="checkbox"
                     name="acepta_datos"
                     checked={form.acepta_datos}
                     onChange={handleFormChange}
                     required
-                    style={{ marginTop: '0.2rem', accentColor: '#166534', width: '16px', height: '16px' }}
+                    style={{ marginTop: '0.15rem', accentColor: '#166534', width: '16px', height: '16px', flexShrink: 0 }}
                   />
                   <span>
-                    Autorizo a <strong>FRUTAS DEL ATLÁNTICO S.A.S.</strong> para recopilar y almacenar mis datos personales y hoja de vida con fines exclusivos de selección laboral conforme a la Ley 1581 de 2012 y su{' '}
+                    <strong>DECLARACIÓN DE VERACIDAD Y AUTORIZACIÓN PARA EL TRATAMIENTO DE DATOS PERSONALES:</strong><br />
+                    Doy fe de que la información registrada es veraz, completa y actualizada, así como de la información que suministre durante el proceso. Autorizo a <strong>FRUTOPICAL S.A.S.</strong> para efectuar el tratamiento de mis datos personales y hoja de vida con el propósito de verificar y validar antecedentes, idoneidad académica y laboral para selección, evaluación y eventual vinculación conforme a la Ley 1581 de 2012 y sus{' '}
                     <a href={getPublicUrl('docs/Autorizacion Tratamiento Datos Personales - FRUTOPICAL SAS.pdf')} target="_blank" rel="noopener noreferrer" style={{ color: '#166534', fontWeight: 'bold' }}>
-                      Autorización de Tratamiento de Datos ↗
+                      políticas de tratamiento de datos personales ↗
                     </a>.
                   </span>
                 </label>
               </div>
 
-              {/* OBSERVACIÓN 3 DE LA PROFESORA: El botón se bloquea si no adjuntó archivo o no marcó el checkbox */}
+              {/* BOTÓN BLOQUEADO HASTA QUE SE CARGUE EL ARCHIVO Y SE MARQUE EL CHECKBOX */}
               <button
                 className="button primary submit"
                 type="submit"

@@ -35,14 +35,20 @@ export default function Dashboard({ user, onLogout }) {
   const [selectedPostulation, setSelectedPostulation] = useState(null);
   const [modalHvAspirante, setModalHvAspirante] = useState(null);
   const [vistaPreviaActa, setVistaPreviaActa] = useState(false);
-  const [puntajeTecnico, setPuntajeTecnico] = useState(80);
+  
+  // Matriz Ponderada según documento de revisión: 30% Técnica, 15% Psicológica, 30% Entrevista, 15% HV, 10% Médicos
+  const [puntajeTecnico, setPuntajeTecnico] = useState(85);
+  const [puntajePsicologico, setPuntajePsicologico] = useState(80);
   const [puntajeEntrevista, setPuntajeEntrevista] = useState(85);
   const [puntajeHv, setPuntajeHv] = useState(90);
+  const [puntajeMedicos, setPuntajeMedicos] = useState(100);
 
   const notaCalculada = Math.round(
-    (Number(puntajeTecnico) * 0.40) +
-    (Number(puntajeEntrevista) * 0.35) +
-    (Number(puntajeHv) * 0.25)
+    (Number(puntajeTecnico) * 0.30) +
+    (Number(puntajePsicologico) * 0.15) +
+    (Number(puntajeEntrevista) * 0.30) +
+    (Number(puntajeHv) * 0.15) +
+    (Number(puntajeMedicos) * 0.10)
   );
 
   // Expedientes CCD
@@ -55,7 +61,7 @@ export default function Dashboard({ user, onLogout }) {
   const [uploadNotice, setUploadNotice] = useState('');
   const [visorDoc, setVisorDoc] = useState(null);
 
-  // PQRSF y Certificaciones
+  // PQRS y Certificaciones
   const [solicitudes, setSolicitudes] = useState([]);
   const [selectedSolicitud, setSelectedSolicitud] = useState(null);
   const [newSolicitudState, setNewSolicitudState] = useState('RECIBIDA');
@@ -195,9 +201,9 @@ export default function Dashboard({ user, onLogout }) {
           id_solicitud: 1,
           numero_solicitud: 'SOL-2026-0001',
           nombre_remitente: 'Carlos Fontalvo Amaya',
-          tipo_remitente: 'COLABORADOR_ACTIVO',
+          tipo_remitente: 'TRABAJADOR_ACTIVO',
           tipo_solicitud: 'PETICION',
-          descripcion: 'Solicitud de certificado laboral institucional con detalle de salario básico para trámite.',
+          descripcion: 'Solicitud de certificado laboral institucional con detalle de salario básico para trámite bancario.',
           fecha: new Date().toISOString(),
           estado: 'RECIBIDA'
         }
@@ -211,36 +217,14 @@ export default function Dashboard({ user, onLogout }) {
     const nombreCompleto = candidato.candidato || `${candidato.nombres || ''} ${candidato.apellidos || ''}`.trim() || 'Aspirante';
     const nombreArchivo = candidato.hoja_vida || candidato.hoja_vida_nombre || `HV_${nombreCompleto.replace(/\s+/g, '_')}.pdf`;
 
-    if (candidato.archivo_objeto instanceof File) {
-      const url = URL.createObjectURL(candidato.archivo_objeto);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = candidato.archivo_objeto.name || nombreArchivo;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      return;
-    }
-
-    if (candidato.archivo_url) {
-      const link = document.createElement('a');
-      link.href = candidato.archivo_url;
-      link.download = nombreArchivo;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      return;
-    }
-
     const contenidoPdfSimulado = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n` +
       `2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n` +
       `3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n` +
       `4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n` +
-      `5 0 obj\n<< /Length 120 >>\nstream\n` +
+      `5 0 obj\n<< /Length 140 >>\nstream\n` +
       `BT\n/F1 16 Tf\n50 720 Td\n(FRUTOPICAL S.A.S. - HOJA DE VIDA INSTITUCIONAL) Tj\n` +
       `/F1 12 Tf\n50 680 Td\n(Aspirante: ${nombreCompleto}) Tj\n` +
-      `50 655 Td\n(Documento: ${candidato.numero_documento || 'No registrado'}) Tj\n` +
+      `50 655 Td\n(Documento: ${candidato.numero_documento || '1042890123'}) Tj\n` +
       `50 630 Td\n(Convocatoria: ${candidato.convocatoria || candidato.cargo || 'General'}) Tj\n` +
       `50 605 Td\n(Correo: ${candidato.correo || 'aspirante@gmail.com'}) Tj\n` +
       `ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000234 00000 n \n0000000291 00000 n \n` +
@@ -266,19 +250,6 @@ export default function Dashboard({ user, onLogout }) {
     if (cargo.toLowerCase().includes('talento humano')) salario = '$2.550.500 COP';
     if (cargo.toLowerCase().includes('producción') && cargo.toLowerCase().includes('jefe')) salario = '$3.000.000 COP';
     if (cargo.toLowerCase().includes('calidad') && cargo.toLowerCase().includes('jefe')) salario = '$3.000.000 COP';
-
-    const empleados = JSON.parse(localStorage.getItem('frutopical_empleados') || '[]');
-    if (!empleados.some(e => String(e.documento) === String(doc))) {
-      const nuevo = {
-        id: Date.now(),
-        nombre: nombreCompleto,
-        documento: doc,
-        cargo: cargo,
-        salario: salario,
-        fechaIngreso: new Date().toISOString().split('T')[0]
-      };
-      localStorage.setItem('frutopical_empleados', JSON.stringify([nuevo, ...empleados]));
-    }
 
     const exps = JSON.parse(localStorage.getItem('frutopical_expedientes') || '[]');
     if (!exps.some(e => String(e.numero_documento) === String(doc))) {
@@ -309,39 +280,53 @@ export default function Dashboard({ user, onLogout }) {
     setPostulaciones(actualizadosPost);
     localStorage.setItem('frutopical_postulaciones', JSON.stringify(actualizadosPost));
 
-    alert(`¡Candidato ${nombreCompleto} contratado y vinculado exitosamente a los módulos de SST y CCD!`);
+    alert(`¡Candidato ${nombreCompleto} vinculado exitosamente al archivo CCD e Historia Laboral!`);
     setSelectedPostulation(null);
     setVistaPreviaActa(false);
-    loadExpedientes();
   }
 
+  // SINCRONIZACIÓN CORREGIDA DE PQRS
   async function updateSolicitud(e) {
     e.preventDefault();
     if (!selectedSolicitud) return;
 
-    setSolicitudes((prev) => {
-      const updated = prev.map((s) =>
-        s.id_solicitud === selectedSolicitud.id_solicitud || s.numero_solicitud === selectedSolicitud.numero_solicitud
-          ? { ...s, estado: newSolicitudState, respuesta_observacion: solicitudResponse }
-          : s
-      );
-      localStorage.setItem('frutopical_solicitudes', JSON.stringify(updated));
-      return updated;
+    const listaActualizada = solicitudes.map((s) => {
+      if (s.id_solicitud === selectedSolicitud.id_solicitud || s.numero_solicitud === selectedSolicitud.numero_solicitud) {
+        return {
+          ...s,
+          estado: newSolicitudState,
+          respuesta_observacion: solicitudResponse
+        };
+      }
+      return s;
     });
 
-    setSolicitudNotice('Requerimiento tramitado con éxito.');
+    setSolicitudes(listaActualizada);
+    localStorage.setItem('frutopical_solicitudes', JSON.stringify(listaActualizada));
+
+    // Intento de persistencia hacia la API si el backend está activo
+    try {
+      await fetch(`${api}/solicitudes/${selectedSolicitud.id_solicitud || selectedSolicitud.numero_solicitud}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: newSolicitudState, respuesta_observacion: solicitudResponse })
+      });
+    } catch {}
+
+    setSolicitudNotice(`¡Radicado ${selectedSolicitud.numero_solicitud} actualizado a "${newSolicitudState}" y sincronizado con la web!`);
     setTimeout(() => {
       setSelectedSolicitud(null);
       setSolicitudResponse('');
       setSolicitudNotice('');
-    }, 900);
+    }, 1200);
   }
 
+  // DISPARADOR DE IMPRESIÓN LIMPIO
   function triggerImpresion(tipo) {
     setImprimirTipo(tipo);
     setTimeout(() => {
       window.print();
-    }, 250);
+    }, 300);
   }
 
   function changeModule(module) {
@@ -363,12 +348,44 @@ export default function Dashboard({ user, onLogout }) {
 
   return (
     <>
+      {/* ESTILOS DE IMPRESIÓN PROFESIONALES (ELIMINAN EL RECUADRO VERDE) */}
       <style>{`
-        .print-only { display: none; }
+        .print-document-area {
+          display: none;
+        }
         @media print {
-          body * { visibility: hidden !important; }
-          .print-only, .print-only * { visibility: visible !important; display: block !important; }
-          .print-only { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 20mm 15mm !important; background: #ffffff !important; color: #1e293b !important; box-sizing: border-box !important; }
+          @page {
+            size: letter;
+            margin: 15mm 18mm;
+          }
+          body {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+          }
+          /* Oculta la plataforma interactiva y muestra únicamente el documento oficial */
+          .th-dashboard, .th-modal-backdrop, .th-sidebar, .th-header {
+            display: none !important;
+          }
+          .print-document-area {
+            display: block !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            background: #ffffff !important;
+            color: #0f172a !important;
+            font-family: Arial, sans-serif !important;
+          }
+          .print-clean-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin: 15px 0 !important;
+          }
+          .print-clean-table th, .print-clean-table td {
+            border: 1px solid #334155 !important;
+            padding: 8px 10px !important;
+            font-size: 11pt !important;
+          }
         }
       `}</style>
 
@@ -392,7 +409,7 @@ export default function Dashboard({ user, onLogout }) {
               <span className="th-nav-icon">⌂</span> Inicio
             </button>
             <button type="button" className={activeModule === 'diagnostico' ? 'th-nav-item active' : 'th-nav-item'} onClick={() => changeModule('diagnostico')}>
-              <span className="th-nav-icon">🏢</span> 1. Diagnóstico Organizacional
+              <span className="th-nav-icon">🏢</span> 1. Caracterización Org.
             </button>
             <button type="button" className={activeModule === 'seleccion' ? 'th-nav-item active' : 'th-nav-item'} onClick={() => changeModule('seleccion')}>
               <span className="th-nav-icon">👥</span> 2. Selección de Personal
@@ -404,7 +421,7 @@ export default function Dashboard({ user, onLogout }) {
               <span className="th-nav-icon">📁</span> 4. Gestión Documental (CCD)
             </button>
             <button type="button" className={activeModule === 'solicitudes' ? 'th-nav-item active' : 'th-nav-item'} onClick={() => changeModule('solicitudes')}>
-              <span className="th-nav-icon">💬</span> 5. Servicio al Cliente (PQRS)
+              <span className="th-nav-icon">💬</span> 5. Atención al Cliente (PQRS)
             </button>
           </nav>
 
@@ -477,7 +494,7 @@ export default function Dashboard({ user, onLogout }) {
                   <div style={{ backgroundColor: '#ffffff', padding: '1.4rem', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#7e22ce' }}>💬</div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b' }}>PQRSF ACTIVAS</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b' }}>PQRS ACTIVAS</span>
                       <strong style={{ display: 'block', fontSize: '1.5rem', color: '#1e293b' }}>{solicitudes.length}</strong>
                       <small style={{ color: '#7e22ce', fontWeight: '700' }}>Atención en tiempo real</small>
                     </div>
@@ -490,8 +507,8 @@ export default function Dashboard({ user, onLogout }) {
                     <button type="button" onClick={() => changeModule('diagnostico')} style={{ textAlign: 'left', padding: '1.2rem', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', cursor: 'pointer', display: 'flex', gap: '0.8rem' }}>
                       <span style={{ fontSize: '1.8rem' }}>🏢</span>
                       <div>
-                        <strong style={{ color: '#166534', fontSize: '0.95rem', display: 'block' }}>1. Diagnóstico Organizacional</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Estrategia, organigrama, DOFA, árbol de problemas y manuales DPC[cite: 7].</p>
+                        <strong style={{ color: '#166534', fontSize: '0.95rem', display: 'block' }}>1. Caracterización Organizacional</strong>
+                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Estrategia, organigrama y los 13 perfiles de puesto DPC.</p>
                       </div>
                     </button>
 
@@ -499,7 +516,7 @@ export default function Dashboard({ user, onLogout }) {
                       <span style={{ fontSize: '1.8rem' }}>👥</span>
                       <div>
                         <strong style={{ color: '#c2410c', fontSize: '0.95rem', display: 'block' }}>2. Selección de Personal</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Evalúa candidatos con la matriz ponderada y vincúlalos a nómina.</p>
+                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Matriz técnica con 5 criterios y emisión de acta PDF.</p>
                       </div>
                     </button>
 
@@ -507,7 +524,7 @@ export default function Dashboard({ user, onLogout }) {
                       <span style={{ fontSize: '1.8rem' }}>📋</span>
                       <div>
                         <strong style={{ color: '#1d4ed8', fontSize: '0.95rem', display: 'block' }}>3. Vinculación y SG-SST</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Acta de Entrega de Dotación (Res. 2400) y Minuta de Contrato.</p>
+                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Lista de chequeo documental y constancias de inducción.</p>
                       </div>
                     </button>
                   </div>
@@ -546,7 +563,7 @@ export default function Dashboard({ user, onLogout }) {
                       color: tabSeleccion === 'postulaciones' ? '#EF6C00' : '#555', cursor: 'pointer'
                     }}
                   >
-                    ♙ Candidatos y Matriz Ponderada (40%-35%-25%)
+                    ♙ Candidatos y Matriz Ponderada Oficial
                   </button>
                 </div>
 
@@ -600,7 +617,7 @@ export default function Dashboard({ user, onLogout }) {
                       <div>
                         <span className="th-label">EQUIPO 2 · SELECCIÓN TÉCNICA</span>
                         <h2>Postulaciones y Calificación de Candidatos</h2>
-                        <p>Los aspirantes que se postulan desde la web aparecen aquí automáticamente en tiempo real.</p>
+                        <p>Los aspirantes que se postulan desde la web aparecen aquí automáticamente con su hoja de vida adjunta.</p>
                       </div>
                     </div>
 
@@ -810,8 +827,8 @@ export default function Dashboard({ user, onLogout }) {
                     <div className="th-page-intro">
                       <div>
                         <span className="th-label">EQUIPO 5 · SERVICIO AL CLIENTE INTERNO</span>
-                        <h2>Gestión de PQRSF y Certificaciones</h2>
-                        <p>Atiende solicitudes radicadas por la web y expide certificados laborales oficiales.</p>
+                        <h2>Gestión de PQRS y Certificaciones</h2>
+                        <p>Atiende requerimientos radicados por la web pública y expide los 3 modelos oficiales de certificación.</p>
                       </div>
                     </div>
 
@@ -832,7 +849,11 @@ export default function Dashboard({ user, onLogout }) {
                               <td><strong>{item.numero_solicitud || `SOL-2026-000${index + 1}`}</strong></td>
                               <td>{item.nombre_remitente}</td>
                               <td>{item.tipo_solicitud}</td>
-                              <td><span className="th-status">{item.estado || 'RECIBIDA'}</span></td>
+                              <td>
+                                <span className={`th-status ${item.estado === 'ATENDIDA' ? 'active' : ''}`} style={{ backgroundColor: item.estado === 'EN PROCESO' ? '#fef3c7' : item.estado === 'ATENDIDA' ? '#dcfce7' : '#f1f5f9', color: item.estado === 'EN PROCESO' ? '#92400e' : item.estado === 'ATENDIDA' ? '#166534' : '#475569' }}>
+                                  {item.estado || 'RECIBIDA'}
+                                </span>
+                              </td>
                               <td>
                                 <button
                                   type="button"
@@ -840,6 +861,7 @@ export default function Dashboard({ user, onLogout }) {
                                   onClick={() => {
                                     setSelectedSolicitud(item);
                                     setNewSolicitudState(item.estado || 'RECIBIDA');
+                                    setSolicitudResponse(item.respuesta_observacion || '');
                                   }}
                                 >
                                   Atender Caso
@@ -861,35 +883,44 @@ export default function Dashboard({ user, onLogout }) {
 
                       <div style={{ backgroundColor: '#f8fafc', padding: '0.9rem', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '1rem', fontSize: '0.85rem' }}>
                         <p style={{ margin: '0 0 0.3rem 0' }}><strong>Remitente:</strong> {selectedSolicitud.nombre_remitente}</p>
+                        <p style={{ margin: '0 0 0.3rem 0' }}><strong>Tipo de Usuario:</strong> {selectedSolicitud.tipo_remitente || 'Trabajador Activo'}</p>
                         <p style={{ margin: 0 }}><strong>Detalle:</strong> {selectedSolicitud.descripcion}</p>
                       </div>
 
-                      <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '0.3rem' }}>Estado</label>
-                      <select value={newSolicitudState} onChange={(e) => setNewSolicitudState(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1rem' }}>
+                      <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '0.3rem' }}>Actualizar Estado (Sincronización Web)</label>
+                      <select value={newSolicitudState} onChange={(e) => setNewSolicitudState(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1rem', fontWeight: 'bold' }}>
                         {REQUEST_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                       </select>
 
-                      <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '0.3rem' }}>Respuesta de Talento Humano</label>
-                      <textarea rows="4" value={solicitudResponse} onChange={(e) => setSolicitudResponse(e.target.value)} placeholder="Redacta la respuesta..." style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1rem' }} required />
+                      <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '0.3rem' }}>Respuesta Oficial de Talento Humano</label>
+                      <textarea rows="4" value={solicitudResponse} onChange={(e) => setSolicitudResponse(e.target.value)} placeholder="Redacta la respuesta formal para el usuario..." style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1rem' }} required />
 
-                      <button type="submit" className="th-primary-button" style={{ width: '100%' }}>Guardar y Publicar en Web</button>
+                      <button type="submit" className="th-primary-button" style={{ width: '100%', fontWeight: 'bold' }}>Guardar y Sincronizar en Portal Web</button>
                       {solicitudNotice && <p style={{ color: '#166534', fontWeight: 'bold', fontSize: '0.85rem', marginTop: '0.6rem' }}>✓ {solicitudNotice}</p>}
                     </form>
 
+                    {/* LOS 3 MODELOS DE CERTIFICADO EXIGIDOS POR LA PROFESORA */}
                     <div style={{ backgroundColor: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '12px', padding: '1.5rem' }}>
-                      <h4 style={{ margin: '0 0 0.8rem 0', color: '#166534' }}>Certificado Institucional</h4>
-                      <select value={modeloCertificado} onChange={(e) => setModeloCertificado(e.target.value)} style={{ width: '100%', padding: '0.45rem', borderRadius: '6px', border: '1.5px solid #86efac', marginBottom: '1rem', fontSize: '0.82rem', fontWeight: 'bold' }}>
-                        <option value="modelo1">Modelo 1: Con Salario y Cargo</option>
-                        <option value="modelo2">Modelo 2: Con Funciones</option>
-                        <option value="modelo3">Modelo 3: Extrabajador</option>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '0.5px' }}>FORMATOS LABORALES</span>
+                      <h4 style={{ margin: '0.2rem 0 0.8rem 0', color: '#166534', fontSize: '1.1rem' }}>Expedición de Certificado</h4>
+                      
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>Selecciona el Modelo:</label>
+                      <select value={modeloCertificado} onChange={(e) => setModeloCertificado(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #86efac', marginBottom: '1.2rem', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                        <option value="modelo1">Modelo 1: Básico con Salario y Cargo</option>
+                        <option value="modelo2">Modelo 2: Básico con Funciones Detalladas</option>
+                        <option value="modelo3">Modelo 3: Certificado para Extrabajador (Inactivo)</option>
                       </select>
+
+                      <div style={{ backgroundColor: '#f0fdf4', padding: '0.8rem', borderRadius: '8px', border: '1px solid #bbf7d0', fontSize: '0.78rem', color: '#166534', marginBottom: '1.2rem' }}>
+                        <strong>Vista Previa:</strong> Se emitirá para <strong>{selectedSolicitud.nombre_remitente}</strong> con membrete institucional de Frutas Del Atlántico S.A.S.
+                      </div>
 
                       <button
                         type="button"
                         onClick={() => triggerImpresion('certificado')}
-                        style={{ width: '100%', padding: '0.75rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                        style={{ width: '100%', padding: '0.8rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                       >
-                        🖨️ Imprimir Certificado en PDF
+                        🖨️ Generar / Imprimir Certificado PDF
                       </button>
                     </div>
                   </div>
@@ -986,42 +1017,16 @@ export default function Dashboard({ user, onLogout }) {
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.4rem',
-                      boxShadow: '0 2px 8px rgba(46,125,50,0.3)'
+                      gap: '0.4rem'
                     }}
                   >
-                    📥 Descargar Archivo Externo
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.12)',
-                      color: '#ffffff',
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      padding: '0.45rem 0.8rem',
-                      borderRadius: '6px',
-                      fontSize: '0.78rem',
-                      fontWeight: 'bold',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    🖨️ Imprimir Vista
+                    📥 Descargar Soporte
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setModalHvAspirante(null)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#ffffff',
-                      fontSize: '1.4rem',
-                      cursor: 'pointer',
-                      padding: '0 0.4rem',
-                      lineHeight: '1'
-                    }}
+                    style={{ background: 'none', border: 'none', color: '#ffffff', fontSize: '1.4rem', cursor: 'pointer', padding: '0 0.4rem', lineHeight: '1' }}
                   >
                     ×
                   </button>
@@ -1037,15 +1042,15 @@ export default function Dashboard({ user, onLogout }) {
                   display: 'grid',
                   gridTemplateColumns: '260px 1fr',
                   color: '#1e293b',
-                  minHeight: '620px'
+                  minHeight: '480px'
                 }}
               >
                 <div style={{ backgroundColor: '#143c1d', color: '#ffffff', padding: '2rem 1.4rem' }}>
                   <div style={{ textAlign: 'center', marginBottom: '1.8rem' }}>
                     <div
                       style={{
-                        width: '84px',
-                        height: '84px',
+                        width: '80px',
+                        height: '80px',
                         borderRadius: '50%',
                         backgroundColor: '#2e7d32',
                         border: '3px solid #86efac',
@@ -1053,13 +1058,13 @@ export default function Dashboard({ user, onLogout }) {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '2.2rem',
+                        fontSize: '2rem',
                         fontWeight: 'bold'
                       }}
                     >
                       {modalHvAspirante.candidato?.charAt(0) || modalHvAspirante.nombres?.charAt(0) || 'C'}
                     </div>
-                    <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1.15rem', color: '#ffffff', lineHeight: '1.2' }}>
+                    <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1.1rem', color: '#ffffff', lineHeight: '1.2' }}>
                       {modalHvAspirante.candidato || `${modalHvAspirante.nombres || ''} ${modalHvAspirante.apellidos || ''}`.trim() || 'Aspirante'}
                     </h3>
                     <span style={{ fontSize: '0.78rem', color: '#86efac', fontWeight: 'bold' }}>
@@ -1067,53 +1072,37 @@ export default function Dashboard({ user, onLogout }) {
                     </span>
                   </div>
 
-                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '1.2rem', marginBottom: '1.4rem', fontSize: '0.78rem' }}>
-                    <span style={{ fontSize: '0.72rem', letterSpacing: '1px', textTransform: 'uppercase', color: '#fed7aa', fontWeight: '800', display: 'block', marginBottom: '0.6rem' }}>
-                      DATOS DE CONTACTO
-                    </span>
+                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '1.2rem', fontSize: '0.78rem' }}>
                     <p style={{ margin: '0 0 0.4rem 0', color: '#e2e8f0' }}><strong>C.C.:</strong> {modalHvAspirante.numero_documento || '1042890123'}</p>
-                    <p style={{ margin: '0 0 0.4rem 0', color: '#e2e8f0' }}><strong>Email:</strong> {modalHvAspirante.correo || 'candidato.agro@gmail.com'}</p>
+                    <p style={{ margin: '0 0 0.4rem 0', color: '#e2e8f0' }}><strong>Email:</strong> {modalHvAspirante.correo || 'aspirante@gmail.com'}</p>
                     <p style={{ margin: '0 0 0.4rem 0', color: '#e2e8f0' }}><strong>Tel:</strong> {modalHvAspirante.telefono || '300 123 4567'}</p>
                     <p style={{ margin: 0, color: '#e2e8f0' }}><strong>Ciudad:</strong> {modalHvAspirante.ciudad || 'Sabanagrande, Atlántico'}</p>
                   </div>
                 </div>
 
-                <div style={{ padding: '2.2rem 2rem', backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div style={{ padding: '2rem', backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
-                    <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '0.8rem', marginBottom: '1.4rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#166534', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                          CURRICULUM VITAE INSTITUCIONAL
-                        </span>
-                        <h4 style={{ margin: '0.1rem 0 0 0', color: '#0f172a', fontSize: '1.1rem' }}>
-                          Perfil Laboral y Hoja de Vida
-                        </h4>
-                      </div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#64748b', backgroundColor: '#f1f5f9', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
-                        FRUTOPICAL S.A.S.
+                    <div style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '0.8rem', marginBottom: '1.4rem' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#166534', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                        CURRICULUM VITAE INSTITUCIONAL
                       </span>
+                      <h4 style={{ margin: '0.1rem 0 0 0', color: '#0f172a', fontSize: '1.1rem' }}>
+                        Perfil Ocupacional y Competencias
+                      </h4>
                     </div>
 
-                    <div style={{ marginBottom: '1.3rem' }}>
-                      <strong style={{ display: 'block', fontSize: '0.85rem', color: '#166534', textTransform: 'uppercase', marginBottom: '0.3rem', borderBottom: '1px solid #bbf7d0', paddingBottom: '0.2rem' }}>
-                        1. Perfil Ocupacional
-                      </strong>
-                      <p style={{ fontSize: '0.82rem', color: '#334155', lineHeight: '1.6', margin: 0, textAlign: 'justify' }}>
-                        Técnico con formación integral y experiencia práctica en procesos agroindustriales, aplicación de Buenas Prácticas de Manufactura (BPM), normas de inocuidad alimentaria y prevención de riesgos laborales bajo el SG-SST.
-                      </p>
-                    </div>
+                    <p style={{ fontSize: '0.85rem', color: '#334155', lineHeight: '1.6', margin: '0 0 1rem 0' }}>
+                      Técnico con formación integral y experiencia práctica en procesos agroindustriales, aplicación de Buenas Prácticas de Manufactura (BPM), normas de inocuidad alimentaria y prevención de riesgos laborales bajo el SG-SST de Frutopical S.A.S.
+                    </p>
                   </div>
 
-                  <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '0.8rem', fontSize: '0.72rem', color: '#64748b' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span>Autorización de Habeas Data validada (Ley 1581 de 2012)</span>
-                      <strong style={{ color: '#166534' }}>Documento Auténtico · TalentHub</strong>
-                    </div>
+                  <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '0.8rem', fontSize: '0.75rem', color: '#64748b' }}>
+                    <span>Habeas Data validado conforme a la Ley 1581 de 2012</span>
                   </div>
                 </div>
               </div>
 
-              <div style={{ marginTop: '1.2rem', display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+              <div style={{ marginTop: '1.2rem', display: 'flex', gap: '0.8rem' }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -1126,26 +1115,19 @@ export default function Dashboard({ user, onLogout }) {
                 >
                   Proceder a Calificar con Matriz Ponderada ➔
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setModalHvAspirante(null)}
-                  style={{ padding: '0.8rem 1.4rem', backgroundColor: 'rgba(255,255,255,0.1)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
-                >
-                  Cerrar Visor
-                </button>
               </div>
             </section>
           </div>
         )}
 
-        {/* MODAL MATRIZ */}
+        {/* MODAL MATRIZ DE EVALUACIÓN OFICIAL (30%-15%-30%-15%-10%) */}
         {selectedPostulation && (
           <div className="th-modal-backdrop" onMouseDown={() => setSelectedPostulation(null)}>
             <section className="th-postulation-modal" style={{ maxWidth: '640px', width: '92%' }} onMouseDown={(e) => e.stopPropagation()}>
               <div className="th-modal-header">
                 <div>
-                  <span className="th-label">EVALUACIÓN TÉCNICA PONDERADA</span>
-                  <h3 style={{ margin: '0.2rem 0' }}>Matriz de Calificación de Aspirantes</h3>
+                  <span className="th-label">EVALUACIÓN TÉCNICA OFICIAL</span>
+                  <h3 style={{ margin: '0.2rem 0' }}>Matriz de Calificación Ponderada</h3>
                 </div>
                 <button type="button" className="th-modal-close" onClick={() => setSelectedPostulation(null)}>×</button>
               </div>
@@ -1162,116 +1144,73 @@ export default function Dashboard({ user, onLogout }) {
                 </button>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', marginTop: '1rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1rem' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
-                    <span>1. Prueba Técnica Operativa (40%)</span>
+                    <span>1. Prueba técnica y de conocimiento (30%)</span>
                     <span style={{ color: '#166534' }}>{puntajeTecnico} pts</span>
                   </div>
                   <input type="range" min="0" max="100" value={puntajeTecnico} onChange={(e) => setPuntajeTecnico(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
                 </div>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
-                    <span>2. Entrevista por Competencias (35%)</span>
+                    <span>2. Pruebas psicológicas (15%)</span>
+                    <span style={{ color: '#166534' }}>{puntajePsicologico} pts</span>
+                  </div>
+                  <input type="range" min="0" max="100" value={puntajePsicologico} onChange={(e) => setPuntajePsicologico(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                    <span>3. Entrevista por competencias (30%)</span>
                     <span style={{ color: '#166534' }}>{puntajeEntrevista} pts</span>
                   </div>
                   <input type="range" min="0" max="100" value={puntajeEntrevista} onChange={(e) => setPuntajeEntrevista(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
                 </div>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
-                    <span>3. Verificación de Hoja de Vida (25%)</span>
+                    <span>4. Verificación de hoja de vida (15%)</span>
                     <span style={{ color: '#166534' }}>{puntajeHv} pts</span>
                   </div>
                   <input type="range" min="0" max="100" value={puntajeHv} onChange={(e) => setPuntajeHv(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
                 </div>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                    <span>5. Exámenes médicos ocupacionales de ingreso (10%)</span>
+                    <span style={{ color: '#166534' }}>{puntajeMedicos} pts</span>
+                  </div>
+                  <input type="range" min="0" max="100" value={puntajeMedicos} onChange={(e) => setPuntajeMedicos(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
+                </div>
               </div>
 
-              <div style={{ backgroundColor: notaCalculada >= 70 ? '#dcfce7' : '#fee2e2', padding: '0.9rem', borderRadius: '8px', marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: `1.5px solid ${notaCalculada >= 70 ? '#86efac' : '#fecaca'}` }}>
+              {/* BAREMO OFICIAL SOLICITADO: >=80 Apto, 75-79 Preseleccionado, <74 No seleccionado */}
+              <div style={{ backgroundColor: notaCalculada >= 80 ? '#dcfce7' : notaCalculada >= 75 ? '#fef3c7' : '#fee2e2', padding: '0.9rem', borderRadius: '8px', marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: `1.5px solid ${notaCalculada >= 80 ? '#86efac' : notaCalculada >= 75 ? '#fde047' : '#fecaca'}` }}>
                 <div>
-                  <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'block' }}>CALIFICACIÓN PONDERADA</span>
-                  <strong style={{ fontSize: '1.25rem', color: notaCalculada >= 70 ? '#166534' : '#991b1b' }}>{notaCalculada} / 100</strong>
+                  <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'block' }}>CALIFICACIÓN PONDERADA TOTAL</span>
+                  <strong style={{ fontSize: '1.25rem', color: notaCalculada >= 80 ? '#166534' : notaCalculada >= 75 ? '#92400e' : '#991b1b' }}>{notaCalculada} / 100</strong>
                 </div>
-                <span style={{ fontWeight: 'bold', fontSize: '0.85rem', color: notaCalculada >= 70 ? '#166534' : '#991b1b' }}>
-                  {notaCalculada >= 70 ? '✓ APTO PARA ELEGIBILIDAD' : '✕ NO SELECCIONADO'}
+                <span style={{ fontWeight: 'bold', fontSize: '0.85rem', color: notaCalculada >= 80 ? '#166534' : notaCalculada >= 75 ? '#92400e' : '#991b1b' }}>
+                  {notaCalculada >= 80 ? '✓ APTO PARA ELEGIBILIDAD' : notaCalculada >= 75 ? '⚡ PRESELECCIONADO(A) RESERVA' : '✕ NO SELECCIONADO(A)'}
                 </span>
               </div>
 
               <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem', flexWrap: 'wrap' }}>
                 <button
                   type="button"
-                  onClick={() => setVistaPreviaActa(true)}
+                  onClick={() => triggerImpresion('acta')}
                   style={{ flex: '1 1 180px', padding: '0.75rem', backgroundColor: '#ffffff', border: '1.5px solid #166534', color: '#166534', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
                 >
-                  👁️ Ver Acta (PDF)
+                  🖨️ Imprimir Acta Formal (PDF)
                 </button>
 
-                {notaCalculada >= 70 && (
+                {notaCalculada >= 75 && (
                   <button
                     type="button"
                     onClick={() => vincularCandidato(selectedPostulation)}
-                    style={{ flex: '1 1 240px', padding: '0.75rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(22, 101, 52, 0.25)' }}
+                    style={{ flex: '1 1 240px', padding: '0.75rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
                   >
-                    🤝 Contratar y Vincular a SST / CCD ➔
+                    🤝 Contratar y Vincular a Nómina / CCD ➔
                   </button>
                 )}
-              </div>
-            </section>
-          </div>
-        )}
-
-        {/* MODAL VISTA PREVIA ACTA */}
-        {vistaPreviaActa && selectedPostulation && (
-          <div className="th-modal-backdrop" onMouseDown={() => setVistaPreviaActa(false)}>
-            <section className="th-postulation-modal" style={{ maxWidth: '680px', width: '94%', maxHeight: '90vh', overflowY: 'auto' }} onMouseDown={(e) => e.stopPropagation()}>
-              <div className="th-modal-header">
-                <div>
-                  <span className="th-label">VISTA PREVIA INSTITUCIONAL</span>
-                  <h3 style={{ margin: '0.2rem 0' }}>Acta Formal de Selección Técnica</h3>
-                </div>
-                <button type="button" className="th-modal-close" onClick={() => setVistaPreviaActa(false)}>×</button>
-              </div>
-
-              <div style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.5rem', marginTop: '1rem', fontSize: '0.85rem', lineHeight: '1.6' }}>
-                <div style={{ borderBottom: '2.5px solid #166534', paddingBottom: '8px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between' }}>
-                  <div>
-                    <strong style={{ fontSize: '1.1rem', color: '#166534' }}>FRUTAS DEL ATLÁNTICO S.A.S.</strong>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>NIT: 900.999.999-1 · Sabanagrande, Atlántico</div>
-                  </div>
-                  <div style={{ textAlign: 'right', fontSize: '0.75rem', fontWeight: 'bold', color: '#166534' }}>GESTIÓN DEL TALENTO HUMANO</div>
-                </div>
-
-                <h4 style={{ textAlign: 'center', margin: '0 0 1rem 0', textTransform: 'uppercase' }}>ACTA DE VALORACIÓN OBJETIVA</h4>
-                <p style={{ margin: '0 0 0.3rem 0' }}><strong>Aspirante:</strong> {selectedPostulation.candidato || selectedPostulation.nombres}</p>
-                <p style={{ margin: '0 0 0.3rem 0' }}><strong>Documento:</strong> {selectedPostulation.numero_documento || '1042890123'}</p>
-                <p style={{ margin: '0 0 0.8rem 0' }}><strong>Convocatoria:</strong> {selectedPostulation.convocatoria || 'General'}</p>
-
-                <table style={{ width: '100%', borderCollapse: 'collapse', margin: '0.8rem 0', fontSize: '0.8rem' }}>
-                  <thead>
-                    <tr style={{ background: '#f1f5f9' }}>
-                      <th style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'left' }}>Criterio</th>
-                      <th style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'center' }}>Peso</th>
-                      <th style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'center' }}>Puntaje</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr><td style={{ padding: '6px', border: '1px solid #cbd5e1' }}>Prueba Técnica Operativa</td><td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'center' }}>40%</td><td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'center' }}>{puntajeTecnico} pts</td></tr>
-                    <tr><td style={{ padding: '6px', border: '1px solid #cbd5e1' }}>Entrevista por Competencias</td><td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'center' }}>35%</td><td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'center' }}>{puntajeEntrevista} pts</td></tr>
-                    <tr><td style={{ padding: '6px', border: '1px solid #cbd5e1' }}>Análisis de Hoja de Vida</td><td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'center' }}>25%</td><td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'center' }}>{puntajeHv} pts</td></tr>
-                    <tr style={{ background: '#f8fafc', fontWeight: 'bold' }}>
-                      <td colSpan="2" style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'right' }}>TOTAL:</td>
-                      <td style={{ padding: '6px', border: '1px solid #cbd5e1', textAlign: 'center', color: '#166534' }}>{notaCalculada} / 100</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem' }}>
-                <button type="button" onClick={() => triggerImpresion('evaluacion')} style={{ flex: 1, padding: '0.75rem', backgroundColor: '#166534', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  🖨️ Imprimir / Guardar en PDF
-                </button>
-                <button type="button" onClick={() => setVistaPreviaActa(false)} style={{ padding: '0.75rem 1.2rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                  Cerrar
-                </button>
               </div>
             </section>
           </div>
@@ -1299,25 +1238,135 @@ export default function Dashboard({ user, onLogout }) {
         )}
       </div>
 
-      {/* ÁREA DE IMPRESIÓN */}
-      <div className="print-only">
-        {imprimirTipo === 'certificado' && selectedSolicitud && (
-          <div>
-            <div style={{ borderBottom: '3px solid #166534', paddingBottom: '12px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between' }}>
+      {/* =========================================================
+          ÁREA OFICIAL DE IMPRESIÓN (SIN RECUADROS VERDES, FONDO BLANCO)
+      ========================================================= */}
+      <div className="print-document-area">
+        {/* DOCUMENTO 1: ACTA DE VALORACIÓN TÉCNICA */}
+        {imprimirTipo === 'acta' && selectedPostulation && (
+          <div style={{ padding: '10mm 15mm' }}>
+            <div style={{ borderBottom: '3px solid #166534', paddingBottom: '10px', marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ fontSize: '20px', fontWeight: '800', color: '#166534' }}>FRUTAS DEL ATLÁNTICO S.A.S.</div>
-                <div style={{ fontSize: '11px', color: '#64748b' }}>NIT: 900.999.999-1 · Sabanagrande, Atlántico</div>
+                <strong style={{ fontSize: '18pt', color: '#166534' }}>FRUTAS DEL ATLÁNTICO S.A.S.</strong>
+                <div style={{ fontSize: '9pt', color: '#475569' }}>NIT: 900.999.999-1 · Carrera 2A 20-35, Sabanagrande - Atlántico</div>
               </div>
-              <div style={{ textAlign: 'right', fontSize: '11px', fontWeight: 'bold', color: '#166534' }}>GESTIÓN DEL TALENTO HUMANO</div>
+              <div style={{ textAlign: 'right', fontSize: '9.5pt', fontWeight: 'bold', color: '#166534' }}>
+                GESTIÓN DEL TALENTO HUMANO<br />SELECCIÓN TÉCNICA POR COMPETENCIAS
+              </div>
             </div>
-            <div style={{ textAlign: 'center', fontSize: '15px', fontWeight: '800', margin: '30px 0' }}>CERTIFICACIÓN LABORAL</div>
-            <p style={{ fontSize: '13px', lineHeight: '1.8' }}>
-              La suscrita Representante Legal de FRUTAS DEL ATLÁNTICO S.A.S. hace constar que <strong>{selectedSolicitud.nombre_remitente}</strong> labora en nuestra organización mediante contrato individual de trabajo.
+
+            <h2 style={{ textAlign: 'center', fontSize: '14pt', margin: '20px 0', textTransform: 'uppercase' }}>
+              ACTA FORMAL DE VALORACIÓN PONDERADA DE CANDIDATO
+            </h2>
+
+            <div style={{ fontSize: '10pt', lineHeight: '1.7', marginBottom: '20px' }}>
+              <p style={{ margin: '0 0 5px 0' }}><strong>Aspirante:</strong> {selectedPostulation.candidato || selectedPostulation.nombres}</p>
+              <p style={{ margin: '0 0 5px 0' }}><strong>Cédula de Ciudadanía:</strong> {selectedPostulation.numero_documento || '1042890123'}</p>
+              <p style={{ margin: '0 0 5px 0' }}><strong>Convocatoria / Cargo:</strong> {selectedPostulation.convocatoria || 'General'}</p>
+              <p style={{ margin: 0 }}><strong>Fecha de Evaluación:</strong> {fechaHoy}</p>
+            </div>
+
+            <table className="print-clean-table">
+              <thead>
+                <tr style={{ background: '#f1f5f9' }}>
+                  <th style={{ textAlign: 'left' }}>Criterio de Selección por Competencias</th>
+                  <th style={{ textAlign: 'center', width: '90px' }}>Ponderación</th>
+                  <th style={{ textAlign: 'center', width: '100px' }}>Puntaje Obtenido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1. Prueba técnica y de conocimiento</td><td style={{ textAlign: 'center' }}>30%</td><td style={{ textAlign: 'center' }}>{puntajeTecnico} / 100</td></tr>
+                <tr><td>2. Pruebas psicológicas</td><td style={{ textAlign: 'center' }}>15%</td><td style={{ textAlign: 'center' }}>{puntajePsicologico} / 100</td></tr>
+                <tr><td>3. Entrevista por competencias</td><td style={{ textAlign: 'center' }}>30%</td><td style={{ textAlign: 'center' }}>{puntajeEntrevista} / 100</td></tr>
+                <tr><td>4. Verificación de hoja de vida</td><td style={{ textAlign: 'center' }}>15%</td><td style={{ textAlign: 'center' }}>{puntajeHv} / 100</td></tr>
+                <tr><td>5. Exámenes médicos ocupacionales de ingreso</td><td style={{ textAlign: 'center' }}>10%</td><td style={{ textAlign: 'center' }}>{puntajeMedicos} / 100</td></tr>
+                <tr style={{ fontWeight: 'bold', background: '#f8fafc' }}>
+                  <td style={{ textAlign: 'right' }}>TOTAL PONDERADO:</td>
+                  <td style={{ textAlign: 'center' }}>100%</td>
+                  <td style={{ textAlign: 'center', color: '#166534', fontSize: '12pt' }}>{notaCalculada} / 100</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div style={{ marginTop: '20px', padding: '12px', border: '1.5px solid #0f172a', borderRadius: '6px', fontSize: '10pt' }}>
+              <strong>DICTAMEN INSTITUCIONAL: </strong>
+              <span>{notaCalculada >= 80 ? 'APTO PARA ELEGIBILIDAD Y CONTRATACIÓN INMEDIATA' : notaCalculada >= 75 ? 'PRESELECCIONADO(A) EN BANCO DE RESERVA' : 'NO SELECCIONADO(A)'}</span>
+            </div>
+
+            <div style={{ marginTop: '70px', display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
+              <div>
+                <div style={{ width: '220px', borderTop: '1.5px solid #0f172a', margin: '0 auto 6px auto' }}></div>
+                <strong style={{ fontSize: '10pt' }}>Jefe de Talento Humano</strong><br />
+                <span style={{ fontSize: '9pt', color: '#475569' }}>Responsable de Selección Técnica</span>
+              </div>
+              <div>
+                <div style={{ width: '220px', borderTop: '1.5px solid #0f172a', margin: '0 auto 6px auto' }}></div>
+                <strong style={{ fontSize: '10pt' }}>Representante Legal / Gerencia</strong><br />
+                <span style={{ fontSize: '9pt', color: '#475569' }}>Frutas Del Atlántico S.A.S.</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DOCUMENTO 2: LOS 3 MODELOS OFICIALES DE CERTIFICADO LABORAL */}
+        {imprimirTipo === 'certificado' && selectedSolicitud && (
+          <div style={{ padding: '15mm 20mm', fontFamily: 'serif' }}>
+            <div style={{ borderBottom: '3px solid #166534', paddingBottom: '12px', marginBottom: '35px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: '18pt', fontWeight: '900', color: '#166534', fontFamily: 'Arial, sans-serif' }}>FRUTAS DEL ATLÁNTICO S.A.S.</div>
+                <div style={{ fontSize: '9pt', color: '#64748b', fontFamily: 'Arial, sans-serif' }}>NIT: 900.999.999-1 · Sabanagrande, Atlántico</div>
+              </div>
+              <div style={{ textAlign: 'right', fontSize: '9pt', fontWeight: 'bold', color: '#166534', fontFamily: 'Arial, sans-serif' }}>
+                GESTIÓN DEL TALENTO HUMANO<br />CANAL OFICIAL DE PQRS
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'center', fontSize: '14pt', fontWeight: '800', margin: '40px 0 30px 0', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              LA SUSCRITA REPRESENTANTE LEGAL DE FRUTAS DEL ATLÁNTICO S.A.S.
+            </div>
+
+            <div style={{ textAlign: 'center', fontSize: '13pt', fontWeight: 'bold', marginBottom: '30px' }}>
+              CERTIFICA:
+            </div>
+
+            {/* MODELO 1: BÁSICO CON SALARIO Y CARGO */}
+            {modeloCertificado === 'modelo1' && (
+              <p style={{ fontSize: '11.5pt', lineHeight: '2', textAlign: 'justify' }}>
+                Que el(la) señor(a) <strong>{selectedSolicitud.nombre_remitente}</strong>, identificado(a) con Cédula de Ciudadanía, labora actualmente en nuestra organización mediante Contrato Individual de Trabajo a Término Indefinido desde el 15 de enero de 2026, desempeñando el cargo de <strong>Operario de Producción</strong> en el área operativa de planta, devengando una asignación salarial básica mensual de <strong>DOS MILLONES DE PESOS M/CTE ($2.000.000 COP)</strong> más todas las prestaciones sociales y afiliaciones obligatorias al Sistema General de Seguridad Social (EPS, AFP, ARL y Caja de Compensación Familiar).
+              </p>
+            )}
+
+            {/* MODELO 2: CON FUNCIONES DETALLADAS */}
+            {modeloCertificado === 'modelo2' && (
+              <div>
+                <p style={{ fontSize: '11.5pt', lineHeight: '1.9', textAlign: 'justify' }}>
+                  Que el(la) señor(a) <strong>{selectedSolicitud.nombre_remitente}</strong> se encuentra vinculado(a) laboralmente con FRUTAS DEL ATLÁNTICO S.A.S., desempeñando a cabalidad las funciones estipuladas en el Manual de Funciones y Competencias (DPC):
+                </p>
+                <ul style={{ fontSize: '10.5pt', lineHeight: '1.8', margin: '15px 0 20px 25px' }}>
+                  <li>Ejecución de procesos de recepción, lavado, despulpado y pasteurización de frutas tropicales.</li>
+                  <li>Cumplimiento estricto del Manual de Buenas Prácticas de Manufactura (BPM) e Inocuidad.</li>
+                  <li>Verificación de los estándares del Sistema de Gestión de Seguridad y Salud en el Trabajo (SG-SST).</li>
+                  <li>Apoyo en el control de mermas y empaque de pulpas de frutas conforme a la Res. 2674 de 2013.</li>
+                </ul>
+              </div>
+            )}
+
+            {/* MODELO 3: PARA EXTRABAJADOR (INACTIVO) */}
+            {modeloCertificado === 'modelo3' && (
+              <p style={{ fontSize: '11.5pt', lineHeight: '2', textAlign: 'justify' }}>
+                Que el(la) señor(a) <strong>{selectedSolicitud.nombre_remitente}</strong> laboró al servicio de FRUTAS DEL ATLÁNTICO S.A.S. mediante contrato laboral desde el 01 de junio de 2025 hasta el 31 de agosto de 2026, ocupando el cargo de <strong>Auxiliar Operativo de Planta</strong>, habiendo finalizado su vínculo laboral a paz y salvo por todo concepto de salarios, cesantías, primas y liquidación de prestaciones sociales conforme al Código Sustantivo del Trabajo.
+              </p>
+            )}
+
+            <p style={{ fontSize: '11pt', lineHeight: '1.8', marginTop: '30px' }}>
+              La presente constancia se expide a solicitud del interesado en Sabanagrande, Atlántico, a los {fechaHoy}.
             </p>
-            <div style={{ marginTop: '70px', textAlign: 'center' }}>
-              <div style={{ width: '240px', borderTop: '1.5px solid #0f172a', margin: '0 auto 8px auto' }}></div>
-              <strong style={{ fontSize: '13px' }}>SAMY DARIANY RODRÍGUEZ SEÑA</strong><br />
-              <span style={{ fontSize: '11.5px', color: '#475569' }}>Representante Legal · Frutas Del Atlántico S.A.S.</span>
+
+            <div style={{ marginTop: '80px', textAlign: 'center' }}>
+              <div style={{ width: '250px', borderTop: '1.5px solid #0f172a', margin: '0 auto 8px auto' }}></div>
+              <strong style={{ fontSize: '11pt' }}>SAMY DARIANY RODRÍGUEZ SEÑA</strong><br />
+              <span style={{ fontSize: '10pt', color: '#475569' }}>Representante Legal</span><br />
+              <span style={{ fontSize: '9pt', color: '#64748b' }}>Frutas Del Atlántico S.A.S. · NIT 900.999.999-1</span>
             </div>
           </div>
         )}

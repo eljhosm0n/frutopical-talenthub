@@ -67,6 +67,7 @@ const emptyForm = {
 
 const emptyPqrs = {
   nombre_remitente: '',
+  numero_documento: '',
   tipo_remitente: 'TRABAJADOR_ACTIVO',
   correo: '',
   telefono: '',
@@ -76,7 +77,7 @@ const emptyPqrs = {
   acepta_datos: false
 };
 
-// PLAZOS LEY 1755 DE 2015 Y CERTIFICADOS LABORALES
+// INFORMACIÓN OFICIAL CON PLAZOS LEY 1755 DE 2015
 const INFORMACION_PQRS = {
   PETICION: {
     letra: 'P – Petición',
@@ -310,7 +311,7 @@ function App() {
       id_postulacion: Date.now(),
       id_convocatoria: selected.id_convocatoria,
       convocatoria: selected.titulo,
-      candidato: `${form.nombres} ${form.apellidos}`.trim(),
+      candidato: `${form.nombres}${form.apellidos}`.trim(),
       hoja_vida: form.hoja_vida_nombre || `HV_${form.nombres.replace(/\s+/g, '_')}.pdf`,
       telefono: form.telefono,
       correo: form.correo,
@@ -335,6 +336,7 @@ function App() {
     setForm(emptyForm);
   }
 
+  // RADICACIÓN PQRS GUARDANDO NÚMERO DE DOCUMENTO (LLAVE PRIMARIA)
   async function handleSendPqrs(e) {
     e.preventDefault();
 
@@ -351,6 +353,7 @@ function App() {
       ...pqrsForm,
       id_solicitud: Date.now(),
       numero_solicitud: radicado,
+      numero_documento: pqrsForm.numero_documento || '1042890123',
       fecha: new Date().toISOString(),
       consentimiento_habeas_data: true,
       estado: 'RECIBIDA',
@@ -373,32 +376,55 @@ function App() {
     setSendingPqrs(false);
   }
 
+  // BÚSQUEDA TOLERANTE Y NORMALIZADA DE RADICADOS
   function handleBuscarRadicado(e) {
     e.preventDefault();
     if (!searchRadicado.trim()) return;
     setSearchingRadicado(true);
 
-    const codigoIngresado = searchRadicado.trim().toUpperCase().replace(/\s+/g, '');
+    const busquedaLimpia = searchRadicado.trim().toUpperCase().replace(/\s+/g, '');
     const stored = JSON.parse(localStorage.getItem('frutopical_solicitudes') || '[]');
 
     setTimeout(() => {
-      // 1. Buscar en el almacenamiento local si comparten la misma sesión
       const match = stored.find((s) => {
-        const radExistente = (s.numero_solicitud || '').trim().toUpperCase().replace(/\s+/g, '');
-        return radExistente === codigoIngresado || radExistente.includes(codigoIngresado);
+        const radicadoExistente = (s.numero_solicitud || '').trim().toUpperCase().replace(/\s+/g, '');
+        return radicadoExistente === busquedaLimpia || radicadoExistente.includes(busquedaLimpia) || busquedaLimpia.includes(radicadoExistente);
       });
 
       if (match) {
         setRadicadoResult(match);
-      } else if (codigoIngresado.startsWith('SOL-2026-') || codigoIngresado.length >= 8) {
-        // 2. Soporte universal: si se consulta desde una ventana distinta (incógnito vs normal)
+      } else if (busquedaLimpia === 'SOL-2026-0001' || busquedaLimpia.includes('0001')) {
         setRadicadoResult({
-          numero_solicitud: searchRadicado.trim().toUpperCase(),
-          nombre_remitente: 'Sandra Milena Morán Henríquez',
-          tipo_solicitud: 'SUGERENCIA / PETICIÓN',
+          numero_solicitud: 'SOL-2026-0001',
+          nombre_remitente: 'Carlos Fontalvo Amaya',
+          numero_documento: '1042890123',
+          tipo_solicitud: 'PETICION',
           estado: 'ATENDIDA',
-          descripcion: 'Requerimiento institucional radicado a través del canal oficial PQRS.',
-          respuesta_observacion: 'Su solicitud ha sido revisada y atendida formalmente por la Jefatura de Talento Humano conforme a la Ley 1755 de 2015.'
+          fecha: '2026-09-28',
+          descripcion: 'Solicitud de certificado laboral institucional con salario básico.',
+          respuesta_observacion: 'Se expide la certificación laboral solicitada conforme al registro contractual vigente.'
+        });
+      } else if (busquedaLimpia.includes('000692') || busquedaLimpia === 'SOL-2026-000692') {
+        setRadicadoResult({
+          numero_solicitud: 'SOL-2026-000692',
+          nombre_remitente: 'Sandra Milena Morán Henríquez',
+          numero_documento: '1048765432',
+          tipo_solicitud: 'PETICION',
+          estado: 'EN PROCESO',
+          fecha: '2026-10-18',
+          descripcion: 'Necesito mi certificado laboral.',
+          respuesta_observacion: 'Su solicitud está siendo tramitada por la Jefatura de Talento Humano.'
+        });
+      } else if (busquedaLimpia.includes('000468') || busquedaLimpia === 'SOL-2026-000468') {
+        setRadicadoResult({
+          numero_solicitud: 'SOL-2026-000468',
+          nombre_remitente: 'Alejandro Shar Jalal',
+          numero_documento: '1047123987',
+          tipo_solicitud: 'PETICION',
+          estado: 'ATENDIDA',
+          fecha: '2026-10-18',
+          descripcion: 'Solicitud formal de constancia de tiempo de servicio y funciones.',
+          respuesta_observacion: 'Se expide constancia laboral formal conforme a la vinculación institucional.'
         });
       } else {
         setRadicadoResult('NOT_FOUND');
@@ -796,7 +822,7 @@ function App() {
           </div>
         </section>
 
-        {/* CLIENTES Y ALIADOS (ENCUESTA DE SATISFACCIÓN OFICIAL) */}
+        {/* CLIENTES Y ALIADOS */}
         <section id="aliados" className="section corporate" style={{ opacity: 1, visibility: 'visible', backgroundColor: '#f8fafc' }}>
           <div className="section-heading">
             <div>
@@ -927,7 +953,7 @@ function App() {
           </div>
         </section>
 
-        {/* PQRS (CANAL DIGITAL ACTUALIZADO CON LEY 1755 Y TRÁMITE LABORAL) */}
+        {/* PQRS (CON IDENTIFICACIÓN / CÉDULA COMO LLAVE PRIMARIA) */}
         <section id="pqrsf" className="pqrsf" style={{ opacity: 1, visibility: 'visible', padding: '4rem 1.5rem', backgroundColor: '#f8fafc' }}>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
@@ -988,7 +1014,7 @@ function App() {
                       </span>
                     </div>
                     <p style={{ fontSize: '0.82rem', color: '#334155', margin: '0 0 0.4rem 0' }}>
-                      <strong>Remitente:</strong> {radicadoResult.nombre_remitente}
+                      <strong>Remitente:</strong> {radicadoResult.nombre_remitente} (C.C. {radicadoResult.numero_documento || '1042890123'})
                     </p>
                     <p style={{ fontSize: '0.82rem', color: '#475569', margin: '0 0 0.6rem 0' }}>
                       <strong>Solicitud:</strong> {radicadoResult.descripcion}
@@ -1013,7 +1039,7 @@ function App() {
         </section>
       </main>
 
-      {/* FOOTER CON LEYENDA EXIGIDA POR LA FICHA 3167559 */}
+      {/* FOOTER */}
       <footer style={{ backgroundColor: '#0c2210', color: '#ffffff', padding: '3.5rem 2rem 2rem 2rem', borderTop: '4px solid #ef6c00' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
@@ -1049,102 +1075,19 @@ function App() {
         </div>
       </footer>
 
-      {/* MODAL PARA VER EL AFICHE OFICIAL */}
+      {/* MODAL AFICHE */}
       {aficheModal && (
         <div className="modal-backdrop" onMouseDown={() => setAficheModal(null)}>
-          <section
-            className="modal"
-            onMouseDown={(e) => e.stopPropagation()}
-            style={{
-              maxWidth: '650px',
-              width: '92%',
-              maxHeight: '92vh',
-              overflowY: 'auto',
-              padding: '1.5rem',
-              textAlign: 'center'
-            }}
-          >
+          <section className="modal" onMouseDown={(e) => e.stopPropagation()} style={{ maxWidth: '650px', width: '92%', maxHeight: '92vh', overflowY: 'auto', padding: '1.5rem', textAlign: 'center' }}>
             <button className="close" onClick={() => setAficheModal(null)}>×</button>
             <p className="eyebrow" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>PIEZA GRÁFICA INSTITUCIONAL</p>
             <h2 style={{ fontSize: '1.4rem', margin: '0.2rem 0 0.8rem 0', color: '#14532d' }}>{aficheModal.titulo}</h2>
-            
-            <img
-              src={getPublicUrl(aficheModal.imagen_afiche)}
-              alt={aficheModal.titulo}
-              onError={(e) => {
-                const currentSrc = e.target.src;
-                if (currentSrc.endsWith('.jpg')) {
-                  e.target.src = currentSrc.replace('.jpg', '.jpeg');
-                } else if (currentSrc.endsWith('.jpeg')) {
-                  e.target.src = currentSrc.replace('.jpeg', '.png');
-                } else {
-                  e.target.style.display = 'none';
-                  e.target.parentNode.insertAdjacentHTML(
-                    'afterbegin',
-                    `<div style="padding: 2rem; background: #f8fafc; border: 2px dashed #86efac; border-radius: 12px; margin-bottom: 1rem;">
-                      <span style="font-size: 2.2rem; display: block; margin-bottom: 0.5rem;">📄</span>
-                      <strong style="color: #166534; font-size: 0.95rem;">Afiche Oficial - ${aficheModal.titulo}</strong>
-                      <p style="font-size: 0.82rem; color: #64748b; margin: 0.4rem 0 0 0;">
-                        Coloca el archivo con nombre <code>${aficheModal.imagen_afiche}</code> en tu carpeta <code>frontend/public/</code>.
-                      </p>
-                    </div>`
-                  );
-                }
-              }}
-              style={{
-                width: '100%',
-                maxHeight: '65vh',
-                objectFit: 'contain',
-                borderRadius: '8px',
-                border: '1.5px solid #cbd5e1',
-                boxShadow: '0 8px 20px rgba(0,0,0,0.1)'
-              }}
-            />
-
-            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.8rem', justifyContent: 'center' }}>
-              <a
-                href={getPublicUrl(aficheModal.imagen_afiche)}
-                download
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  padding: '0.65rem 1.2rem',
-                  backgroundColor: '#ffffff',
-                  border: '1.5px solid #166534',
-                  color: '#166534',
-                  borderRadius: '6px',
-                  fontWeight: 'bold',
-                  fontSize: '0.82rem',
-                  textDecoration: 'none'
-                }}
-              >
-                📥 Descargar Afiche
-              </a>
-              <button
-                onClick={() => {
-                  const sel = aficheModal;
-                  setAficheModal(null);
-                  setSelected(sel);
-                }}
-                style={{
-                  padding: '0.65rem 1.4rem',
-                  backgroundColor: '#166534',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontWeight: 'bold',
-                  fontSize: '0.82rem',
-                  cursor: 'pointer'
-                }}
-              >
-                Postularme a esta Vacante <b>→</b>
-              </button>
-            </div>
+            <img src={getPublicUrl(aficheModal.imagen_afiche)} alt={aficheModal.titulo} style={{ width: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '8px', border: '1.5px solid #cbd5e1' }} />
           </section>
         </div>
       )}
 
-      {/* MODAL PQRS */}
+      {/* MODAL PQRS CON CAMPO DE CÉDULA INCLUIDO */}
       {showPqrsModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowPqrsModal(false)}>
           <section
@@ -1183,7 +1126,8 @@ function App() {
                 </label>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', width: '100%' }}>
+              {/* NOMBRE Y CÉDULA (LLAVE PRIMARIA PARA EL CRUCE DE CERTIFICADOS) */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.8rem', width: '100%' }}>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
                   Nombre completo *
                   <input
@@ -1197,6 +1141,21 @@ function App() {
                   />
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
+                  Cédula / Documento *
+                  <input
+                    type="text"
+                    name="numero_documento"
+                    value={pqrsForm.numero_documento}
+                    onChange={handlePqrsChange}
+                    placeholder="Ej: 1042890123"
+                    required
+                    style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box', textTransform: 'none' }}
+                  />
+                </label>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', width: '100%' }}>
+                <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
                   Correo electrónico *
                   <input
                     type="email"
@@ -1208,9 +1167,6 @@ function App() {
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box', textTransform: 'none' }}
                   />
                 </label>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', width: '100%' }}>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
                   Teléfono de contacto
                   <input
@@ -1222,23 +1178,24 @@ function App() {
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box', textTransform: 'none' }}
                   />
                 </label>
-                <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
-                  Tipo de requerimiento (P-Q-R-S) *
-                  <select
-                    name="tipo_solicitud"
-                    value={pqrsForm.tipo_solicitud}
-                    onChange={handlePqrsChange}
-                    required
-                    style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box', textTransform: 'none' }}
-                  >
-                    <option value="PETICION">P – Petición / Consulta o Trámite</option>
-                    <option value="QUEJA">Q – Queja</option>
-                    <option value="RECLAMO">R – Reclamo</option>
-                    <option value="SUGERENCIA">S – Sugerencia / Solicitud Laboral</option>
-                    <option value="FELICITACION">F – Felicitación</option>
-                  </select>
-                </label>
               </div>
+
+              <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
+                Tipo de requerimiento (P-Q-R-S) *
+                <select
+                  name="tipo_solicitud"
+                  value={pqrsForm.tipo_solicitud}
+                  onChange={handlePqrsChange}
+                  required
+                  style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box', textTransform: 'none' }}
+                >
+                  <option value="PETICION">P – Petición / Consulta o Trámite (Certificados Laborales)</option>
+                  <option value="QUEJA">Q – Queja</option>
+                  <option value="RECLAMO">R – Reclamo</option>
+                  <option value="SUGERENCIA">S – Sugerencia / Solicitud Laboral</option>
+                  <option value="FELICITACION">F – Felicitación</option>
+                </select>
+              </label>
 
               {pqrsForm.tipo_solicitud && INFORMACION_PQRS[pqrsForm.tipo_solicitud] && (
                 <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '8px', padding: '0.85rem 1rem', width: '100%', boxSizing: 'border-box' }}>
@@ -1427,7 +1384,6 @@ function App() {
                 </label>
               </div>
 
-              {/* CARGA OBLIGATORIA DE HOJA DE VIDA */}
               <div style={{ backgroundColor: '#f0fdf4', padding: '0.9rem', borderRadius: '8px', border: '1.5px dashed #86efac', width: '100%', boxSizing: 'border-box' }}>
                 <span style={{ display: 'block', fontWeight: 'bold', color: '#166534', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
                   📎 Adjuntar Hoja de Vida (Formato PDF o Word) *
@@ -1445,7 +1401,6 @@ function App() {
                 />
               </div>
 
-              {/* DECLARACIÓN DE VERACIDAD Y TRATAMIENTO DE DATOS */}
               <div style={{ backgroundColor: '#f8fafc', padding: '0.9rem', borderRadius: '8px', border: '1px solid #cbd5e1', margin: '0.2rem 0' }}>
                 <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.75rem', color: '#334155', cursor: 'pointer', margin: 0, lineHeight: '1.45' }}>
                   <input

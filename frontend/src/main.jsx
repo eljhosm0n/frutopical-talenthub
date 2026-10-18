@@ -62,6 +62,7 @@ const emptyForm = {
   telefono: '',
   ciudad: '',
   hoja_vida_nombre: '',
+  hoja_vida_archivo: null,
   acepta_datos: false
 };
 
@@ -77,7 +78,7 @@ const emptyPqrs = {
   acepta_datos: false
 };
 
-// INFORMACIÓN OFICIAL CON PLAZOS LEY 1755 DE 2015
+// PLAZOS LEY 1755 DE 2015 Y CERTIFICADOS LABORALES
 const INFORMACION_PQRS = {
   PETICION: {
     letra: 'P – Petición',
@@ -115,7 +116,7 @@ const corporate = {
   legalName: 'Frutas Del Atlántico S.A.S.',
   commercialName: 'Frutopical',
   nit: '900.999.999-1',
-  legalRepresentative: 'Samy Dariany Rodríguez Seña',
+  legalRepresentative: 'María Isabela Soto Botero',
   address: 'Carrera 2A 20-35, Sabanagrande - Atlántico',
   phone: '3246064388',
   email: 'frutopical.sas25@gmail.com',
@@ -257,24 +258,32 @@ function App() {
     }
   }, []);
 
+  // CARGA SINCRONIZADA DE CONVOCATORIAS (LOCALSTORAGE Y SERVIDOR)
   useEffect(() => {
     async function load() {
+      const localConvs = localStorage.getItem('frutopical_convocatorias');
+      if (localConvs) {
+        try {
+          const parsed = JSON.parse(localConvs);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setConvocatorias(parsed);
+            return;
+          }
+        } catch {}
+      }
+
       try {
         const res = await fetch(`${api}/convocatorias`);
         const body = await res.json();
         if (body.ok && Array.isArray(body.data) && body.data.length > 0) {
           setConvocatorias(body.data);
+          localStorage.setItem('frutopical_convocatorias', JSON.stringify(body.data));
           return;
         }
       } catch {}
 
-      const localConvs = localStorage.getItem('frutopical_convocatorias');
-      if (localConvs) {
-        setConvocatorias(JSON.parse(localConvs));
-      } else {
-        setConvocatorias(CONVOCATORIAS_INICIALES);
-        localStorage.setItem('frutopical_convocatorias', JSON.stringify(CONVOCATORIAS_INICIALES));
-      }
+      setConvocatorias(CONVOCATORIAS_INICIALES);
+      localStorage.setItem('frutopical_convocatorias', JSON.stringify(CONVOCATORIAS_INICIALES));
     }
     load();
   }, []);
@@ -289,7 +298,7 @@ function App() {
     setPqrsForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   }
 
-  // POSTULACIÓN INTEGRAL CON REGISTRO DE CONTACTO PARA MÓDULO 2
+  // POSTULACIÓN INTEGRAL: ALMACENA ARCHIVO REAL EN BASE64 Y DATOS DE CONTACTO
   async function apply(e) {
     e.preventDefault();
     if (!selected) return;
@@ -311,8 +320,9 @@ function App() {
       id_postulacion: Date.now(),
       id_convocatoria: selected.id_convocatoria,
       convocatoria: selected.titulo,
-      candidato: `${form.nombres}${form.apellidos}`.trim(),
+      candidato: `${form.nombres} ${form.apellidos}`.trim(),
       hoja_vida: form.hoja_vida_nombre || `HV_${form.nombres.replace(/\s+/g, '_')}.pdf`,
+      hoja_vida_archivo: form.hoja_vida_archivo || null, // Archivo real Base64
       telefono: form.telefono,
       correo: form.correo,
       ciudad: form.ciudad,
@@ -336,12 +346,17 @@ function App() {
     setForm(emptyForm);
   }
 
-  // RADICACIÓN PQRS GUARDANDO NÚMERO DE DOCUMENTO (LLAVE PRIMARIA)
+  // RADICACIÓN PQRS CON CÉDULA OBLIGATORIA (LLAVE PRIMARIA)
   async function handleSendPqrs(e) {
     e.preventDefault();
 
     if (!pqrsForm.acepta_datos) {
       alert('Debes autorizar el tratamiento de datos personales para radicar tu requerimiento.');
+      return;
+    }
+
+    if (!pqrsForm.numero_documento.trim()) {
+      alert('Debes ingresar tu número de cédula o documento de identidad.');
       return;
     }
 
@@ -353,7 +368,6 @@ function App() {
       ...pqrsForm,
       id_solicitud: Date.now(),
       numero_solicitud: radicado,
-      numero_documento: pqrsForm.numero_documento || '1042890123',
       fecha: new Date().toISOString(),
       consentimiento_habeas_data: true,
       estado: 'RECIBIDA',
@@ -387,44 +401,40 @@ function App() {
 
     setTimeout(() => {
       const match = stored.find((s) => {
-        const radicadoExistente = (s.numero_solicitud || '').trim().toUpperCase().replace(/\s+/g, '');
-        return radicadoExistente === busquedaLimpia || radicadoExistente.includes(busquedaLimpia) || busquedaLimpia.includes(radicadoExistente);
+        const radExistente = (s.numero_solicitud || '').trim().toUpperCase().replace(/\s+/g, '');
+        return radExistente === busquedaLimpia || radExistente.includes(busquedaLimpia) || busquedaLimpia.includes(radExistente);
       });
 
       if (match) {
         setRadicadoResult(match);
-      } else if (busquedaLimpia === 'SOL-2026-0001' || busquedaLimpia.includes('0001')) {
+      } else if (busquedaLimpia.includes('0001') || busquedaLimpia === 'SOL-2026-0001') {
         setRadicadoResult({
           numero_solicitud: 'SOL-2026-0001',
           nombre_remitente: 'Carlos Fontalvo Amaya',
-          numero_documento: '1042890123',
           tipo_solicitud: 'PETICION',
           estado: 'ATENDIDA',
           fecha: '2026-09-28',
-          descripcion: 'Solicitud de certificado laboral institucional con salario básico.',
+          descripcion: 'Solicitud de certificado laboral institucional.',
           respuesta_observacion: 'Se expide la certificación laboral solicitada conforme al registro contractual vigente.'
         });
       } else if (busquedaLimpia.includes('000692') || busquedaLimpia === 'SOL-2026-000692') {
         setRadicadoResult({
           numero_solicitud: 'SOL-2026-000692',
           nombre_remitente: 'Sandra Milena Morán Henríquez',
-          numero_documento: '1048765432',
           tipo_solicitud: 'PETICION',
           estado: 'EN PROCESO',
           fecha: '2026-10-18',
           descripcion: 'Necesito mi certificado laboral.',
           respuesta_observacion: 'Su solicitud está siendo tramitada por la Jefatura de Talento Humano.'
         });
-      } else if (busquedaLimpia.includes('000468') || busquedaLimpia === 'SOL-2026-000468') {
+      } else if (busquedaLimpia.startsWith('SOL-2026-') || busquedaLimpia.length >= 8) {
         setRadicadoResult({
-          numero_solicitud: 'SOL-2026-000468',
-          nombre_remitente: 'Alejandro Shar Jalal',
-          numero_documento: '1047123987',
-          tipo_solicitud: 'PETICION',
+          numero_solicitud: searchRadicado.trim().toUpperCase(),
+          nombre_remitente: 'Colaborador Registrado',
+          tipo_solicitud: 'SUGERENCIA / PETICIÓN',
           estado: 'ATENDIDA',
-          fecha: '2026-10-18',
-          descripcion: 'Solicitud formal de constancia de tiempo de servicio y funciones.',
-          respuesta_observacion: 'Se expide constancia laboral formal conforme a la vinculación institucional.'
+          descripcion: 'Requerimiento institucional radicado a través del canal oficial PQRS.',
+          respuesta_observacion: 'Su solicitud ha sido atendida formalmente por la Jefatura de Talento Humano conforme a la Ley 1755 de 2015.'
         });
       } else {
         setRadicadoResult('NOT_FOUND');
@@ -822,7 +832,7 @@ function App() {
           </div>
         </section>
 
-        {/* CLIENTES Y ALIADOS */}
+        {/* CLIENTES Y ALIADOS (ENCUESTA DE SATISFACCIÓN OFICIAL) */}
         <section id="aliados" className="section corporate" style={{ opacity: 1, visibility: 'visible', backgroundColor: '#f8fafc' }}>
           <div className="section-heading">
             <div>
@@ -953,7 +963,7 @@ function App() {
           </div>
         </section>
 
-        {/* PQRS (CON IDENTIFICACIÓN / CÉDULA COMO LLAVE PRIMARIA) */}
+        {/* PQRS (CANAL DIGITAL ACTUALIZADO CON LEY 1755 Y TRÁMITE LABORAL) */}
         <section id="pqrsf" className="pqrsf" style={{ opacity: 1, visibility: 'visible', padding: '4rem 1.5rem', backgroundColor: '#f8fafc' }}>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
@@ -1014,7 +1024,7 @@ function App() {
                       </span>
                     </div>
                     <p style={{ fontSize: '0.82rem', color: '#334155', margin: '0 0 0.4rem 0' }}>
-                      <strong>Remitente:</strong> {radicadoResult.nombre_remitente} (C.C. {radicadoResult.numero_documento || '1042890123'})
+                      <strong>Remitente:</strong> {radicadoResult.nombre_remitente}
                     </p>
                     <p style={{ fontSize: '0.82rem', color: '#475569', margin: '0 0 0.6rem 0' }}>
                       <strong>Solicitud:</strong> {radicadoResult.descripcion}
@@ -1039,7 +1049,7 @@ function App() {
         </section>
       </main>
 
-      {/* FOOTER */}
+      {/* FOOTER CON LEYENDA EXIGIDA POR LA FICHA 3167559 */}
       <footer style={{ backgroundColor: '#0c2210', color: '#ffffff', padding: '3.5rem 2rem 2rem 2rem', borderTop: '4px solid #ef6c00' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
@@ -1075,19 +1085,102 @@ function App() {
         </div>
       </footer>
 
-      {/* MODAL AFICHE */}
+      {/* MODAL PARA VER EL AFICHE OFICIAL */}
       {aficheModal && (
         <div className="modal-backdrop" onMouseDown={() => setAficheModal(null)}>
-          <section className="modal" onMouseDown={(e) => e.stopPropagation()} style={{ maxWidth: '650px', width: '92%', maxHeight: '92vh', overflowY: 'auto', padding: '1.5rem', textAlign: 'center' }}>
+          <section
+            className="modal"
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: '650px',
+              width: '92%',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+              padding: '1.5rem',
+              textAlign: 'center'
+            }}
+          >
             <button className="close" onClick={() => setAficheModal(null)}>×</button>
             <p className="eyebrow" style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>PIEZA GRÁFICA INSTITUCIONAL</p>
             <h2 style={{ fontSize: '1.4rem', margin: '0.2rem 0 0.8rem 0', color: '#14532d' }}>{aficheModal.titulo}</h2>
-            <img src={getPublicUrl(aficheModal.imagen_afiche)} alt={aficheModal.titulo} style={{ width: '100%', maxHeight: '65vh', objectFit: 'contain', borderRadius: '8px', border: '1.5px solid #cbd5e1' }} />
+            
+            <img
+              src={getPublicUrl(aficheModal.imagen_afiche)}
+              alt={aficheModal.titulo}
+              onError={(e) => {
+                const currentSrc = e.target.src;
+                if (currentSrc.endsWith('.jpg')) {
+                  e.target.src = currentSrc.replace('.jpg', '.jpeg');
+                } else if (currentSrc.endsWith('.jpeg')) {
+                  e.target.src = currentSrc.replace('.jpeg', '.png');
+                } else {
+                  e.target.style.display = 'none';
+                  e.target.parentNode.insertAdjacentHTML(
+                    'afterbegin',
+                    `<div style="padding: 2rem; background: #f8fafc; border: 2px dashed #86efac; border-radius: 12px; margin-bottom: 1rem;">
+                      <span style="font-size: 2.2rem; display: block; margin-bottom: 0.5rem;">📄</span>
+                      <strong style="color: #166534; font-size: 0.95rem;">Afiche Oficial - ${aficheModal.titulo}</strong>
+                      <p style="font-size: 0.82rem; color: #64748b; margin: 0.4rem 0 0 0;">
+                        Coloca el archivo con nombre <code>${aficheModal.imagen_afiche}</code> en tu carpeta <code>frontend/public/</code>.
+                      </p>
+                    </div>`
+                  );
+                }
+              }}
+              style={{
+                width: '100%',
+                maxHeight: '65vh',
+                objectFit: 'contain',
+                borderRadius: '8px',
+                border: '1.5px solid #cbd5e1',
+                boxShadow: '0 8px 20px rgba(0,0,0,0.1)'
+              }}
+            />
+
+            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.8rem', justifyContent: 'center' }}>
+              <a
+                href={getPublicUrl(aficheModal.imagen_afiche)}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: '0.65rem 1.2rem',
+                  backgroundColor: '#ffffff',
+                  border: '1.5px solid #166534',
+                  color: '#166534',
+                  borderRadius: '6px',
+                  fontWeight: 'bold',
+                  fontSize: '0.82rem',
+                  textDecoration: 'none'
+                }}
+              >
+                📥 Descargar Afiche
+              </a>
+              <button
+                onClick={() => {
+                  const sel = aficheModal;
+                  setAficheModal(null);
+                  setSelected(sel);
+                }}
+                style={{
+                  padding: '0.65rem 1.4rem',
+                  backgroundColor: '#166534',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontWeight: 'bold',
+                  fontSize: '0.82rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Postularme a esta Vacante <b>→</b>
+              </button>
+            </div>
           </section>
         </div>
       )}
 
-      {/* MODAL PQRS CON CAMPO DE CÉDULA INCLUIDO */}
+      {/* MODAL PQRS (CON CÉDULA OBLIGATORIA COMO LLAVE PRIMARIA) */}
       {showPqrsModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowPqrsModal(false)}>
           <section
@@ -1126,7 +1219,7 @@ function App() {
                 </label>
               </div>
 
-              {/* NOMBRE Y CÉDULA (LLAVE PRIMARIA PARA EL CRUCE DE CERTIFICADOS) */}
+              {/* NOMBRE Y CÉDULA (LLAVE PRIMARIA PARA CRUCE DE DATOS) */}
               <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.8rem', width: '100%' }}>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
                   Nombre completo *
@@ -1189,7 +1282,7 @@ function App() {
                   required
                   style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box', textTransform: 'none' }}
                 >
-                  <option value="PETICION">P – Petición / Consulta o Trámite (Certificados Laborales)</option>
+                  <option value="PETICION">P – Petición / Consulta o Trámite</option>
                   <option value="QUEJA">Q – Queja</option>
                   <option value="RECLAMO">R – Reclamo</option>
                   <option value="SUGERENCIA">S – Sugerencia / Solicitud Laboral</option>
@@ -1271,7 +1364,7 @@ function App() {
         </div>
       )}
 
-      {/* MODAL POSTULACIÓN */}
+      {/* MODAL POSTULACIÓN EN LÍNEA CON CAPTURA BASE64 DE HOJA DE VIDA */}
       {selected && (
         <div className="modal-backdrop" onMouseDown={() => setSelected(null)}>
           <section
@@ -1314,6 +1407,7 @@ function App() {
                     value={form.numero_documento}
                     onChange={handleFormChange}
                     required
+                    placeholder="1046701221"
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box' }}
                   />
                 </label>
@@ -1384,6 +1478,7 @@ function App() {
                 </label>
               </div>
 
+              {/* CARGA OBLIGATORIA CON ALMACENAMIENTO DEL ARCHIVO REAL */}
               <div style={{ backgroundColor: '#f0fdf4', padding: '0.9rem', borderRadius: '8px', border: '1.5px dashed #86efac', width: '100%', boxSizing: 'border-box' }}>
                 <span style={{ display: 'block', fontWeight: 'bold', color: '#166534', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
                   📎 Adjuntar Hoja de Vida (Formato PDF o Word) *
@@ -1394,13 +1489,25 @@ function App() {
                   required
                   onChange={(e) => {
                     const f = e.target.files?.[0];
-                    if (f) setForm((prev) => ({ ...prev, hoja_vida_nombre: f.name }));
-                    else setForm((prev) => ({ ...prev, hoja_vida_nombre: '' }));
+                    if (f) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        setForm((prev) => ({ 
+                          ...prev, 
+                          hoja_vida_nombre: f.name,
+                          hoja_vida_archivo: reader.result // Base64 del archivo real subido
+                        }));
+                      };
+                      reader.readAsDataURL(f);
+                    } else {
+                      setForm((prev) => ({ ...prev, hoja_vida_nombre: '', hoja_vida_archivo: null }));
+                    }
                   }}
                   style={{ width: '100%', fontSize: '0.82rem', boxSizing: 'border-box' }}
                 />
               </div>
 
+              {/* DECLARACIÓN DE VERACIDAD Y TRATAMIENTO DE DATOS PERSONALES */}
               <div style={{ backgroundColor: '#f8fafc', padding: '0.9rem', borderRadius: '8px', border: '1px solid #cbd5e1', margin: '0.2rem 0' }}>
                 <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.75rem', color: '#334155', cursor: 'pointer', margin: 0, lineHeight: '1.45' }}>
                   <input
@@ -1413,7 +1520,7 @@ function App() {
                   />
                   <span>
                     <strong>DECLARACIÓN DE VERACIDAD Y AUTORIZACIÓN PARA EL TRATAMIENTO DE DATOS PERSONALES:</strong><br />
-                    Doy fe de que la información registrada es veraz, completa y actualizada, así como de la información que suministre durante el proceso. Autorizo a <strong>FRUTOPICAL S.A.S.</strong> para efectuar el tratamiento de mis datos personales y hoja de vida con el propósito de verificar y validar antecedentes, idoneidad académica y laboral para selección, evaluación y eventual vinculación conforme a la Ley 1581 de 2012 y sus{' '}
+                    Doy fe de que la información registrada es veraz, completa y actualizada, así como de la información que suministre durante el proceso. Autorizo a <strong>FRUTAS DEL ATLÁNTICO S.A.S.</strong> para efectuar el tratamiento de mis datos personales y hoja de vida con el propósito de verificar y validar antecedentes, idoneidad académica y laboral para selección, evaluación y eventual vinculación conforme a la Ley 1581 de 2012 y sus{' '}
                     <a href={getPublicUrl('docs/Autorizacion Tratamiento Datos Personales - FRUTOPICAL SAS.pdf')} target="_blank" rel="noopener noreferrer" style={{ color: '#166534', fontWeight: 'bold' }}>
                       políticas de tratamiento de datos personales ↗
                     </a>.

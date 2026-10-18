@@ -61,7 +61,7 @@ const BASE_DATOS_TRABAJADORES = [
     telefono: '302 345 6789',
     funciones: [
       'Planificación, programación y supervisión de las líneas de producción de pulpas y jugos.',
-      'Control de rendimientos, балансе de materia prima y eficiencia técnica de maquinaria.',
+      'Control de rendimientos, balance de materia prima y eficiencia técnica de maquinaria.',
       'Coordinación de los turnos de trabajo del personal operativo de planta.',
       'Garantía de cumplimiento de las metas de producción conforme a las órdenes de despacho.'
     ]
@@ -222,6 +222,37 @@ export default function Dashboard({ user, onLogout }) {
     if (!guardados) {
       localStorage.setItem('frutopical_empleados', JSON.stringify(BASE_DATOS_TRABAJADORES));
     }
+  }
+
+  function getListaEmpleados() {
+    try {
+      const guardados = localStorage.getItem('frutopical_empleados');
+      if (guardados) {
+        const parsed = JSON.parse(guardados);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return BASE_DATOS_TRABAJADORES;
+  }
+
+  // DESCARGA DE LA BASE DE DATOS MAESTRA EN FORMATO CSV COMPATIBLE CON EXCEL
+  function descargarExcelNomina() {
+    const lista = getListaEmpleados();
+    const encabezados = "Cedula;Nombres y Apellidos;Cargo;Tipo Contrato;Salario Mensual;Salario en Letras;Fecha Ingreso;Fecha Retiro;Estado Laboral\n";
+    const filas = lista.map(e => 
+      `"${e.documento}";"${e.nombre}";"${e.cargo}";"${e.tipoContrato || 'Término Indefinido'}";"${e.salario}";"${e.salarioLetras || ''}";"${e.fechaIngreso}";"${e.fechaRetiro || 'Vigente'}";"${e.estadoLaboral || 'ACTIVO'}"`
+    ).join("\n");
+
+    const contenidoBlob = "\uFEFF" + encabezados + filas;
+    const blob = new Blob([contenidoBlob], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "MATRIZ_MAESTRA_NOMINA_FRUTOPICAL_SAS.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   async function loadConvocatorias() {
@@ -484,6 +515,7 @@ export default function Dashboard({ user, onLogout }) {
     URL.revokeObjectURL(url);
   }
 
+  // AL VINCULAR UN CANDIDATO, SE GUARDA EN LA BASE DE DATOS MAESTRA DE NÓMINA
   function vincularCandidato(candidatoAprobado) {
     const nombreCompleto = candidatoAprobado.candidato || `${candidatoAprobado.nombres || ''} ${candidatoAprobado.apellidos || ''}`.trim() || 'Aspirante';
     const doc = candidatoAprobado.numero_documento || '104' + Math.floor(Math.random() * 900000);
@@ -523,7 +555,7 @@ export default function Dashboard({ user, onLogout }) {
       ]
     };
 
-    const emps = JSON.parse(localStorage.getItem('frutopical_empleados') || JSON.stringify(BASE_DATOS_TRABAJADORES));
+    const emps = getListaEmpleados();
     if (!emps.some(e => String(e.documento) === String(doc))) {
       emps.unshift(nuevoColaborador);
       localStorage.setItem('frutopical_empleados', JSON.stringify(emps));
@@ -601,7 +633,7 @@ export default function Dashboard({ user, onLogout }) {
     setNewSolicitudState(item.estado || 'RECIBIDA');
     setSolicitudResponse(item.respuesta_observacion || '');
 
-    const emps = JSON.parse(localStorage.getItem('frutopical_empleados') || JSON.stringify(BASE_DATOS_TRABAJADORES));
+    const emps = getListaEmpleados();
     const docBuscado = (item.numero_documento || '').replace(/\D/g, '');
     const nombreLimpio = (item.nombre_remitente || '').toLowerCase();
 
@@ -619,7 +651,6 @@ export default function Dashboard({ user, onLogout }) {
     if (encontrado) {
       setCertDatos(encontrado);
     } else {
-      // Si no existe, crear registro base adaptado al solicitante
       setCertDatos({
         documento: item.numero_documento || '1042890123',
         nombre: item.nombre_remitente || 'Colaborador',
@@ -639,9 +670,8 @@ export default function Dashboard({ user, onLogout }) {
     }
   }
 
-  // CAMBIO DIRECTO DESDE EL SELECTOR DE TRABAJADORES EN EL PANEL DE CERTIFICACIÓN
   function seleccionarTrabajadorManual(doc) {
-    const emps = JSON.parse(localStorage.getItem('frutopical_empleados') || JSON.stringify(BASE_DATOS_TRABAJADORES));
+    const emps = getListaEmpleados();
     const match = emps.find(e => String(e.documento) === String(doc));
     if (match) {
       setCertDatos(match);
@@ -671,22 +701,10 @@ export default function Dashboard({ user, onLogout }) {
   }
 
   const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
-  const listaMaestraEmpleados = JSON.parse(localStorage.getItem('frutopical_empleados') || JSON.stringify(BASE_DATOS_TRABAJADORES));
+  const listaMaestraEmpleados = getListaEmpleados();
 
   return (
     <>
-      <style>{`
-        .print-document-area { display: none; }
-        @media print {
-          @page { size: letter; margin: 15mm 18mm; }
-          body { background-color: #ffffff !important; color: #000000 !important; }
-          .th-dashboard, .th-modal-backdrop, .th-sidebar, .th-header { display: none !important; }
-          .print-document-area { display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; background: #ffffff !important; color: #0f172a !important; font-family: Arial, sans-serif !important; }
-          .print-clean-table { width: 100% !important; border-collapse: collapse !important; margin: 15px 0 !important; }
-          .print-clean-table th, .print-clean-table td { border: 1px solid #334155 !important; padding: 8px 10px !important; font-size: 11pt !important; }
-        }
-      `}</style>
-
       <div className="th-dashboard">
         <aside className="th-sidebar">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '1.2rem 1.4rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
@@ -1167,13 +1185,22 @@ export default function Dashboard({ user, onLogout }) {
                         <h2>Gestión de PQRS y Certificaciones Laborales</h2>
                         <p>Atiende radicados y genera certificados con cruce automático de nómina e historial contractual.</p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={loadSolicitudes}
-                        style={{ backgroundColor: '#ffffff', border: '1.5px solid #166534', color: '#166534', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.82rem', cursor: 'pointer' }}
-                      >
-                        🔄 Refrescar Radicados
-                      </button>
+                      <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                        <button
+                          type="button"
+                          onClick={descargarExcelNomina}
+                          style={{ backgroundColor: '#ffffff', border: '1.5px solid #166534', color: '#166534', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                        >
+                          📊 Descargar Matriz de Nómina (Excel)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={loadSolicitudes}
+                          style={{ backgroundColor: '#166534', border: 'none', color: '#ffffff', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.82rem', cursor: 'pointer' }}
+                        >
+                          🔄 Refrescar Radicados
+                        </button>
+                      </div>
                     </div>
 
                     <div className="th-table-wrapper">
@@ -1282,7 +1309,7 @@ export default function Dashboard({ user, onLogout }) {
                       </div>
                       
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>Selecciona el Modelo:</label>
-                      <select value={modeloCertificado} onChange={(e) => setModeloCertificado(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginBottom: '1rem', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                      <select value={modeloCertificado} onChange={(e) => setModeloCertificado(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1rem', fontSize: '0.82rem', fontWeight: 'bold' }}>
                         <option value="modelo1">Modelo 1: Básico con Salario y Cargo</option>
                         <option value="modelo2">Modelo 2: Con Funciones Detalladas (DPC)</option>
                         <option value="modelo3">Modelo 3: Certificado para Extrabajador (Inactivo)</option>
@@ -1639,7 +1666,7 @@ export default function Dashboard({ user, onLogout }) {
         )}
       </div>
 
-      {/* ÁREA OFICIAL DE IMPRESIÓN (SIN RECUADROS VERDES, MEMBRETE BLANCO FORMAL) */}
+      {/* ÁREA OFICIAL DE IMPRESIÓN (MEMBRETE BLANCO FORMAL) */}
       <div className="print-document-area">
         {imprimirTipo === 'acta' && selectedPostulation && (
           <div style={{ padding: '10mm 15mm' }}>

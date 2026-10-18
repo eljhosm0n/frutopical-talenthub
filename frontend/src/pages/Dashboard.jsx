@@ -36,7 +36,7 @@ export default function Dashboard({ user, onLogout }) {
   const [modalHvAspirante, setModalHvAspirante] = useState(null);
   const [vistaPreviaActa, setVistaPreviaActa] = useState(false);
   
-  // Matriz Ponderada según documento de revisión: 30% Técnica, 15% Psicológica, 30% Entrevista, 15% HV, 10% Médicos
+  // Matriz Ponderada Oficial (Ley / Parámetros SENA): 30% Técnica, 15% Psicológica, 30% Entrevista, 15% HV, 10% Médicos
   const [puntajeTecnico, setPuntajeTecnico] = useState(85);
   const [puntajePsicologico, setPuntajePsicologico] = useState(80);
   const [puntajeEntrevista, setPuntajeEntrevista] = useState(85);
@@ -246,11 +246,6 @@ export default function Dashboard({ user, onLogout }) {
     const doc = candidatoAprobado.numero_documento || '104' + Math.floor(Math.random() * 900000);
     const cargo = candidatoAprobado.convocatoria || candidatoAprobado.cargo || 'Operario de Producción';
 
-    let salario = '$2.000.000 COP';
-    if (cargo.toLowerCase().includes('talento humano')) salario = '$2.550.500 COP';
-    if (cargo.toLowerCase().includes('producción') && cargo.toLowerCase().includes('jefe')) salario = '$3.000.000 COP';
-    if (cargo.toLowerCase().includes('calidad') && cargo.toLowerCase().includes('jefe')) salario = '$3.000.000 COP';
-
     const exps = JSON.parse(localStorage.getItem('frutopical_expedientes') || '[]');
     if (!exps.some(e => String(e.numero_documento) === String(doc))) {
       const partes = nombreCompleto.split(' ');
@@ -304,7 +299,6 @@ export default function Dashboard({ user, onLogout }) {
     setSolicitudes(listaActualizada);
     localStorage.setItem('frutopical_solicitudes', JSON.stringify(listaActualizada));
 
-    // Intento de persistencia hacia la API si el backend está activo
     try {
       await fetch(`${api}/solicitudes/${selectedSolicitud.id_solicitud || selectedSolicitud.numero_solicitud}`, {
         method: 'PUT',
@@ -362,7 +356,6 @@ export default function Dashboard({ user, onLogout }) {
             background-color: #ffffff !important;
             color: #000000 !important;
           }
-          /* Oculta la plataforma interactiva y muestra únicamente el documento oficial */
           .th-dashboard, .th-modal-backdrop, .th-sidebar, .th-header {
             display: none !important;
           }
@@ -501,14 +494,15 @@ export default function Dashboard({ user, onLogout }) {
                   </div>
                 </div>
 
+                {/* ACCESO RÁPIDO A LOS 5 MÓDULOS OFICIALES COMPLETOS */}
                 <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '1.8rem', border: '1px solid #e2e8f0' }}>
                   <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '1px' }}>ACCESO RÁPIDO A MÓDULOS</span>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
                     <button type="button" onClick={() => changeModule('diagnostico')} style={{ textAlign: 'left', padding: '1.2rem', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', cursor: 'pointer', display: 'flex', gap: '0.8rem' }}>
                       <span style={{ fontSize: '1.8rem' }}>🏢</span>
                       <div>
                         <strong style={{ color: '#166534', fontSize: '0.95rem', display: 'block' }}>1. Caracterización Organizacional</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Estrategia, organigrama y los 13 perfiles de puesto DPC.</p>
+                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Estrategia, organigrama y los 13 perfiles DPC.</p>
                       </div>
                     </button>
 
@@ -516,7 +510,7 @@ export default function Dashboard({ user, onLogout }) {
                       <span style={{ fontSize: '1.8rem' }}>👥</span>
                       <div>
                         <strong style={{ color: '#c2410c', fontSize: '0.95rem', display: 'block' }}>2. Selección de Personal</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Matriz técnica con 5 criterios y emisión de acta PDF.</p>
+                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Matriz técnica ponderada y actas de evaluación.</p>
                       </div>
                     </button>
 
@@ -525,6 +519,22 @@ export default function Dashboard({ user, onLogout }) {
                       <div>
                         <strong style={{ color: '#1d4ed8', fontSize: '0.95rem', display: 'block' }}>3. Vinculación y SG-SST</strong>
                         <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Lista de chequeo documental y constancias de inducción.</p>
+                      </div>
+                    </button>
+
+                    <button type="button" onClick={() => changeModule('documentos')} style={{ textAlign: 'left', padding: '1.2rem', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', cursor: 'pointer', display: 'flex', gap: '0.8rem' }}>
+                      <span style={{ fontSize: '1.8rem' }}>📁</span>
+                      <div>
+                        <strong style={{ color: '#b45309', fontSize: '0.95rem', display: 'block' }}>4. Gestión Documental (CCD)</strong>
+                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Cuadro de clasificación series 100/200 e historias laborales.</p>
+                      </div>
+                    </button>
+
+                    <button type="button" onClick={() => changeModule('solicitudes')} style={{ textAlign: 'left', padding: '1.2rem', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', cursor: 'pointer', display: 'flex', gap: '0.8rem' }}>
+                      <span style={{ fontSize: '1.8rem' }}>💬</span>
+                      <div>
+                        <strong style={{ color: '#7e22ce', fontSize: '0.95rem', display: 'block' }}>5. Atención al Cliente (PQRS)</strong>
+                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Trámite de radicados y expedición de los 3 certificados.</p>
                       </div>
                     </button>
                   </div>
@@ -1238,9 +1248,7 @@ export default function Dashboard({ user, onLogout }) {
         )}
       </div>
 
-      {/* =========================================================
-          ÁREA OFICIAL DE IMPRESIÓN (SIN RECUADROS VERDES, FONDO BLANCO)
-      ========================================================= */}
+      {/* ÁREA OFICIAL DE IMPRESIÓN (SIN RECUADROS VERDES, FONDO BLANCO) */}
       <div className="print-document-area">
         {/* DOCUMENTO 1: ACTA DE VALORACIÓN TÉCNICA */}
         {imprimirTipo === 'acta' && selectedPostulation && (

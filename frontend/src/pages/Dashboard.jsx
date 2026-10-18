@@ -7,6 +7,143 @@ const api = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1';
 
 const REQUEST_STATES = ['RECIBIDA', 'EN PROCESO', 'ATENDIDA', 'CERRADA'];
 
+// BASE DE DATOS MAESTRA INSTITUCIONAL DE TRABAJADORES (FRUTAS DEL ATLÁNTICO S.A.S.)
+const BASE_DATOS_TRABAJADORES = [
+  {
+    documento: '1042890123',
+    nombre: 'Carlos Fontalvo Amaya',
+    cargo: 'Operario de Producción',
+    salario: '$2.000.000 COP',
+    salarioLetras: 'DOS MILLONES DE PESOS M/CTE',
+    tipoContrato: 'Término Indefinido',
+    fechaIngreso: '01 de febrero de 2026',
+    fechaRetiro: 'Vigente (Activo)',
+    estadoLaboral: 'ACTIVO',
+    correo: 'carlos.fontalvo@gmail.com',
+    telefono: '301 234 5678',
+    funciones: [
+      'Ejecución de actividades operativas de recepción, lavado, despulpado y pasteurización de frutas tropicales.',
+      'Cumplimiento estricto del Manual de Buenas Prácticas de Manufactura (BPM) e Inocuidad.',
+      'Operación y sanitización de maquinaria de envasado y sellado al vacío.',
+      'Verificación y control de estándares del SG-SST bajo Resolución 2400 de 1979.'
+    ]
+  },
+  {
+    documento: '1043567890',
+    nombre: 'María Conrado Jiménez',
+    cargo: 'Jefe de Calidad',
+    salario: '$3.000.000 COP',
+    salarioLetras: 'TRES MILLONES DE PESOS M/CTE',
+    tipoContrato: 'Término Indefinido',
+    fechaIngreso: '15 de febrero de 2026',
+    fechaRetiro: 'Vigente (Activo)',
+    estadoLaboral: 'ACTIVO',
+    correo: 'maria.conrado@gmail.com',
+    telefono: '310 987 6543',
+    funciones: [
+      'Planificación, implementación y aseguramiento del Sistema de Gestión de Calidad e Inocuidad.',
+      'Supervisión y auditoría interna de Buenas Prácticas de Manufactura (BPM) y sistema HACCP.',
+      'Control analítico de materias primas, mermas, acidez y grados Brix en pulpas congeladas.',
+      'Capacitación continua al personal de planta en estándares sanitarios y normatividad vigente.'
+    ]
+  },
+  {
+    documento: '1044123456',
+    nombre: 'David Riquett Villalobos',
+    cargo: 'Jefe de Producción',
+    salario: '$3.000.000 COP',
+    salarioLetras: 'TRES MILLONES DE PESOS M/CTE',
+    tipoContrato: 'Término Indefinido',
+    fechaIngreso: '01 de marzo de 2026',
+    fechaRetiro: 'Vigente (Activo)',
+    estadoLaboral: 'ACTIVO',
+    correo: 'david.riquett@gmail.com',
+    telefono: '302 345 6789',
+    funciones: [
+      'Planificación, programación y supervisión de las líneas de producción de pulpas y jugos.',
+      'Control de rendimientos, балансе de materia prima y eficiencia técnica de maquinaria.',
+      'Coordinación de los turnos de trabajo del personal operativo de planta.',
+      'Garantía de cumplimiento de las metas de producción conforme a las órdenes de despacho.'
+    ]
+  },
+  {
+    documento: '1045987654',
+    nombre: 'Laura Mendoza Peñaranda',
+    cargo: 'Jefe de Talento Humano',
+    salario: '$2.550.500 COP',
+    salarioLetras: 'DOS MILLONES QUINIENTOS CINCUENTA MIL QUINIENTOS PESOS M/CTE',
+    tipoContrato: 'Término Indefinido',
+    fechaIngreso: '10 de marzo de 2026',
+    fechaRetiro: 'Vigente (Activo)',
+    estadoLaboral: 'ACTIVO',
+    correo: 'laura.mendoza@frutopical.com',
+    telefono: '300 456 7890',
+    funciones: [
+      'Dirección y coordinación de los procesos de selección, contratación e inducción del personal.',
+      'Administración de historias laborales conforme a las Series CCD 100 y 200 del AGN.',
+      'Gestión de novedades de nómina, seguridad social integral y bienestar laboral.',
+      'Atención, trámite y resolución de peticiones, quejas y reclamos (PQRS) bajo Ley 1755.'
+    ]
+  },
+  {
+    documento: '1048765432',
+    nombre: 'Sandra Milena Morán Henríquez',
+    cargo: 'Analista de Gestión Humana',
+    salario: '$2.400.000 COP',
+    salarioLetras: 'DOS MILLONES CUATROCIENTOS MIL PESOS M/CTE',
+    tipoContrato: 'Término Indefinido',
+    fechaIngreso: '10 de febrero de 2026',
+    fechaRetiro: 'Vigente (Activo)',
+    estadoLaboral: 'ACTIVO',
+    correo: 'sandra.moran@gmail.com',
+    telefono: '315 889 9001',
+    funciones: [
+      'Apoyo en la gestión documental y foliación de expedientes de personal.',
+      'Verificación de listas de chequeo de ingreso, afiliaciones al SGSSS y dotación.',
+      'Atención de solicitudes de certificados laborales y desprendibles de pago.',
+      'Consolidación de reportes de ausentismo y matriz de capacitación continua.'
+    ]
+  },
+  {
+    documento: '1047123987',
+    nombre: 'Alejandro Shar',
+    cargo: 'Auxiliar Administrativo y Logística',
+    salario: '$2.200.000 COP',
+    salarioLetras: 'DOS MILLONES DOSCIENTOS MIL PESOS M/CTE',
+    tipoContrato: 'Término Fijo',
+    fechaIngreso: '01 de marzo de 2026',
+    fechaRetiro: '30 de septiembre de 2026',
+    estadoLaboral: 'EXTRABAJADOR',
+    correo: 'alejandro.shar@gmail.com',
+    telefono: '300 776 5432',
+    funciones: [
+      'Recepción y despacho de pedidos de pulpas para clientes del canal institucional.',
+      'Control de inventario de producto terminado en cuartos fríos y almacenamiento.',
+      'Radicación de facturas y archivo de remisiones de transporte.',
+      'Soporte administrativo en compras de insumos operativos y empaques.'
+    ]
+  },
+  {
+    documento: '10234532121',
+    nombre: 'Min Yongi',
+    cargo: 'Supervisor de Planta y Despachos',
+    salario: '$2.600.000 COP',
+    salarioLetras: 'DOS MILLONES SEISCIENTOS MIL PESOS M/CTE',
+    tipoContrato: 'Término Indefinido',
+    fechaIngreso: '15 de enero de 2026',
+    fechaRetiro: 'Vigente (Activo)',
+    estadoLaboral: 'ACTIVO',
+    correo: 'min.yongi@frutopical.com',
+    telefono: '320 654 3210',
+    funciones: [
+      'Supervisión de la línea de despulpado y verificación de temperaturas en cuartos fríos.',
+      'Control de entrega de elementos de protección personal (EPP) bajo Res. 2400.',
+      'Seguimiento a los cronogramas de mantenimiento preventivo de maquinaria.',
+      'Coordinación de despacho con conductores y logística de distribución refrigerada.'
+    ]
+  }
+];
+
 const CCD_SERIES = [
   { codigo: '100.1', serie: '100 - HISTORIAS LABORALES', nombre: '100.1 Documento de Identificación y Hoja de Vida', categoria: 'CV' },
   { codigo: '100.2', serie: '100 - HISTORIAS LABORALES', nombre: '100.2 Contrato Laboral y Afiliaciones (Seguridad Social)', categoria: 'Contrato' },
@@ -69,18 +206,23 @@ export default function Dashboard({ user, onLogout }) {
   const [modeloCertificado, setModeloCertificado] = useState('modelo1');
   const [solicitudNotice, setSolicitudNotice] = useState('');
 
-  // Parámetros dinámicos para los certificados laborales
-  const [certCargo, setCertCargo] = useState('Operario de Producción');
-  const [certSalario, setCertSalario] = useState('$2.000.000 COP');
-  const [certFechaIngreso, setCertFechaIngreso] = useState('15 de enero de 2026');
-  const [certFechaRetiro, setCertFechaRetiro] = useState('31 de agosto de 2026');
+  // DATOS DINÁMICOS DEL CERTIFICADO LABORAL (CARGADOS DE LA BASE DE DATOS MAESTRA)
+  const [certDatos, setCertDatos] = useState(BASE_DATOS_TRABAJADORES[0]);
 
   useEffect(() => {
     loadConvocatorias();
     loadExpedientes();
     loadPostulaciones();
     loadSolicitudes();
+    sincronizarBaseTrabajadores();
   }, []);
+
+  function sincronizarBaseTrabajadores() {
+    const guardados = localStorage.getItem('frutopical_empleados');
+    if (!guardados) {
+      localStorage.setItem('frutopical_empleados', JSON.stringify(BASE_DATOS_TRABAJADORES));
+    }
+  }
 
   async function loadConvocatorias() {
     try {
@@ -234,6 +376,7 @@ export default function Dashboard({ user, onLogout }) {
         id_solicitud: 1,
         numero_solicitud: 'SOL-2026-0001',
         nombre_remitente: 'Carlos Fontalvo Amaya',
+        numero_documento: '1042890123',
         tipo_remitente: 'TRABAJADOR_ACTIVO',
         correo: 'carlos.fontalvo@gmail.com',
         telefono: '301 234 5678',
@@ -242,6 +385,34 @@ export default function Dashboard({ user, onLogout }) {
         fecha: new Date().toISOString(),
         estado: 'ATENDIDA',
         respuesta_observacion: 'Se expide la certificación laboral solicitada conforme al registro contractual vigente.'
+      },
+      {
+        id_solicitud: 2,
+        numero_solicitud: 'SOL-2026-000692',
+        nombre_remitente: 'Sandra Milena Morán Henríquez',
+        numero_documento: '1048765432',
+        tipo_remitente: 'TRABAJADOR_ACTIVO',
+        correo: 'sandra.moran@gmail.com',
+        telefono: '315 889 9001',
+        tipo_solicitud: 'PETICION',
+        descripcion: 'Solicito certificación de funciones y salario para crédito de vivienda.',
+        fecha: new Date().toISOString(),
+        estado: 'EN PROCESO',
+        respuesta_observacion: 'Su solicitud está siendo tramitada por la Jefatura de Talento Humano.'
+      },
+      {
+        id_solicitud: 3,
+        numero_solicitud: 'SOL-2026-000468',
+        nombre_remitente: 'Alejandro Shar',
+        numero_documento: '1047123987',
+        tipo_remitente: 'EXTRABAJADOR',
+        correo: 'alejandro.shar@gmail.com',
+        telefono: '300 776 5432',
+        tipo_solicitud: 'PETICION',
+        descripcion: 'Constancia laboral de extrabajador para vinculación en nuevo empleo.',
+        fecha: new Date().toISOString(),
+        estado: 'RECIBIDA',
+        respuesta_observacion: 'En verificación de archivo de historias laborales Serie 100.'
       }
     ];
 
@@ -319,20 +490,42 @@ export default function Dashboard({ user, onLogout }) {
     const cargo = candidatoAprobado.convocatoria || candidatoAprobado.cargo || 'Operario de Producción';
 
     let salario = '$2.000.000 COP';
-    if (cargo.toLowerCase().includes('talento humano')) salario = '$2.550.500 COP';
-    if (cargo.toLowerCase().includes('calidad') && cargo.toLowerCase().includes('jefe')) salario = '$3.000.000 COP';
-    if (cargo.toLowerCase().includes('producción') && cargo.toLowerCase().includes('jefe')) salario = '$3.000.000 COP';
+    let salarioLetras = 'DOS MILLONES DE PESOS M/CTE';
+    if (cargo.toLowerCase().includes('talento humano')) {
+      salario = '$2.550.500 COP';
+      salarioLetras = 'DOS MILLONES QUINIENTOS CINCUENTA MIL QUINIENTOS PESOS M/CTE';
+    }
+    if (cargo.toLowerCase().includes('calidad') && cargo.toLowerCase().includes('jefe')) {
+      salario = '$3.000.000 COP';
+      salarioLetras = 'TRES MILLONES DE PESOS M/CTE';
+    }
+    if (cargo.toLowerCase().includes('producción') && cargo.toLowerCase().includes('jefe')) {
+      salario = '$3.000.000 COP';
+      salarioLetras = 'TRES MILLONES DE PESOS M/CTE';
+    }
 
-    const emps = JSON.parse(localStorage.getItem('frutopical_empleados') || '[]');
+    const nuevoColaborador = {
+      documento: doc,
+      nombre: nombreCompleto,
+      cargo: cargo,
+      salario: salario,
+      salarioLetras: salarioLetras,
+      tipoContrato: 'Término Indefinido',
+      fechaIngreso: fechaHoy,
+      fechaRetiro: 'Vigente (Activo)',
+      estadoLaboral: 'ACTIVO',
+      correo: candidatoAprobado.correo || 'colaborador@frutopical.com',
+      telefono: candidatoAprobado.telefono || '300 123 4567',
+      funciones: [
+        `Ejecución cabal de responsabilidades conforme al manual DPC del cargo ${cargo}.`,
+        'Cumplimiento de estándares de Buenas Prácticas de Manufactura (BPM) e Inocuidad.',
+        'Aplicación estricta de lineamientos del SG-SST institucional.'
+      ]
+    };
+
+    const emps = JSON.parse(localStorage.getItem('frutopical_empleados') || JSON.stringify(BASE_DATOS_TRABAJADORES));
     if (!emps.some(e => String(e.documento) === String(doc))) {
-      emps.unshift({
-        id: Date.now(),
-        nombre: nombreCompleto,
-        documento: doc,
-        cargo: cargo,
-        salario: salario,
-        fechaIngreso: new Date().toISOString().split('T')[0]
-      });
+      emps.unshift(nuevoColaborador);
       localStorage.setItem('frutopical_empleados', JSON.stringify(emps));
     }
 
@@ -360,7 +553,7 @@ export default function Dashboard({ user, onLogout }) {
     setPostulaciones(actualizadosPost);
     localStorage.setItem('frutopical_postulaciones', JSON.stringify(actualizadosPost));
 
-    alert(`¡Candidato ${nombreCompleto} vinculado exitosamente al Módulo 3 (SST) y al Archivo Central CCD!`);
+    alert(`¡Candidato ${nombreCompleto} vinculado exitosamente a Nómina, SST y Archivo Central CCD!`);
     setSelectedPostulation(null);
     setVistaPreviaActa(false);
   }
@@ -402,46 +595,56 @@ export default function Dashboard({ user, onLogout }) {
     }, 1200);
   }
 
-  // CRUCE AUTOMÁTICO DE DATOS REALES DEL SOLICITANTE CON LA BASE DE DATOS CONTRACTUAL
+  // ATENCIÓN DE PQRS: CRUCE AUTOMÁTICO INMEDIATO CON LA BASE DE DATOS MAESTRA
   function abrirCasoPQRS(item) {
     setSelectedSolicitud(item);
     setNewSolicitudState(item.estado || 'RECIBIDA');
     setSolicitudResponse(item.respuesta_observacion || '');
 
-    const emps = JSON.parse(localStorage.getItem('frutopical_empleados') || '[]');
+    const emps = JSON.parse(localStorage.getItem('frutopical_empleados') || JSON.stringify(BASE_DATOS_TRABAJADORES));
+    const docBuscado = (item.numero_documento || '').replace(/\D/g, '');
     const nombreLimpio = (item.nombre_remitente || '').toLowerCase();
-    
-    // Buscar coincidencia en colaboradores de nómina / vinculación
-    const encontrado = emps.find(e => 
-      nombreLimpio.includes(e.nombre.toLowerCase()) || 
-      e.nombre.toLowerCase().includes(nombreLimpio)
-    );
+
+    // 1. Cruce por cédula (llave primaria)
+    let encontrado = emps.find(e => docBuscado && String(e.documento).replace(/\D/g, '') === docBuscado);
+
+    // 2. Cruce por nombre
+    if (!encontrado) {
+      encontrado = emps.find(e => 
+        nombreLimpio.includes(e.nombre.toLowerCase()) || 
+        e.nombre.toLowerCase().includes(nombreLimpio)
+      );
+    }
 
     if (encontrado) {
-      setCertCargo(encontrado.cargo);
-      setCertSalario(encontrado.salario || '$2.000.000 COP');
-      setCertFechaIngreso(encontrado.fechaIngreso ? `${encontrado.fechaIngreso}` : '15 de enero de 2026');
-      setCertFechaRetiro('31 de agosto de 2026');
-    } else if (nombreLimpio.includes('alejandro') || nombreLimpio.includes('shar')) {
-      setCertCargo('Auxiliar Administrativo y Logística');
-      setCertSalario('$2.200.000 COP');
-      setCertFechaIngreso('01 de marzo de 2026');
-      setCertFechaRetiro('30 de septiembre de 2026');
-    } else if (nombreLimpio.includes('sandra') || nombreLimpio.includes('moran') || nombreLimpio.includes('morán')) {
-      setCertCargo('Analista de Gestión Humana');
-      setCertSalario('$2.400.000 COP');
-      setCertFechaIngreso('10 de febrero de 2026');
-      setCertFechaRetiro('31 de agosto de 2026');
-    } else if (nombreLimpio.includes('yongi') || nombreLimpio.includes('min')) {
-      setCertCargo('Supervisor de Almacén');
-      setCertSalario('$2.500.000 COP');
-      setCertFechaIngreso('15 de febrero de 2026');
-      setCertFechaRetiro('15 de octubre de 2026');
+      setCertDatos(encontrado);
     } else {
-      setCertCargo('Operario de Producción');
-      setCertSalario('$2.000.000 COP');
-      setCertFechaIngreso('15 de enero de 2026');
-      setCertFechaRetiro('31 de agosto de 2026');
+      // Si no existe, crear registro base adaptado al solicitante
+      setCertDatos({
+        documento: item.numero_documento || '1042890123',
+        nombre: item.nombre_remitente || 'Colaborador',
+        cargo: 'Operario de Producción',
+        salario: '$2.000.000 COP',
+        salarioLetras: 'DOS MILLONES DE PESOS M/CTE',
+        tipoContrato: 'Término Indefinido',
+        fechaIngreso: '15 de enero de 2026',
+        fechaRetiro: '31 de agosto de 2026',
+        estadoLaboral: item.tipo_remitente === 'EXTRABAJADOR' ? 'EXTRABAJADOR' : 'ACTIVO',
+        funciones: [
+          'Ejecución cabal de actividades operativas e institucionales conforme al área asignada.',
+          'Cumplimiento estricto del Manual de Buenas Prácticas de Manufactura (BPM) e Inocuidad.',
+          'Verificación de los estándares del Sistema de Gestión de Seguridad y Salud en el Trabajo (SG-SST).'
+        ]
+      });
+    }
+  }
+
+  // CAMBIO DIRECTO DESDE EL SELECTOR DE TRABAJADORES EN EL PANEL DE CERTIFICACIÓN
+  function seleccionarTrabajadorManual(doc) {
+    const emps = JSON.parse(localStorage.getItem('frutopical_empleados') || JSON.stringify(BASE_DATOS_TRABAJADORES));
+    const match = emps.find(e => String(e.documento) === String(doc));
+    if (match) {
+      setCertDatos(match);
     }
   }
 
@@ -468,6 +671,7 @@ export default function Dashboard({ user, onLogout }) {
   }
 
   const fechaHoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+  const listaMaestraEmpleados = JSON.parse(localStorage.getItem('frutopical_empleados') || JSON.stringify(BASE_DATOS_TRABAJADORES));
 
   return (
     <>
@@ -960,8 +1164,8 @@ export default function Dashboard({ user, onLogout }) {
                     <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                       <div>
                         <span className="th-label">EQUIPO 5 · SERVICIO AL CLIENTE INTERNO</span>
-                        <h2>Gestión de PQRS y Certificaciones</h2>
-                        <p>Atiende requerimientos radicados por la web pública y expide los 3 modelos oficiales de certificación con datos cruzados.</p>
+                        <h2>Gestión de PQRS y Certificaciones Laborales</h2>
+                        <p>Atiende radicados y genera certificados con cruce automático de nómina e historial contractual.</p>
                       </div>
                       <button
                         type="button"
@@ -978,6 +1182,7 @@ export default function Dashboard({ user, onLogout }) {
                           <tr>
                             <th>Radicado</th>
                             <th>Remitente</th>
+                            <th>Cédula / Documento</th>
                             <th>Contacto (Tel / Email)</th>
                             <th>Tipo Solicitud</th>
                             <th>Estado</th>
@@ -989,6 +1194,7 @@ export default function Dashboard({ user, onLogout }) {
                             <tr key={item.id_solicitud ?? index}>
                               <td><strong>{item.numero_solicitud || `SOL-2026-000${index + 1}`}</strong></td>
                               <td>{item.nombre_remitente}</td>
+                              <td><strong style={{ color: '#166534' }}>{item.numero_documento || '1042890123'}</strong></td>
                               <td>
                                 <div style={{ fontSize: '0.78rem' }}>
                                   <span>✉ {item.correo || 'correo@ejemplo.com'}</span><br />
@@ -1024,18 +1230,19 @@ export default function Dashboard({ user, onLogout }) {
                         <button type="button" onClick={() => setSelectedSolicitud(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕ Volver</button>
                       </div>
 
-                      {/* DATOS DE CONTACTO VISIBLES PARA TALENTO HUMANO */}
+                      {/* DATOS DE CONTACTO Y VINCULACIÓN */}
                       <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '1rem', fontSize: '0.85rem' }}>
-                        <p style={{ margin: '0 0 0.4rem 0' }}><strong>Remitente:</strong> {selectedSolicitud.nombre_remitente}</p>
-                        <p style={{ margin: '0 0 0.4rem 0' }}><strong>Tipo de Usuario:</strong> {selectedSolicitud.tipo_remitente || 'Trabajador Activo'}</p>
-                        <p style={{ margin: '0 0 0.4rem 0', color: '#166534' }}>
-                          <strong>✉ Correo de Notificación:</strong> {selectedSolicitud.correo || 'correo.solicitante@ejemplo.com'}
+                        <p style={{ margin: '0 0 0.3rem 0' }}><strong>Remitente:</strong> {selectedSolicitud.nombre_remitente}</p>
+                        <p style={{ margin: '0 0 0.3rem 0' }}><strong>Cédula / Identificación:</strong> <strong style={{ color: '#166534' }}>{selectedSolicitud.numero_documento || certDatos.documento}</strong></p>
+                        <p style={{ margin: '0 0 0.3rem 0' }}><strong>Tipo de Usuario:</strong> {selectedSolicitud.tipo_remitente || 'Trabajador Activo'}</p>
+                        <p style={{ margin: '0 0 0.3rem 0', color: '#166534' }}>
+                          <strong>✉ Correo:</strong> {selectedSolicitud.correo || certDatos.correo || 'correo@ejemplo.com'}
                         </p>
                         <p style={{ margin: '0 0 0.4rem 0', color: '#166534' }}>
-                          <strong>📞 Teléfono de Contacto:</strong> {selectedSolicitud.telefono || '300 000 0000'}
+                          <strong>📞 Celular:</strong> {selectedSolicitud.telefono || certDatos.telefono || '300 000 0000'}
                         </p>
                         <p style={{ margin: '0.4rem 0 0 0', borderTop: '1px dashed #cbd5e1', paddingTop: '0.4rem' }}>
-                          <strong>Detalle Requerimiento:</strong> {selectedSolicitud.descripcion}
+                          <strong>Requerimiento:</strong> {selectedSolicitud.descripcion}
                         </p>
                       </div>
 
@@ -1051,68 +1258,52 @@ export default function Dashboard({ user, onLogout }) {
                       {solicitudNotice && <p style={{ color: '#166534', fontWeight: 'bold', fontSize: '0.85rem', marginTop: '0.6rem' }}>✓ {solicitudNotice}</p>}
                     </form>
 
-                    {/* EXPEDICIÓN DE CERTIFICADO CON CAMPOS DINÁMICOS Y EDITABLES */}
+                    {/* EXPEDICIÓN DE CERTIFICADO CON CRUCE DE NÓMINA */}
                     <div style={{ backgroundColor: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '12px', padding: '1.5rem' }}>
                       <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '0.5px' }}>FORMATOS LABORALES</span>
                       <h4 style={{ margin: '0.2rem 0 0.8rem 0', color: '#166534', fontSize: '1.1rem' }}>Expedición de Certificado</h4>
+
+                      {/* SELECTOR MAESTRO DE COLABORADOR EN LA BASE DE DATOS */}
+                      <div style={{ marginBottom: '1rem', backgroundColor: '#f0fdf4', padding: '0.8rem', borderRadius: '8px', border: '1.5px solid #86efac' }}>
+                        <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 'bold', color: '#166534', marginBottom: '0.3rem' }}>
+                          🏢 Registro de Nómina / Colaborador Vinculado:
+                        </label>
+                        <select
+                          value={certDatos.documento}
+                          onChange={(e) => seleccionarTrabajadorManual(e.target.value)}
+                          style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1.5px solid #166534', fontWeight: 'bold', fontSize: '0.82rem', backgroundColor: '#ffffff', cursor: 'pointer' }}
+                        >
+                          {listaMaestraEmpleados.map((emp) => (
+                            <option key={emp.documento} value={emp.documento}>
+                              {emp.nombre} (C.C. {emp.documento}) - {emp.cargo}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                       
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>Selecciona el Modelo:</label>
-                      <select value={modeloCertificado} onChange={(e) => setModeloCertificado(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #86efac', marginBottom: '1rem', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                      <select value={modeloCertificado} onChange={(e) => setModeloCertificado(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginBottom: '1rem', fontSize: '0.82rem', fontWeight: 'bold' }}>
                         <option value="modelo1">Modelo 1: Básico con Salario y Cargo</option>
-                        <option value="modelo2">Modelo 2: Básico con Funciones Detalladas</option>
+                        <option value="modelo2">Modelo 2: Con Funciones Detalladas (DPC)</option>
                         <option value="modelo3">Modelo 3: Certificado para Extrabajador (Inactivo)</option>
                       </select>
 
-                      {/* DATOS CRUZADOS AUTOMÁTICAMENTE Y EDITABLES */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', marginBottom: '1rem' }}>
-                        <div>
-                          <label style={{ fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Cargo a Certificar:</label>
-                          <input
-                            type="text"
-                            value={certCargo}
-                            onChange={(e) => setCertCargo(e.target.value)}
-                            style={{ width: '100%', padding: '0.45rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Salario Mensual:</label>
-                          <input
-                            type="text"
-                            value={certSalario}
-                            onChange={(e) => setCertSalario(e.target.value)}
-                            style={{ width: '100%', padding: '0.45rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Fecha de Ingreso:</label>
-                          <input
-                            type="text"
-                            value={certFechaIngreso}
-                            onChange={(e) => setCertFechaIngreso(e.target.value)}
-                            style={{ width: '100%', padding: '0.45rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
-                          />
-                        </div>
+                      {/* RESUMEN DE DATOS AUTOMÁTICOS DEL CERTIFICADO */}
+                      <div style={{ backgroundColor: '#f8fafc', padding: '0.9rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', lineHeight: '1.6', marginBottom: '1.2rem' }}>
+                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>Titular:</strong> {certDatos.nombre}</p>
+                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>C.C.:</strong> {certDatos.documento}</p>
+                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>Cargo Oficial:</strong> {certDatos.cargo}</p>
+                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>Asignación Mensual:</strong> <strong style={{ color: '#166534' }}>{certDatos.salario}</strong></p>
+                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>Fecha de Vinculación:</strong> {certDatos.fechaIngreso}</p>
                         {modeloCertificado === 'modelo3' && (
-                          <div>
-                            <label style={{ fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Fecha de Retiro:</label>
-                            <input
-                              type="text"
-                              value={certFechaRetiro}
-                              onChange={(e) => setCertFechaRetiro(e.target.value)}
-                              style={{ width: '100%', padding: '0.45rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
-                            />
-                          </div>
+                          <p style={{ margin: 0, color: '#c2410c' }}><strong>Fecha de Retiro:</strong> {certDatos.fechaRetiro}</p>
                         )}
-                      </div>
-
-                      <div style={{ backgroundColor: '#f0fdf4', padding: '0.8rem', borderRadius: '8px', border: '1px solid #bbf7d0', fontSize: '0.78rem', color: '#166534', marginBottom: '1.2rem' }}>
-                        <strong>Vista Previa:</strong> Se emitirá para <strong>{selectedSolicitud.nombre_remitente}</strong> ({certCargo}) con asignación de <strong>{certSalario}</strong>.
                       </div>
 
                       <button
                         type="button"
                         onClick={() => triggerImpresion('certificado')}
-                        style={{ width: '100%', padding: '0.8rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                        style={{ width: '100%', padding: '0.85rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 12px rgba(22, 101, 52, 0.2)' }}
                       >
                         🖨️ Generar / Imprimir Certificado PDF
                       </button>
@@ -1448,7 +1639,7 @@ export default function Dashboard({ user, onLogout }) {
         )}
       </div>
 
-      {/* ÁREA OFICIAL DE IMPRESIÓN (SIN RECUADROS VERDES, FONDO BLANCO) */}
+      {/* ÁREA OFICIAL DE IMPRESIÓN (SIN RECUADROS VERDES, MEMBRETE BLANCO FORMAL) */}
       <div className="print-document-area">
         {imprimirTipo === 'acta' && selectedPostulation && (
           <div style={{ padding: '10mm 15mm' }}>
@@ -1515,8 +1706,8 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* CERTIFICADOS LABORALES CON DATOS 100% DINÁMICOS Y PERSONALIZADOS */}
-        {imprimirTipo === 'certificado' && selectedSolicitud && (
+        {/* CERTIFICADOS LABORALES: DILIGENCIADOS 100% AUTOMÁTICOS DESDE LA NÓMINA */}
+        {imprimirTipo === 'certificado' && certDatos && (
           <div style={{ padding: '15mm 20mm', fontFamily: 'serif' }}>
             <div style={{ borderBottom: '3px solid #166534', paddingBottom: '12px', marginBottom: '35px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
@@ -1539,7 +1730,7 @@ export default function Dashboard({ user, onLogout }) {
             {/* MODELO 1: BÁSICO CON SALARIO Y CARGO CRUZADO */}
             {modeloCertificado === 'modelo1' && (
               <p style={{ fontSize: '11.5pt', lineHeight: '2', textAlign: 'justify' }}>
-                Que el(la) señor(a) <strong>{selectedSolicitud.nombre_remitente}</strong>, identificado(a) con Cédula de Ciudadanía, labora actualmente en nuestra organización mediante Contrato Individual de Trabajo a Término Indefinido desde el <strong>{certFechaIngreso}</strong>, desempeñando el cargo de <strong>{certCargo}</strong>, devengando una asignación salarial básica mensual de <strong>{certSalario}</strong> más todas las prestaciones sociales y afiliaciones obligatorias al Sistema General de Seguridad Social (EPS, AFP, ARL y Caja de Compensación Familiar).
+                Que el(la) señor(a) <strong>{certDatos.nombre}</strong>, identificado(a) con Cédula de Ciudadanía <strong>N° {certDatos.documento}</strong>, labora actualmente en nuestra organización mediante Contrato Individual de Trabajo a {certDatos.tipoContrato || 'Término Indefinido'} desde el <strong>{certDatos.fechaIngreso}</strong>, desempeñando el cargo de <strong>{certDatos.cargo}</strong>, devengando una asignación salarial básica mensual de <strong>{certDatos.salarioLetras || certDatos.salario} ({certDatos.salario})</strong> más todas las prestaciones sociales y afiliaciones obligatorias al Sistema General de Seguridad Social (EPS, AFP, ARL y Caja de Compensación Familiar).
               </p>
             )}
 
@@ -1547,13 +1738,16 @@ export default function Dashboard({ user, onLogout }) {
             {modeloCertificado === 'modelo2' && (
               <div>
                 <p style={{ fontSize: '11.5pt', lineHeight: '1.9', textAlign: 'justify' }}>
-                  Que el(la) señor(a) <strong>{selectedSolicitud.nombre_remitente}</strong> se encuentra vinculado(a) laboralmente con FRUTAS DEL ATLÁNTICO S.A.S. en el cargo de <strong>{certCargo}</strong> desde el <strong>{certFechaIngreso}</strong>, desempeñando a cabalidad las funciones estipuladas en el Manual de Funciones y Competencias (DPC):
+                  Que el(la) señor(a) <strong>{certDatos.nombre}</strong>, identificado(a) con Cédula de Ciudadanía <strong>N° {certDatos.documento}</strong>, se encuentra vinculado(a) laboralmente con FRUTAS DEL ATLÁNTICO S.A.S. en el cargo de <strong>{certDatos.cargo}</strong> desde el <strong>{certDatos.fechaIngreso}</strong>, desempeñando a cabalidad las funciones estipuladas en el Manual de Funciones y Competencias (DPC):
                 </p>
                 <ul style={{ fontSize: '10.5pt', lineHeight: '1.8', margin: '15px 0 20px 25px' }}>
-                  <li>Ejecución de actividades operativas e institucionales conforme al área asignada.</li>
-                  <li>Cumplimiento estricto del Manual de Buenas Prácticas de Manufactura (BPM) e Inocuidad.</li>
-                  <li>Verificación de los estándares del Sistema de Gestión de Seguridad y Salud en el Trabajo (SG-SST).</li>
-                  <li>Custodia documental y reporte de indicadores ante la Jefatura de Área.</li>
+                  {(certDatos.funciones || [
+                    'Ejecución de actividades operativas e institucionales conforme al área asignada.',
+                    'Cumplimiento estricto del Manual de Buenas Prácticas de Manufactura (BPM) e Inocuidad.',
+                    'Verificación de los estándares del Sistema de Gestión de Seguridad y Salud en el Trabajo (SG-SST).'
+                  ]).map((fun, fIdx) => (
+                    <li key={fIdx}>{fun}</li>
+                  ))}
                 </ul>
               </div>
             )}
@@ -1561,7 +1755,7 @@ export default function Dashboard({ user, onLogout }) {
             {/* MODELO 3: PARA EXTRABAJADOR (INACTIVO) CON FECHA DE RETIRO */}
             {modeloCertificado === 'modelo3' && (
               <p style={{ fontSize: '11.5pt', lineHeight: '2', textAlign: 'justify' }}>
-                Que el(la) señor(a) <strong>{selectedSolicitud.nombre_remitente}</strong> laboró al servicio de FRUTAS DEL ATLÁNTICO S.A.S. mediante contrato laboral desde el <strong>{certFechaIngreso}</strong> hasta el <strong>{certFechaRetiro}</strong>, ocupando el cargo de <strong>{certCargo}</strong> con una asignación salarial de <strong>{certSalario}</strong>, habiendo finalizado su vínculo laboral a paz y salvo por todo concepto de salarios, cesantías, primas y liquidación de prestaciones sociales conforme al Código Sustantivo del Trabajo.
+                Que el(la) señor(a) <strong>{certDatos.nombre}</strong>, identificado(a) con Cédula de Ciudadanía <strong>N° {certDatos.documento}</strong>, laboró al servicio de FRUTAS DEL ATLÁNTICO S.A.S. mediante contrato laboral desde el <strong>{certDatos.fechaIngreso}</strong> hasta el <strong>{certDatos.fechaRetiro || '31 de agosto de 2026'}</strong>, ocupando el cargo de <strong>{certDatos.cargo}</strong> con una asignación salarial de <strong>{certDatos.salarioLetras || certDatos.salario} ({certDatos.salario})</strong>, habiendo finalizado su vínculo laboral a paz y salvo por todo concepto de salarios, cesantías, primas y liquidación de prestaciones sociales conforme al Código Sustantivo del Trabajo.
               </p>
             )}
 

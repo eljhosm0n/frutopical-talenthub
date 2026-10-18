@@ -7,10 +7,10 @@ import './styles.css';
 import './corporate.css';
 import './motion.css';
 
-// Cambiar el título de la pestaña de forma formal
+// Título de la pestaña
 document.title = "Frutopical | TalentHub";
 
-// Forzar el favicon apuntando directo a la carpeta public
+// Favicon institucional
 const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
 link.type = 'image/png';
 link.rel = 'icon';
@@ -21,7 +21,7 @@ const api =
   import.meta.env.VITE_API_URL ??
   'http://localhost:3000/api/v1';
 
-// Función para resolver rutas seguras a la carpeta public
+// Resolver rutas públicas
 function getPublicUrl(path) {
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   return `${import.meta.env.BASE_URL}${cleanPath}`;
@@ -76,13 +76,13 @@ const emptyPqrs = {
   acepta_datos: false
 };
 
-// INFORMACIÓN OFICIAL SEGÚN OBSERVACIONES DE REVISIÓN Y LEY 1755 DE 2015
+// PLAZOS LEY 1755 DE 2015 Y CERTIFICADOS LABORALES
 const INFORMACION_PQRS = {
   PETICION: {
     letra: 'P – Petición',
     titulo: 'Petición / Consulta General o Certificado Laboral',
-    definicion: 'Solicitud de información, orientación o consulta general sobre la empresa o sus procesos. Si eres trabajador activo o extrabajador, podrás tramitar tus solicitudes de certificados laborales a través del PQRS.',
-    sla: 'General: 15 días hábiles | Certificado Activo: 3 a 5 días hábiles | Certificado Inactivo: 8 días hábiles'
+    definicion: 'Solicitud de información, orientación o consulta general. Si eres trabajador activo o inactivo, puedes tramitar aquí tus certificados laborales.',
+    sla: 'General: 15 días hábiles | Certificado Activo: 3 a 5 días | Extrabajador: 8 días'
   },
   QUEJA: {
     letra: 'Q – Queja',
@@ -93,20 +93,20 @@ const INFORMACION_PQRS = {
   RECLAMO: {
     letra: 'R – Reclamo',
     titulo: 'Reclamo',
-    definicion: 'Manifestación de inconformidad por el incumplimiento o fallo en un servicio o relación contractual, que exige una solución o corrección específica.',
+    definicion: 'Manifestación de inconformidad por el incumplimiento o fallo en un servicio o relación contractual.',
     sla: '15 días hábiles (Ley 1755 de 2015)'
   },
   SUGERENCIA: {
     letra: 'S – Sugerencia / Solicitud',
-    titulo: 'Sugerencia / Solicitud de Trámite Laboral',
-    definicion: 'Propuesta orientada a mejorar los servicios y procesos, o requerimiento formal de expedición de documentos institucionales (certificados laborales, desprendibles de pago, paz y salvos) por colaboradores activos o inactivos.',
-    sla: 'Sugerencia: 15 días hábiles | Certificado Activo: 3 a 5 días hábiles | Certificado Inactivo: 8 días hábiles'
+    titulo: 'Sugerencia / Solicitud Laboral',
+    definicion: 'Propuesta de mejora institucional o requerimiento formal de expedición de certificados laborales o paz y salvos.',
+    sla: 'Sugerencia: 15 días hábiles | Certificado: 3 a 8 días hábiles'
   },
   FELICITACION: {
     letra: 'F – Felicitación',
     titulo: 'Felicitación',
-    definicion: 'Reconocimiento o expresión de satisfacción por la labor, servicio o gestión realizada por la organización.',
-    sla: 'Registro institucional y acuse formal'
+    definicion: 'Reconocimiento explícito y satisfacción por la atención, servicio o gestión institucional.',
+    sla: 'Acuse formal y registro institucional'
   }
 };
 
@@ -166,7 +166,6 @@ const corporate = {
   ]
 };
 
-// 4 CONVOCATORIAS OFICIALES
 const CONVOCATORIAS_INICIALES = [
   {
     id_convocatoria: 1,
@@ -289,11 +288,11 @@ function App() {
     setPqrsForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   }
 
+  // POSTULACIÓN INTEGRAL CON REGISTRO DE CONTACTO PARA MÓDULO 2
   async function apply(e) {
     e.preventDefault();
     if (!selected) return;
 
-    // Validación obligatoria de Hoja de Vida
     if (!form.hoja_vida_nombre) {
       alert('Debes adjuntar tu hoja de vida en formato PDF o Word para completar la postulación.');
       return;
@@ -313,6 +312,9 @@ function App() {
       convocatoria: selected.titulo,
       candidato: `${form.nombres} ${form.apellidos}`.trim(),
       hoja_vida: form.hoja_vida_nombre || `HV_${form.nombres.replace(/\s+/g, '_')}.pdf`,
+      telefono: form.telefono,
+      correo: form.correo,
+      ciudad: form.ciudad,
       consentimiento_habeas_data: true,
       fecha_autorizacion: new Date().toISOString(),
       estado: 'RECIBIDA'
@@ -329,7 +331,7 @@ function App() {
     const prevPost = JSON.parse(localStorage.getItem('frutopical_postulaciones') || '[]');
     localStorage.setItem('frutopical_postulaciones', JSON.stringify([payload, ...prevPost]));
 
-    setNotice('¡Tu postulación y Hoja de Vida fueron radicadas con éxito en TalentHub! Autorización de datos personales registrada.');
+    setNotice(`¡Postulación radicada con éxito para ${payload.candidato}! Tus datos fueron registrados en el Módulo 2.`);
     setForm(emptyForm);
   }
 
@@ -351,7 +353,8 @@ function App() {
       numero_solicitud: radicado,
       fecha: new Date().toISOString(),
       consentimiento_habeas_data: true,
-      estado: 'RECIBIDA'
+      estado: 'RECIBIDA',
+      respuesta_observacion: 'Su requerimiento se encuentra en estudio bajo los términos del SLA institucional.'
     };
 
     try {
@@ -370,22 +373,24 @@ function App() {
     setSendingPqrs(false);
   }
 
+  // BÚSQUEDA TOLERANTE Y NORMALIZADA DE RADICADOS
   function handleBuscarRadicado(e) {
     e.preventDefault();
     if (!searchRadicado.trim()) return;
     setSearchingRadicado(true);
 
-    const codigo = searchRadicado.trim().toUpperCase();
+    const busquedaLimpia = searchRadicado.trim().toUpperCase().replace(/\s+/g, '');
     const stored = JSON.parse(localStorage.getItem('frutopical_solicitudes') || '[]');
-    
-    const match = stored.find(
-      (s) => s.numero_solicitud && s.numero_solicitud.toUpperCase() === codigo
-    );
 
     setTimeout(() => {
+      const match = stored.find((s) => {
+        const radicadoExistente = (s.numero_solicitud || '').trim().toUpperCase().replace(/\s+/g, '');
+        return radicadoExistente === busquedaLimpia || radicadoExistente.includes(busquedaLimpia) || busquedaLimpia.includes(radicadoExistente);
+      });
+
       if (match) {
         setRadicadoResult(match);
-      } else if (codigo === 'SOL-2026-0001') {
+      } else if (busquedaLimpia === 'SOL-2026-0001' || busquedaLimpia.includes('0001')) {
         setRadicadoResult({
           numero_solicitud: 'SOL-2026-0001',
           nombre_remitente: 'Carlos Fontalvo Amaya',
@@ -395,11 +400,21 @@ function App() {
           descripcion: 'Solicitud de certificado laboral institucional.',
           respuesta_observacion: 'Se expide la certificación laboral solicitada conforme al registro contractual vigente.'
         });
+      } else if (busquedaLimpia.includes('000692') || busquedaLimpia === 'SOL-2026-000692') {
+        setRadicadoResult({
+          numero_solicitud: 'SOL-2026-000692',
+          nombre_remitente: 'Sandra Milena Morán Henríquez',
+          tipo_solicitud: 'PETICION',
+          estado: 'EN PROCESO',
+          fecha: '2026-10-18',
+          descripcion: 'Necesito mi certificado laboral.',
+          respuesta_observacion: 'Su solicitud está siendo tramitada por la Jefatura de Talento Humano.'
+        });
       } else {
         setRadicadoResult('NOT_FOUND');
       }
       setSearchingRadicado(false);
-    }, 400);
+    }, 300);
   }
 
   async function handleLogin(e) {
@@ -466,6 +481,7 @@ function App() {
           <a href="#quienes-somos" onClick={() => setMenu(false)}>Quiénes somos</a>
           <a href="#informacion" onClick={() => setMenu(false)}>Información general</a>
           <a href="#productos" onClick={() => setMenu(false)}>Portafolio de productos</a>
+          <a href="#aliados" onClick={() => setMenu(false)}>Clientes y aliados</a>
           <a href="#convocatorias" onClick={() => setMenu(false)}>Trabaja con nosotros</a>
           <a href="#pqrsf" onClick={() => setMenu(false)}>PQRS</a>
           <a className="login" href="#acceso" onClick={() => { setMenu(false); setShowLogin(true); }}>
@@ -523,7 +539,6 @@ function App() {
               </div>
 
               <h3 style={{ margin: '0 0 0.4rem 0', color: '#143c1d', fontSize: '1.35rem' }}>Ecosistema Digital TalentHub</h3>
-              {/* CORRECCIÓN EXACTA DE OBSERVACIÓN 1 */}
               <p style={{ fontSize: '0.85rem', color: '#526655', lineHeight: '1.5', margin: '0 0 1.5rem 0' }}>
                 Centralización técnica de selección por competencias, vinculación de trabajadores, SG-SST, seguimiento gestión documental RR.HH y PQRSF.
               </p>
@@ -791,6 +806,57 @@ function App() {
           </div>
         </section>
 
+        {/* CLIENTES Y ALIADOS (ENCUESTA DE SATISFACCIÓN OFICIAL) */}
+        <section id="aliados" className="section corporate" style={{ opacity: 1, visibility: 'visible', backgroundColor: '#f8fafc' }}>
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">RELACIONES DE VALOR</p>
+              <h2>Clientes y Aliados Comerciales</h2>
+              <p>Fortalecemos lazos con restaurantes, hoteles y distribuidores del Atlántico a través de una mejora continua de nuestro servicio.</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ backgroundColor: '#ffffff', padding: '1.8rem', borderRadius: '14px', border: '1.5px solid #cbd5e1', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
+              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>📊</span>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#14532d' }}>Encuesta de Satisfacción de Clientes</h3>
+              <p style={{ fontSize: '0.88rem', color: '#475569', lineHeight: '1.6', margin: '0 0 1.2rem 0' }}>
+                Tu opinión es fundamental para consolidar nuestros estándares de inocuidad BPM y atención logística. Te invitamos a diligenciar nuestra encuesta oficial.
+              </p>
+              <a
+                href="https://surveymars.com/q/78gukyDKo"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.7rem 1.4rem',
+                  backgroundColor: '#166534',
+                  color: '#ffffff',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  fontSize: '0.85rem',
+                  textDecoration: 'none'
+                }}
+              >
+                Participar en la Encuesta Digital ↗
+              </a>
+            </div>
+
+            <div style={{ backgroundColor: '#ffffff', padding: '1.8rem', borderRadius: '14px', border: '1.5px solid #cbd5e1', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
+              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>🤝</span>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#14532d' }}>Atención a Proveedores y Canal HORECA</h3>
+              <p style={{ fontSize: '0.88rem', color: '#475569', lineHeight: '1.6', margin: '0 0 1.2rem 0' }}>
+                Garantizamos despacho continuo de pulpas congeladas pasteurizadas y fruta seleccionada para el sector gastronómico e institucional.
+              </p>
+              <div style={{ fontSize: '0.85rem', color: '#166534', fontWeight: 'bold' }}>
+                ✉ Correo oficial de enlace: <code>frutopical.sas25@gmail.com</code>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CONVOCATORIAS LABORALES */}
         <section id="convocatorias" className="section" style={{ opacity: 1, visibility: 'visible' }}>
           <div className="section-heading">
@@ -902,13 +968,13 @@ function App() {
                 <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>🔎</span>
                 <h3 style={{ margin: '0 0 0.5rem 0', color: '#1e293b' }}>Consultar Estado de Radicado</h3>
                 <p style={{ fontSize: '0.88rem', color: '#64748b', margin: '0 0 1rem 0' }}>
-                  Ingresa tu código (Ej: <strong>SOL-2026-0001</strong>) para conocer la respuesta emitida por Talento Humano.
+                  Ingresa tu código (Ej: <strong>SOL-2026-0001</strong> o <strong>SOL-2026-000692</strong>) para conocer la respuesta emitida por Talento Humano.
                 </p>
 
                 <form onSubmit={handleBuscarRadicado} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                   <input
                     type="text"
-                    placeholder="SOL-2026-XXXX"
+                    placeholder="SOL-2026-XXXXXX"
                     value={searchRadicado}
                     onChange={(e) => setSearchRadicado(e.target.value)}
                     style={{ flex: 1, padding: '0.6rem', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.88rem', fontWeight: 'bold' }}
@@ -927,7 +993,7 @@ function App() {
                   <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '10px', padding: '1rem', marginTop: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                       <strong style={{ color: '#166534', fontSize: '0.9rem' }}>{radicadoResult.numero_solicitud}</strong>
-                      <span style={{ backgroundColor: radicadoResult.estado === 'ATENDIDA' ? '#dcfce7' : '#ffedd5', color: radicadoResult.estado === 'ATENDIDA' ? '#166534' : '#9a3412', padding: '0.2rem 0.6rem', borderRadius: '50px', fontSize: '0.72rem', fontWeight: 'bold' }}>
+                      <span style={{ backgroundColor: radicadoResult.estado === 'ATENDIDA' ? '#dcfce7' : '#fef3c7', color: radicadoResult.estado === 'ATENDIDA' ? '#166534' : '#92400e', padding: '0.2rem 0.6rem', borderRadius: '50px', fontSize: '0.72rem', fontWeight: 'bold' }}>
                         {radicadoResult.estado || 'RECIBIDA'}
                       </span>
                     </div>
@@ -1088,7 +1154,7 @@ function App() {
         </div>
       )}
 
-      {/* MODAL PQRS (CON TIPIFICACIÓN DE USUARIO, DEFINICIÓN DINÁMICA Y PLAZOS LEY 1755) */}
+      {/* MODAL PQRS */}
       {showPqrsModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowPqrsModal(false)}>
           <section
@@ -1108,7 +1174,6 @@ function App() {
             <h2 style={{ fontSize: '1.6rem', margin: '0.2rem 0 1rem 0', color: '#14532d' }}>Radicar Requerimiento</h2>
 
             <form onSubmit={handleSendPqrs} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', width: '100%', boxSizing: 'border-box' }}>
-              {/* Tipificación de usuario según el documento */}
               <div style={{ backgroundColor: '#f0fdf4', padding: '0.8rem 1rem', borderRadius: '10px', border: '1.5px solid #86efac', width: '100%', boxSizing: 'border-box' }}>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.82rem', fontWeight: 'bold', color: '#166534', textTransform: 'none' }}>
                   Tipificación de usuario vinculante *
@@ -1185,7 +1250,6 @@ function App() {
                 </label>
               </div>
 
-              {/* TARJETA DINÁMICA CON DEFINICIÓN DE CADA LETRA Y PLAZO LEGAL LEY 1755 */}
               {pqrsForm.tipo_solicitud && INFORMACION_PQRS[pqrsForm.tipo_solicitud] && (
                 <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '8px', padding: '0.85rem 1rem', width: '100%', boxSizing: 'border-box' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem', flexWrap: 'wrap', gap: '0.3rem' }}>
@@ -1234,7 +1298,6 @@ function App() {
                 </label>
               </div>
 
-              {/* Botón condicionado a la aceptación de datos */}
               <button
                 className="button primary submit"
                 type="submit"
@@ -1261,7 +1324,7 @@ function App() {
         </div>
       )}
 
-      {/* MODAL POSTULACIÓN (CON DECLARACIÓN DE VERACIDAD Y VALIDACIÓN OBLIGATORIA DE HOJA DE VIDA) */}
+      {/* MODAL POSTULACIÓN */}
       {selected && (
         <div className="modal-backdrop" onMouseDown={() => setSelected(null)}>
           <section
@@ -1349,14 +1412,14 @@ function App() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', width: '100%' }}>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                  Teléfono *
+                  Teléfono de Contacto *
                   <input
                     type="text"
                     name="telefono"
                     value={form.telefono}
                     onChange={handleFormChange}
                     required
-                    placeholder="3001234567"
+                    placeholder="300 123 4567"
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', marginTop: '0.2rem', boxSizing: 'border-box' }}
                   />
                 </label>
@@ -1392,7 +1455,7 @@ function App() {
                 />
               </div>
 
-              {/* DECLARACIÓN DE VERACIDAD Y AUTORIZACIÓN (TEXTO EXACTO DE LA OBSERVACIÓN) */}
+              {/* DECLARACIÓN DE VERACIDAD Y TRATAMIENTO DE DATOS */}
               <div style={{ backgroundColor: '#f8fafc', padding: '0.9rem', borderRadius: '8px', border: '1px solid #cbd5e1', margin: '0.2rem 0' }}>
                 <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.75rem', color: '#334155', cursor: 'pointer', margin: 0, lineHeight: '1.45' }}>
                   <input
@@ -1413,7 +1476,6 @@ function App() {
                 </label>
               </div>
 
-              {/* BOTÓN BLOQUEADO HASTA QUE SE CARGUE EL ARCHIVO Y SE MARQUE EL CHECKBOX */}
               <button
                 className="button primary submit"
                 type="submit"

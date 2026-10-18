@@ -14,14 +14,20 @@ export default function SSTGestion({ onVolver }) {
   
   const [modalActa, setModalActa] = useState(false);
   const [modalContrato, setModalContrato] = useState(false);
-  const [modalInduccion, setModalInduccion] = useState(false);
   const [documentoImprimir, setDocumentoImprimir] = useState(null);
 
-  // Sincronización en vivo con contratados del Módulo 2 y Expedientes
+  // Estados interactivos para Inducción SST (Audio 2 de la profesora)
+  const [fechaInduccion, setFechaInduccion] = useState('2026-10-18');
+  const [evaluacionInduccion, setEvaluacionInduccion] = useState(90);
+  const [instructorInduccion, setInstructorInduccion] = useState('Jefe de Talento Humano · Frutopical S.A.S.');
+  const [temarioInduccion, setTemarioInduccion] = useState(
+    'Políticas Institucionales Frutopical, SG-SST (Dec. 1072), Matriz de Peligros en Planta Agroindustrial, Buenas Prácticas de Manufactura (BPM) y Uso Correcto de EPP.'
+  );
+
+  // Sincronización en vivo de contratados desde localStorage
   useEffect(() => {
     let combinados = [...EMPLEADOS_BASE];
 
-    // 1. Cargar desde frutopical_empleados
     const guardadosEmp = localStorage.getItem('frutopical_empleados');
     if (guardadosEmp) {
       try {
@@ -36,7 +42,6 @@ export default function SSTGestion({ onVolver }) {
       } catch {}
     }
 
-    // 2. Cargar directamente candidatos en estado CONTRATADO desde postulaciones (Ej: Miguel Grimaldo)
     const guardadosPost = localStorage.getItem('frutopical_postulaciones');
     if (guardadosPost) {
       try {
@@ -69,7 +74,6 @@ export default function SSTGestion({ onVolver }) {
     setSelectedEmpleado(combinados[0]);
   }, []);
 
-  // Lista de chequeo documental integral exigida (CST, Res. 2674/2013 y Ley 1581)
   const [checklist, setChecklist] = useState({
     cedula150: true,
     hojaVidaSoportes: true,
@@ -115,8 +119,6 @@ export default function SSTGestion({ onVolver }) {
           body * { visibility: hidden !important; }
           .sst-print-area, .sst-print-area * { visibility: visible !important; display: block !important; }
           .sst-print-area { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 15mm 20mm !important; background: #ffffff !important; color: #1e293b !important; box-sizing: border-box !important; }
-          .sst-print-clean-table { width: 100% !important; border-collapse: collapse !important; margin: 15px 0 !important; }
-          .sst-print-clean-table th, .sst-print-clean-table td { border: 1px solid #334155 !important; padding: 6px 10px !important; font-size: 10pt !important; }
         }
       `}</style>
 
@@ -130,7 +132,7 @@ export default function SSTGestion({ onVolver }) {
               Vinculación de Trabajadores y SG-SST
             </h2>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
-              Aseguramiento normativo, entrega de dotación bajo Res. 2400 y contratación formal en Frutopical S.A.S.
+              Aseguramiento normativo, entrega de dotación bajo Res. 2400 y formalización contractual en Frutopical S.A.S.
             </p>
           </div>
 
@@ -139,7 +141,7 @@ export default function SSTGestion({ onVolver }) {
           </button>
         </div>
 
-        {/* SELECTOR DE COLABORADOR EN VIVO (MUESTRA A MIGUEL GRIMALDO Y CONTRATADOS) */}
+        {/* SELECTOR DE COLABORADOR SINCRONIZADO EN TIEMPO REAL */}
         <div style={{ backgroundColor: '#ffffff', border: '1.5px solid #86efac', borderRadius: '12px', padding: '1rem 1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', boxShadow: '0 4px 15px rgba(22, 101, 52, 0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
             <span style={{ fontSize: '1.4rem' }}>👤</span>
@@ -183,19 +185,19 @@ export default function SSTGestion({ onVolver }) {
           </button>
         </div>
 
-        {/* 1. VINCULACIÓN DE TRABAJADORES (LISTA DE CHEQUEO COMPLETA) */}
+        {/* 1. VINCULACIÓN DE TRABAJADORES (TÍTULO CORREGIDO SIN LA PALABRA INVIMA) */}
         {subTab === 'vinculacion' && (
           <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', padding: '1.8rem', border: '1px solid #e2e8f0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
               <div>
                 <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', textTransform: 'uppercase' }}>
-                  CONTROL DOCUMENTAL PRE-CONTRACTUAL (CST & INVIMA)
+                  CONTROL DOCUMENTAL DE INGRESO (CST Y RESOLUCIÓN 2400)
                 </span>
                 <h3 style={{ margin: '0.2rem 0', color: '#1e293b' }}>
                   Lista de Chequeo Documental de Ingreso: {selectedEmpleado?.nombre}
                 </h3>
                 <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
-                  Verificación de requisitos normativos previo a la firma contractual y apertura de expediente.
+                  Verificación de requisitos normativos previo a la firma contractual y apertura de expediente laboral.
                 </p>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -213,7 +215,7 @@ export default function SSTGestion({ onVolver }) {
                 </strong>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {[
-                    ['cedula150', 'Cédula de Ciudadanía ampliada al 150% (Obligatorio)'],
+                    ['cedula150', 'Fotocopia Cédula ampliada al 150% (Obligatorio)'],
                     ['hojaVidaSoportes', 'Hoja de Vida firmada con soportes (Obligatorio)'],
                     ['soportesEstudio', 'Soportes de Estudio / Diplomas (Obligatorio)'],
                     ['certificacionesLaborales', 'Mínimo 2 Certificaciones Laborales previas'],
@@ -234,9 +236,9 @@ export default function SSTGestion({ onVolver }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {[
                     ['examenMedicoIngreso', 'Certificado Médico de Aptitud Laboral de Ingreso'],
-                    ['manipulacionAlimentos', 'Carné Vigente Manipulación de Alimentos (Res. 2674)'],
+                    ['manipulacionAlimentos', 'Carné Vigente Manipulación Alimentos (BPM Planta)'],
                     ['autorizacionDatos', 'Autorización de Tratamiento de Datos (Ley 1581)'],
-                    ['entregaRit', 'Constancia de Entrega del Reglamento Interno (RIT)'],
+                    ['entregaRit', 'Constancia de Notificación Reglamento Interno (RIT)'],
                     ['entregaEpp', 'Acta de Dotación y Elementos EPP (Res. 2400)']
                   ].map(([k, label]) => (
                     <label key={k} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.82rem', cursor: 'pointer' }}>
@@ -249,11 +251,11 @@ export default function SSTGestion({ onVolver }) {
 
               <div style={{ border: '1px solid #cbd5e1', borderRadius: '10px', padding: '1.2rem', backgroundColor: '#f8fafc' }}>
                 <strong style={{ display: 'block', fontSize: '0.88rem', color: '#1d4ed8', marginBottom: '0.6rem' }}>
-                  Bloque 3: Seguridad Social y Contrato
+                  Bloque 3: Afiliaciones al Sistema de Seguridad Social
                 </strong>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {[
-                    ['afiliacionEps', 'Certificación de Afiliación a EPS activa'],
+                    ['afiliacionEps', 'Certificación de Afiliación a EPS'],
                     ['afiliacionAfp', 'Certificación de Fondo de Pensiones (AFP)'],
                     ['afiliacionArl', 'Afiliación a ARL en Nivel de Riesgo Clase II'],
                     ['cajaCompensacion', 'Afiliación a Caja de Compensación Familiar'],
@@ -314,56 +316,71 @@ export default function SSTGestion({ onVolver }) {
           </div>
         )}
 
-        {/* 3. CONSTANCIAS E INDUCCIÓN SST (RESPONSABLE: JEFE DE TALENTO HUMANO) */}
+        {/* 3. CONSTANCIAS E INDUCCIÓN SST TOTALMENTE EDITABLE (AUDIO 2 PROFESORA) */}
         {subTab === 'induccion' && (
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', padding: '1.8rem', border: '1px solid #e2e8f0', maxWidth: '680px' }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', padding: '1.8rem', border: '1px solid #e2e8f0', maxWidth: '720px' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#ef6c00', textTransform: 'uppercase' }}>
-              CAPACITACIÓN INSTITUCIONAL
+              CAPACITACIÓN INSTITUCIONAL SG-SST
             </span>
             <h3 style={{ margin: '0.2rem 0 0.8rem 0', color: '#1e293b' }}>
               Constancia de Inducción SST
             </h3>
             <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1.2rem' }}>
-              Registro formal de inducción en puesto de trabajo para <strong>{selectedEmpleado?.nombre}</strong>.
+              Formulario interactivo para registrar y certificar la inducción de <strong>{selectedEmpleado?.nombre}</strong>.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Fecha de Inducción:</label>
-                <input type="text" readOnly value={fechaHoy} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', fontWeight: 'bold' }} />
+                <input
+                  type="date"
+                  value={fechaInduccion}
+                  onChange={(e) => setFechaInduccion(e.target.value)}
+                  style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', fontWeight: 'bold' }}
+                />
               </div>
 
               <div>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Temario de Inducción Impartido:</label>
-                <textarea rows="3" readOnly value="Políticas Institucionales Frutopical, SG-SST (Dec. 1072), Matriz de Peligros en Planta Agroindustrial, Buenas Prácticas de Manufactura (BPM) y Uso Correcto de EPP." style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', fontSize: '0.82rem' }} />
+                <textarea
+                  rows="3"
+                  value={temarioInduccion}
+                  onChange={(e) => setTemarioInduccion(e.target.value)}
+                  style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem' }}
+                />
               </div>
 
-              <div style={{ backgroundColor: '#f0fdf4', padding: '1rem', borderRadius: '8px', border: '1.5px solid #86efac' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                  <span style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#166534' }}>Evaluación de Comprensión SST:</span>
-                  <strong style={{ color: '#166534', fontSize: '1rem' }}>95% (Aprobado)</strong>
+              <div style={{ backgroundColor: '#f0fdf4', padding: '1.2rem', borderRadius: '8px', border: '1.5px solid #86efac' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 'bold', color: '#166534' }}>Evaluación de Comprensión:</span>
+                  <strong style={{ color: '#166534', fontSize: '1.1rem' }}>{evaluacionInduccion}%</strong>
                 </div>
-                <div style={{ width: '100%', height: '8px', backgroundColor: '#bbf7d0', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: '95%', height: '100%', backgroundColor: '#166534' }}></div>
-                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={evaluacionInduccion}
+                  onChange={(e) => setEvaluacionInduccion(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: '#166534', cursor: 'pointer' }}
+                />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Instructor / Responsable Evaluador:</label>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Instructor / Responsable:</label>
                 <input
                   type="text"
-                  readOnly
-                  value="Jefe de Talento Humano · Frutopical S.A.S."
-                  style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #166534', backgroundColor: '#f0fdf4', color: '#166534', fontWeight: 'bold', fontSize: '0.85rem' }}
+                  value={instructorInduccion}
+                  onChange={(e) => setInstructorInduccion(e.target.value)}
+                  style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #166534', color: '#166534', fontWeight: 'bold', fontSize: '0.85rem' }}
                 />
               </div>
 
               <button
                 type="button"
                 onClick={() => ejecutarImpresion('induccion')}
-                style={{ width: '100%', padding: '0.8rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '0.5rem' }}
+                style={{ width: '100%', padding: '0.85rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '0.5rem' }}
               >
-                🖨️ Certificar e Imprimir Constancia de Inducción PDF
+                🖨️ Certificar e Imprimir Constancia de Inducción (PDF)
               </button>
             </div>
           </div>
@@ -399,7 +416,7 @@ export default function SSTGestion({ onVolver }) {
         )}
       </div>
 
-      {/* MODAL PREVISUALIZACIÓN ACTA DE DOTACIÓN */}
+      {/* MODAL ACTA DE DOTACIÓN */}
       {modalActa && (
         <div className="th-modal-backdrop" onMouseDown={() => setModalActa(false)}>
           <section className="th-postulation-modal" style={{ maxWidth: '680px', width: '94%', maxHeight: '90vh', overflowY: 'auto' }} onMouseDown={(e) => e.stopPropagation()}>
@@ -568,11 +585,11 @@ export default function SSTGestion({ onVolver }) {
             </div>
             <div style={{ textAlign: 'center', fontSize: '15px', fontWeight: '800', margin: '20px 0' }}>CONSTANCIA DE INDUCCIÓN INSTITUCIONAL Y SG-SST</div>
             <p style={{ fontSize: '12.5px', lineHeight: '1.8' }}>
-              Se certifica que el(la) colaborador(a) <strong>{selectedEmpleado?.nombre}</strong>, identificado(a) con C.C. <strong>{selectedEmpleado?.documento}</strong>, culminó satisfactoriamente su proceso de inducción reglamentaria para el cargo de <strong>{selectedEmpleado?.cargo}</strong>, con una calificación de comprensión del <strong>95%</strong>.
+              Se certifica que el(la) colaborador(a) <strong>{selectedEmpleado?.nombre}</strong>, identificado(a) con C.C. <strong>{selectedEmpleado?.documento}</strong>, culminó su proceso de inducción reglamentaria para el cargo de <strong>{selectedEmpleado?.cargo}</strong> el día <strong>{fechaInduccion}</strong>, obteniendo una calificación de comprensión del <strong>{evaluacionInduccion}%</strong> en los módulos de {temarioInduccion}.
             </p>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '60px', textAlign: 'center', fontSize: '12px' }}>
               <div style={{ width: '45%' }}><div style={{ borderTop: '1.5px solid #0f172a', marginBottom: '6px' }}></div><strong>{selectedEmpleado?.nombre}</strong><br />Firma del Trabajador</div>
-              <div style={{ width: '45%' }}><div style={{ borderTop: '1.5px solid #0f172a', marginBottom: '6px' }}></div><strong>Jefe de Talento Humano</strong><br />Frutas Del Atlántico S.A.S.</div>
+              <div style={{ width: '45%' }}><div style={{ borderTop: '1.5px solid #0f172a', marginBottom: '6px' }}></div><strong>{instructorInduccion}</strong><br />Frutas Del Atlántico S.A.S.</div>
             </div>
           </div>
         )}

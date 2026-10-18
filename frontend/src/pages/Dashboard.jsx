@@ -36,7 +36,7 @@ export default function Dashboard({ user, onLogout }) {
   const [modalHvAspirante, setModalHvAspirante] = useState(null);
   const [vistaPreviaActa, setVistaPreviaActa] = useState(false);
   
-  // Matriz Ponderada Oficial (Ley / Parámetros SENA): 30% Técnica, 15% Psicológica, 30% Entrevista, 15% HV, 10% Médicos
+  // Matriz Ponderada Oficial: 30% Técnica, 15% Psicológica, 30% Entrevista, 15% HV, 10% Médicos
   const [puntajeTecnico, setPuntajeTecnico] = useState(85);
   const [puntajePsicologico, setPuntajePsicologico] = useState(80);
   const [puntajeEntrevista, setPuntajeEntrevista] = useState(85);
@@ -132,85 +132,127 @@ export default function Dashboard({ user, onLogout }) {
     localStorage.setItem('frutopical_convocatorias', JSON.stringify(actualizadas));
   }
 
+  // CARGA DINÁMICA DE POSTULACIONES (MUESTRA CUALQUIER ASPIRANTE RECIENTE)
   function loadPostulaciones() {
     const local = localStorage.getItem('frutopical_postulaciones');
+    const base = [
+      {
+        id_postulacion: 1,
+        candidato: 'Carlos Fontalvo Amaya',
+        numero_documento: '1042890123',
+        convocatoria: 'Operario de Producción',
+        correo: 'carlos.fontalvo@gmail.com',
+        telefono: '301 234 5678',
+        ciudad: 'Sabanagrande, Atlántico',
+        estado: 'CONTRATADO',
+        hoja_vida: 'HV_Carlos_Fontalvo.pdf'
+      },
+      {
+        id_postulacion: 2,
+        candidato: 'María Conrado Jiménez',
+        numero_documento: '1043567890',
+        convocatoria: 'Jefe de Calidad',
+        correo: 'maria.conrado@gmail.com',
+        telefono: '310 987 6543',
+        ciudad: 'Sabanagrande, Atlántico',
+        estado: 'PRESELECCIONADA',
+        hoja_vida: 'HV_Maria_Conrado.pdf'
+      },
+      {
+        id_postulacion: 3,
+        candidato: 'David Riquett Villalobos',
+        numero_documento: '1044123456',
+        convocatoria: 'Jefe de Producción',
+        correo: 'david.riquett@gmail.com',
+        telefono: '302 345 6789',
+        ciudad: 'Barranquilla, Atlántico',
+        estado: 'EN EVALUACIÓN',
+        hoja_vida: 'HV_David_Riquett.pdf'
+      }
+    ];
+
     if (local) {
-      setPostulaciones(JSON.parse(local));
-    } else {
-      const base = [
-        {
-          id_postulacion: 1,
-          candidato: 'Carlos Fontalvo Amaya',
-          numero_documento: '1042890123',
-          convocatoria: 'Operario de Producción',
-          correo: 'carlos.fontalvo@gmail.com',
-          telefono: '301 234 5678',
-          ciudad: 'Sabanagrande, Atlántico',
-          estado: 'CONTRATADO',
-          hoja_vida: 'HV_Carlos_Fontalvo.pdf'
-        },
-        {
-          id_postulacion: 2,
-          candidato: 'María Conrado Jiménez',
-          numero_documento: '1043567890',
-          convocatoria: 'Jefe de Calidad',
-          correo: 'maria.conrado@gmail.com',
-          telefono: '310 987 6543',
-          ciudad: 'Sabanagrande, Atlántico',
-          estado: 'PRESELECCIONADA',
-          hoja_vida: 'HV_Maria_Conrado.pdf'
-        },
-        {
-          id_postulacion: 3,
-          candidato: 'David Riquett Villalobos',
-          numero_documento: '1044123456',
-          convocatoria: 'Jefe de Producción',
-          correo: 'david.riquett@gmail.com',
-          telefono: '302 345 6789',
-          ciudad: 'Barranquilla, Atlántico',
-          estado: 'EN EVALUACIÓN',
-          hoja_vida: 'HV_David_Riquett.pdf'
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Unir base sin perder las postulaciones nuevas hechas en la web
+          const combinadas = [...parsed];
+          base.forEach(b => {
+            if (!combinadas.some(c => String(c.numero_documento) === String(b.numero_documento))) {
+              combinadas.push(b);
+            }
+          });
+          setPostulaciones(combinadas);
+          return;
         }
-      ];
-      setPostulaciones(base);
-      localStorage.setItem('frutopical_postulaciones', JSON.stringify(base));
+      } catch {}
     }
+
+    setPostulaciones(base);
+    localStorage.setItem('frutopical_postulaciones', JSON.stringify(base));
   }
 
   function loadExpedientes() {
     const stored = localStorage.getItem('frutopical_expedientes');
-    if (stored) {
-      setExpedientes(JSON.parse(stored));
-    } else {
-      const base = [
-        { id_expediente: 1, nombres: 'Carlos', apellidos: 'Fontalvo Amaya', tipo_documento: 'CC', numero_documento: '1042890123', cargo: 'Operario de Planta', estado: 'ACTIVO' },
-        { id_expediente: 2, nombres: 'María', apellidos: 'Conrado Jiménez', tipo_documento: 'CC', numero_documento: '1043567890', cargo: 'Auxiliar de Calidad', estado: 'ACTIVO' }
-      ];
-      setExpedientes(base);
-      localStorage.setItem('frutopical_expedientes', JSON.stringify(base));
-    }
+    const base = [
+      { id_expediente: 1, nombres: 'Carlos', apellidos: 'Fontalvo Amaya', tipo_documento: 'CC', numero_documento: '1042890123', cargo: 'Operario de Planta', estado: 'ACTIVO' },
+      { id_expediente: 2, nombres: 'María', apellidos: 'Conrado Jiménez', tipo_documento: 'CC', numero_documento: '1043567890', cargo: 'Auxiliar de Calidad', estado: 'ACTIVO' }
+    ];
+
+    // Incluir automáticamente a cualquier contratado en expedientes
+    const post = JSON.parse(localStorage.getItem('frutopical_postulaciones') || '[]');
+    let actualizados = stored ? JSON.parse(stored) : base;
+
+    post.filter(p => p.estado === 'CONTRATADO').forEach(p => {
+      const doc = p.numero_documento || '10234532121';
+      if (!actualizados.some(e => String(e.numero_documento) === String(doc))) {
+        const nom = p.candidato || `${p.nombres || ''} ${p.apellidos || ''}`.trim() || 'Colaborador';
+        const partes = nom.split(' ');
+        actualizados.unshift({
+          id_expediente: p.id_postulacion || Date.now(),
+          nombres: partes[0] || nom,
+          apellidos: partes.slice(1).join(' ') || '',
+          tipo_documento: 'CC',
+          numero_documento: doc,
+          cargo: p.convocatoria || p.cargo || 'Operario de Producción',
+          estado: 'ACTIVO'
+        });
+      }
+    });
+
+    setExpedientes(actualizados);
+    localStorage.setItem('frutopical_expedientes', JSON.stringify(actualizados));
   }
 
+  // CARGA DE SOLICITUDES SINCRONIZADA
   function loadSolicitudes() {
     const stored = localStorage.getItem('frutopical_solicitudes');
+    const base = [
+      {
+        id_solicitud: 1,
+        numero_solicitud: 'SOL-2026-0001',
+        nombre_remitente: 'Carlos Fontalvo Amaya',
+        tipo_remitente: 'TRABAJADOR_ACTIVO',
+        tipo_solicitud: 'PETICION',
+        descripcion: 'Solicitud de certificado laboral institucional con detalle de salario básico para trámite bancario.',
+        fecha: new Date().toISOString(),
+        estado: 'ATENDIDA',
+        respuesta_observacion: 'Se expide la certificación laboral solicitada conforme al registro contractual vigente.'
+      }
+    ];
+
     if (stored) {
-      setSolicitudes(JSON.parse(stored));
-    } else {
-      const base = [
-        {
-          id_solicitud: 1,
-          numero_solicitud: 'SOL-2026-0001',
-          nombre_remitente: 'Carlos Fontalvo Amaya',
-          tipo_remitente: 'TRABAJADOR_ACTIVO',
-          tipo_solicitud: 'PETICION',
-          descripcion: 'Solicitud de certificado laboral institucional con detalle de salario básico para trámite bancario.',
-          fecha: new Date().toISOString(),
-          estado: 'RECIBIDA'
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setSolicitudes(parsed);
+          return;
         }
-      ];
-      setSolicitudes(base);
-      localStorage.setItem('frutopical_solicitudes', JSON.stringify(base));
+      } catch {}
     }
+
+    setSolicitudes(base);
+    localStorage.setItem('frutopical_solicitudes', JSON.stringify(base));
   }
 
   function descargarHojaDeVida(candidato) {
@@ -227,6 +269,7 @@ export default function Dashboard({ user, onLogout }) {
       `50 655 Td\n(Documento: ${candidato.numero_documento || '1042890123'}) Tj\n` +
       `50 630 Td\n(Convocatoria: ${candidato.convocatoria || candidato.cargo || 'General'}) Tj\n` +
       `50 605 Td\n(Correo: ${candidato.correo || 'aspirante@gmail.com'}) Tj\n` +
+      `50 580 Td\n(Telefono: ${candidato.telefono || '300 123 4567'}) Tj\n` +
       `ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000234 00000 n \n0000000291 00000 n \n` +
       `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n%%EOF`;
 
@@ -241,30 +284,70 @@ export default function Dashboard({ user, onLogout }) {
     URL.revokeObjectURL(url);
   }
 
+  function descargarDocumentoCcd(doc) {
+    const contenidoPdf = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n` +
+      `2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n` +
+      `3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n` +
+      `4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n` +
+      `5 0 obj\n<< /Length 150 >>\nstream\n` +
+      `BT\n/F1 14 Tf\n50 720 Td\n(FRUTOPICAL S.A.S. - ARCHIVO CENTRAL CCD) Tj\n` +
+      `/F1 11 Tf\n50 680 Td\n(Expediente: ${doc.nombre_original}) Tj\n` +
+      `50 655 Td\n(Clasificacion AGN: ${doc.tipo_documento}) Tj\n` +
+      `50 630 Td\n(Fecha de Radicacion: ${new Date(doc.fecha_carga).toLocaleDateString('es-CO')}) Tj\n` +
+      `50 605 Td\n(Estado: Custodiado en Historia Laboral) Tj\n` +
+      `ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000234 00000 n \n0000000291 00000 n \n` +
+      `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n%%EOF`;
+
+    const blob = new Blob([contenidoPdf], { type: 'application/pdf;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = doc.nombre_original.endsWith('.pdf') ? doc.nombre_original : `${doc.nombre_original}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
   function vincularCandidato(candidatoAprobado) {
     const nombreCompleto = candidatoAprobado.candidato || `${candidatoAprobado.nombres || ''} ${candidatoAprobado.apellidos || ''}`.trim() || 'Aspirante';
     const doc = candidatoAprobado.numero_documento || '104' + Math.floor(Math.random() * 900000);
     const cargo = candidatoAprobado.convocatoria || candidatoAprobado.cargo || 'Operario de Producción';
 
+    let salario = '$2.000.000 COP';
+    if (cargo.toLowerCase().includes('talento humano')) salario = '$2.550.500 COP';
+    if (cargo.toLowerCase().includes('calidad') && cargo.toLowerCase().includes('jefe')) salario = '$3.000.000 COP';
+    if (cargo.toLowerCase().includes('producción') && cargo.toLowerCase().includes('jefe')) salario = '$3.000.000 COP';
+
+    // Guardar en empleados activos para SST
+    const emps = JSON.parse(localStorage.getItem('frutopical_empleados') || '[]');
+    if (!emps.some(e => String(e.documento) === String(doc))) {
+      emps.unshift({
+        id: Date.now(),
+        nombre: nombreCompleto,
+        documento: doc,
+        cargo: cargo,
+        salario: salario,
+        fechaIngreso: new Date().toISOString().split('T')[0]
+      });
+      localStorage.setItem('frutopical_empleados', JSON.stringify(emps));
+    }
+
+    // Guardar en expedientes CCD
     const exps = JSON.parse(localStorage.getItem('frutopical_expedientes') || '[]');
     if (!exps.some(e => String(e.numero_documento) === String(doc))) {
       const partes = nombreCompleto.split(' ');
-      const nombres = partes[0] || nombreCompleto;
-      const apellidos = partes.slice(1).join(' ') || '';
-      const nuevoExp = {
+      exps.unshift({
         id_expediente: Date.now(),
-        nombres: nombres,
-        apellidos: apellidos,
+        nombres: partes[0] || nombreCompleto,
+        apellidos: partes.slice(1).join(' ') || '',
         tipo_documento: 'CC',
         numero_documento: doc,
         cargo: cargo,
-        estado: 'ACTIVO',
-        carpetasFoliadas: 7,
-        ubicacionFisica: 'Caja Archivo Central 04 - Estante B2'
-      };
-      const actualizados = [nuevoExp, ...exps];
-      localStorage.setItem('frutopical_expedientes', JSON.stringify(actualizados));
-      setExpedientes(actualizados);
+        estado: 'ACTIVO'
+      });
+      localStorage.setItem('frutopical_expedientes', JSON.stringify(exps));
+      setExpedientes(exps);
     }
 
     const actualizadosPost = postulaciones.map(p =>
@@ -275,18 +358,22 @@ export default function Dashboard({ user, onLogout }) {
     setPostulaciones(actualizadosPost);
     localStorage.setItem('frutopical_postulaciones', JSON.stringify(actualizadosPost));
 
-    alert(`¡Candidato ${nombreCompleto} vinculado exitosamente al archivo CCD e Historia Laboral!`);
+    alert(`¡Candidato ${nombreCompleto} vinculado exitosamente al Módulo 3 (SST) y al Archivo Central CCD!`);
     setSelectedPostulation(null);
     setVistaPreviaActa(false);
   }
 
-  // SINCRONIZACIÓN CORREGIDA DE PQRS
+  // SINCRONIZACIÓN PERFECTA DE ESTADO DE PQRS HACIA LA WEB EXTERNA
   async function updateSolicitud(e) {
     e.preventDefault();
     if (!selectedSolicitud) return;
 
+    // Normalizar radicado limpio
+    const radicadoBuscado = (selectedSolicitud.numero_solicitud || '').trim().toUpperCase();
+
     const listaActualizada = solicitudes.map((s) => {
-      if (s.id_solicitud === selectedSolicitud.id_solicitud || s.numero_solicitud === selectedSolicitud.numero_solicitud) {
+      const radicadoActual = (s.numero_solicitud || '').trim().toUpperCase();
+      if (s.id_solicitud === selectedSolicitud.id_solicitud || radicadoActual === radicadoBuscado) {
         return {
           ...s,
           estado: newSolicitudState,
@@ -315,7 +402,6 @@ export default function Dashboard({ user, onLogout }) {
     }, 1200);
   }
 
-  // DISPARADOR DE IMPRESIÓN LIMPIO
   function triggerImpresion(tipo) {
     setImprimirTipo(tipo);
     setTimeout(() => {
@@ -342,43 +428,15 @@ export default function Dashboard({ user, onLogout }) {
 
   return (
     <>
-      {/* ESTILOS DE IMPRESIÓN PROFESIONALES (ELIMINAN EL RECUADRO VERDE) */}
       <style>{`
-        .print-document-area {
-          display: none;
-        }
+        .print-document-area { display: none; }
         @media print {
-          @page {
-            size: letter;
-            margin: 15mm 18mm;
-          }
-          body {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-          }
-          .th-dashboard, .th-modal-backdrop, .th-sidebar, .th-header {
-            display: none !important;
-          }
-          .print-document-area {
-            display: block !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            background: #ffffff !important;
-            color: #0f172a !important;
-            font-family: Arial, sans-serif !important;
-          }
-          .print-clean-table {
-            width: 100% !important;
-            border-collapse: collapse !important;
-            margin: 15px 0 !important;
-          }
-          .print-clean-table th, .print-clean-table td {
-            border: 1px solid #334155 !important;
-            padding: 8px 10px !important;
-            font-size: 11pt !important;
-          }
+          @page { size: letter; margin: 15mm 18mm; }
+          body { background-color: #ffffff !important; color: #000000 !important; }
+          .th-dashboard, .th-modal-backdrop, .th-sidebar, .th-header { display: none !important; }
+          .print-document-area { display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; background: #ffffff !important; color: #0f172a !important; font-family: Arial, sans-serif !important; }
+          .print-clean-table { width: 100% !important; border-collapse: collapse !important; margin: 15px 0 !important; }
+          .print-clean-table th, .print-clean-table td { border: 1px solid #334155 !important; padding: 8px 10px !important; font-size: 11pt !important; }
         }
       `}</style>
 
@@ -494,7 +552,7 @@ export default function Dashboard({ user, onLogout }) {
                   </div>
                 </div>
 
-                {/* ACCESO RÁPIDO A LOS 5 MÓDULOS OFICIALES COMPLETOS */}
+                {/* ACCESO RÁPIDO A LOS 5 MÓDULOS OFICIALES */}
                 <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '1.8rem', border: '1px solid #e2e8f0' }}>
                   <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '1px' }}>ACCESO RÁPIDO A MÓDULOS</span>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
@@ -623,20 +681,30 @@ export default function Dashboard({ user, onLogout }) {
                   </>
                 ) : (
                   <>
-                    <div className="th-page-intro">
+                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                       <div>
                         <span className="th-label">EQUIPO 2 · SELECCIÓN TÉCNICA</span>
                         <h2>Postulaciones y Calificación de Candidatos</h2>
-                        <p>Los aspirantes que se postulan desde la web aparecen aquí automáticamente con su hoja de vida adjunta.</p>
+                        <p>Los aspirantes que se postulan desde la web aparecen aquí con sus datos de contacto y hoja de vida.</p>
                       </div>
+                      <button
+                        type="button"
+                        onClick={loadPostulaciones}
+                        style={{ backgroundColor: '#ffffff', border: '1.5px solid #166534', color: '#166534', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                      >
+                        🔄 Actualizar Postulaciones en Vivo
+                      </button>
                     </div>
 
+                    {/* TABLA CON COLUMNAS DE CONTACTO COMPLETAS (RESPONDE A LA PROFESORA) */}
                     <div className="th-table-wrapper">
                       <table className="th-table">
                         <thead>
                           <tr>
                             <th>Candidato</th>
                             <th>Documento</th>
+                            <th>Contacto (Tel / Email)</th>
+                            <th>Ubicación</th>
                             <th>Convocatoria</th>
                             <th>Hoja de Vida</th>
                             <th>Estado</th>
@@ -650,6 +718,13 @@ export default function Dashboard({ user, onLogout }) {
                               <tr key={item.id_postulacion ?? index}>
                                 <td><strong>{nombre}</strong></td>
                                 <td>{item.numero_documento || '—'}</td>
+                                <td>
+                                  <div style={{ fontSize: '0.78rem' }}>
+                                    <strong>📞 {item.telefono || 'Sin tel.'}</strong><br />
+                                    <span style={{ color: '#64748b' }}>✉️ {item.correo || 'Sin correo'}</span>
+                                  </div>
+                                </td>
+                                <td><small>{item.ciudad || 'Sabanagrande'}</small></td>
                                 <td>{item.convocatoria || item.cargo || 'Operario de Producción'}</td>
                                 <td>
                                   <button
@@ -692,7 +767,7 @@ export default function Dashboard({ user, onLogout }) {
               <SSTGestion onVolver={() => changeModule('inicio')} />
             )}
 
-            {/* MÓDULO 4: GESTIÓN DOCUMENTAL (CCD) */}
+            {/* MÓDULO 4: GESTIÓN DOCUMENTAL (CCD) CON VISOR Y DESCARGA OFICIAL */}
             {activeModule === 'documentos' && (
               <section className="th-page-section">
                 {!selectedExpediente ? (
@@ -759,7 +834,7 @@ export default function Dashboard({ user, onLogout }) {
                         <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>2. Descripción del Soporte</label>
                         <input
                           type="text"
-                          placeholder="Ej: Acta de Entrega de Dotación y EPP"
+                          placeholder="Ej: Acta de Entrega de Carné Institucional"
                           value={documentType}
                           onChange={(e) => setDocumentType(e.target.value)}
                           style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
@@ -779,7 +854,7 @@ export default function Dashboard({ user, onLogout }) {
                           setDocumentos((prev) => [{ id_archivo: Date.now(), nombre_original: nom, tipo_documento: `[${selectedCcd}] ${documentType}`, fecha_carga: new Date().toISOString() }, ...prev]);
                           setDocumentType('');
                           setSelectedFile(null);
-                          setUploadNotice('Documento archivado en expediente.');
+                          setUploadNotice('Documento archivado exitosamente en historia laboral.');
                           setTimeout(() => setUploadNotice(''), 2000);
                         }}
                         className="th-primary-button"
@@ -807,13 +882,20 @@ export default function Dashboard({ user, onLogout }) {
                               <td><strong>{doc.nombre_original}</strong></td>
                               <td>{doc.tipo_documento}</td>
                               <td>{new Date(doc.fecha_carga).toLocaleDateString('es-CO')}</td>
-                              <td>
+                              <td style={{ display: 'flex', gap: '0.5rem' }}>
                                 <button
                                   type="button"
                                   onClick={() => setVisorDoc(doc)}
-                                  style={{ padding: '0.25rem 0.6rem', backgroundColor: '#f0fdf4', border: '1px solid #86efac', color: '#166534', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
+                                  style={{ padding: '0.3rem 0.6rem', backgroundColor: '#f0fdf4', border: '1px solid #86efac', color: '#166534', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
                                 >
                                   👁️ Ver Ficha
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => descargarDocumentoCcd(doc)}
+                                  style={{ padding: '0.3rem 0.6rem', backgroundColor: '#166534', border: 'none', color: '#ffffff', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
+                                >
+                                  📥 Descargar PDF
                                 </button>
                               </td>
                             </tr>
@@ -834,12 +916,19 @@ export default function Dashboard({ user, onLogout }) {
               <section className="th-page-section">
                 {!selectedSolicitud ? (
                   <>
-                    <div className="th-page-intro">
+                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                       <div>
                         <span className="th-label">EQUIPO 5 · SERVICIO AL CLIENTE INTERNO</span>
                         <h2>Gestión de PQRS y Certificaciones</h2>
                         <p>Atiende requerimientos radicados por la web pública y expide los 3 modelos oficiales de certificación.</p>
                       </div>
+                      <button
+                        type="button"
+                        onClick={loadSolicitudes}
+                        style={{ backgroundColor: '#ffffff', border: '1.5px solid #166534', color: '#166534', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.82rem', cursor: 'pointer' }}
+                      >
+                        🔄 Refrescar Radicados
+                      </button>
                     </div>
 
                     <div className="th-table-wrapper">
@@ -987,7 +1076,7 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* MODAL VISOR HOJA DE VIDA */}
+        {/* MODAL VISOR HOJA DE VIDA CON DATOS DE CONTACTO COMPLETOS */}
         {modalHvAspirante && (
           <div className="th-modal-backdrop" onMouseDown={() => setModalHvAspirante(null)}>
             <section
@@ -1130,7 +1219,7 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* MODAL MATRIZ DE EVALUACIÓN OFICIAL (30%-15%-30%-15%-10%) */}
+        {/* MODAL MATRIZ DE EVALUACIÓN OFICIAL */}
         {selectedPostulation && (
           <div className="th-modal-backdrop" onMouseDown={() => setSelectedPostulation(null)}>
             <section className="th-postulation-modal" style={{ maxWidth: '640px', width: '92%' }} onMouseDown={(e) => e.stopPropagation()}>
@@ -1192,7 +1281,6 @@ export default function Dashboard({ user, onLogout }) {
                 </div>
               </div>
 
-              {/* BAREMO OFICIAL SOLICITADO: >=80 Apto, 75-79 Preseleccionado, <74 No seleccionado */}
               <div style={{ backgroundColor: notaCalculada >= 80 ? '#dcfce7' : notaCalculada >= 75 ? '#fef3c7' : '#fee2e2', padding: '0.9rem', borderRadius: '8px', marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: `1.5px solid ${notaCalculada >= 80 ? '#86efac' : notaCalculada >= 75 ? '#fde047' : '#fecaca'}` }}>
                 <div>
                   <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'block' }}>CALIFICACIÓN PONDERADA TOTAL</span>
@@ -1226,31 +1314,47 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* MODAL VISOR CCD */}
+        {/* MODAL VISOR CCD CON OPCIÓN DE RESCATE/DESCARGA DEL DOCUMENTO */}
         {visorDoc && (
           <div className="th-modal-backdrop" onMouseDown={() => setVisorDoc(null)}>
-            <section className="th-postulation-modal" style={{ maxWidth: '520px', width: '90%' }} onMouseDown={(e) => e.stopPropagation()}>
+            <section className="th-postulation-modal" style={{ maxWidth: '580px', width: '92%' }} onMouseDown={(e) => e.stopPropagation()}>
               <div className="th-modal-header">
                 <div>
-                  <span className="th-label">SOPORTE DE ARCHIVO CENTRAL</span>
+                  <span className="th-label">SOPORTE DE ARCHIVO CENTRAL (AGN)</span>
                   <h3 style={{ margin: '0.2rem 0' }}>Expediente Laboral Digital</h3>
                 </div>
                 <button type="button" className="th-modal-close" onClick={() => setVisorDoc(null)}>×</button>
               </div>
-              <div style={{ backgroundColor: '#f8fafc', padding: '1.2rem', borderRadius: '10px', border: '1px solid #cbd5e1', marginTop: '1rem', fontSize: '0.85rem' }}>
-                <p><strong>Nomenclatura:</strong><br /><code>{visorDoc.nombre_original}</code></p>
-                <p><strong>Clasificación:</strong> {visorDoc.tipo_documento}</p>
-                <p><strong>Fecha:</strong> {new Date(visorDoc.fecha_carga).toLocaleDateString('es-CO')}</p>
+              <div style={{ backgroundColor: '#f8fafc', padding: '1.4rem', borderRadius: '10px', border: '1.5px solid #cbd5e1', marginTop: '1rem', fontSize: '0.85rem' }}>
+                <div style={{ borderBottom: '2px solid #166534', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+                  <strong style={{ color: '#166534', fontSize: '1rem' }}>FRUTAS DEL ATLÁNTICO S.A.S.</strong>
+                  <span style={{ display: 'block', color: '#64748b', fontSize: '0.75rem' }}>Sistema de Gestión Documental y Archivo Central</span>
+                </div>
+                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Nomenclatura AGN:</strong><br /><code style={{ backgroundColor: '#e2e8f0', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>{visorDoc.nombre_original}</code></p>
+                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Subserie / Clasificación:</strong> {visorDoc.tipo_documento}</p>
+                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Fecha de Radicación:</strong> {new Date(visorDoc.fecha_carga).toLocaleDateString('es-CO')}</p>
+                <p style={{ margin: 0, color: '#166534', fontWeight: 'bold' }}>✓ Estado: Documento indexado y custodiado en el expediente digital del colaborador.</p>
               </div>
-              <button type="button" onClick={() => setVisorDoc(null)} className="th-primary-button" style={{ width: '100%', marginTop: '1rem' }}>Cerrar</button>
+
+              <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem' }}>
+                <button
+                  type="button"
+                  onClick={() => descargarDocumentoCcd(visorDoc)}
+                  style={{ flex: 1, padding: '0.75rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                >
+                  📥 Descargar Copia del Documento Foliado (PDF)
+                </button>
+                <button type="button" onClick={() => setVisorDoc(null)} style={{ padding: '0.75rem 1.2rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  Cerrar
+                </button>
+              </div>
             </section>
           </div>
         )}
       </div>
 
-      {/* ÁREA OFICIAL DE IMPRESIÓN (SIN RECUADROS VERDES, FONDO BLANCO) */}
+      {/* ÁREA DE IMPRESIÓN LIMPIA */}
       <div className="print-document-area">
-        {/* DOCUMENTO 1: ACTA DE VALORACIÓN TÉCNICA */}
         {imprimirTipo === 'acta' && selectedPostulation && (
           <div style={{ padding: '10mm 15mm' }}>
             <div style={{ borderBottom: '3px solid #166534', paddingBottom: '10px', marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1316,7 +1420,6 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* DOCUMENTO 2: LOS 3 MODELOS OFICIALES DE CERTIFICADO LABORAL */}
         {imprimirTipo === 'certificado' && selectedSolicitud && (
           <div style={{ padding: '15mm 20mm', fontFamily: 'serif' }}>
             <div style={{ borderBottom: '3px solid #166534', paddingBottom: '12px', marginBottom: '35px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1337,14 +1440,12 @@ export default function Dashboard({ user, onLogout }) {
               CERTIFICA:
             </div>
 
-            {/* MODELO 1: BÁSICO CON SALARIO Y CARGO */}
             {modeloCertificado === 'modelo1' && (
               <p style={{ fontSize: '11.5pt', lineHeight: '2', textAlign: 'justify' }}>
                 Que el(la) señor(a) <strong>{selectedSolicitud.nombre_remitente}</strong>, identificado(a) con Cédula de Ciudadanía, labora actualmente en nuestra organización mediante Contrato Individual de Trabajo a Término Indefinido desde el 15 de enero de 2026, desempeñando el cargo de <strong>Operario de Producción</strong> en el área operativa de planta, devengando una asignación salarial básica mensual de <strong>DOS MILLONES DE PESOS M/CTE ($2.000.000 COP)</strong> más todas las prestaciones sociales y afiliaciones obligatorias al Sistema General de Seguridad Social (EPS, AFP, ARL y Caja de Compensación Familiar).
               </p>
             )}
 
-            {/* MODELO 2: CON FUNCIONES DETALLADAS */}
             {modeloCertificado === 'modelo2' && (
               <div>
                 <p style={{ fontSize: '11.5pt', lineHeight: '1.9', textAlign: 'justify' }}>
@@ -1359,7 +1460,6 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             )}
 
-            {/* MODELO 3: PARA EXTRABAJADOR (INACTIVO) */}
             {modeloCertificado === 'modelo3' && (
               <p style={{ fontSize: '11.5pt', lineHeight: '2', textAlign: 'justify' }}>
                 Que el(la) señor(a) <strong>{selectedSolicitud.nombre_remitente}</strong> laboró al servicio de FRUTAS DEL ATLÁNTICO S.A.S. mediante contrato laboral desde el 01 de junio de 2025 hasta el 31 de agosto de 2026, ocupando el cargo de <strong>Auxiliar Operativo de Planta</strong>, habiendo finalizado su vínculo laboral a paz y salvo por todo concepto de salarios, cesantías, primas y liquidación de prestaciones sociales conforme al Código Sustantivo del Trabajo.

@@ -20,7 +20,9 @@ const BASE_DATOS_TRABAJADORES = [
     fechaRetiro: 'Vigente (Activo)',
     estadoLaboral: 'ACTIVO',
     correo: 'carlos.fontalvo@gmail.com',
-    telefono: '301 234 5678'
+    telefono: '301 234 5678',
+    ciudad: 'Sabanagrande, Atlántico',
+    direccion: 'Calle 18 # 14-25, Sabanagrande'
   },
   {
     documento: '1043567890',
@@ -33,7 +35,9 @@ const BASE_DATOS_TRABAJADORES = [
     fechaRetiro: 'Vigente (Activo)',
     estadoLaboral: 'ACTIVO',
     correo: 'maria.conrado@gmail.com',
-    telefono: '310 987 6543'
+    telefono: '310 987 6543',
+    ciudad: 'Sabanagrande, Atlántico',
+    direccion: 'Carrera 4 # 21-10, Sabanagrande'
   },
   {
     documento: '1044123456',
@@ -46,7 +50,9 @@ const BASE_DATOS_TRABAJADORES = [
     fechaRetiro: 'Vigente (Activo)',
     estadoLaboral: 'ACTIVO',
     correo: 'david.riquett@gmail.com',
-    telefono: '302 345 6789'
+    telefono: '302 345 6789',
+    ciudad: 'Barranquilla, Atlántico',
+    direccion: 'Calle 22 # 15-40, Sabanagrande'
   },
   {
     documento: '1045987654',
@@ -59,7 +65,9 @@ const BASE_DATOS_TRABAJADORES = [
     fechaRetiro: 'Vigente (Activo)',
     estadoLaboral: 'ACTIVO',
     correo: 'laura.mendoza@frutopical.com',
-    telefono: '300 456 7890'
+    telefono: '300 456 7890',
+    ciudad: 'Barranquilla, Atlántico',
+    direccion: 'Calle 76 # 54-11, Barranquilla'
   },
   {
     documento: '1048765432',
@@ -72,20 +80,9 @@ const BASE_DATOS_TRABAJADORES = [
     fechaRetiro: 'Vigente (Activo)',
     estadoLaboral: 'ACTIVO',
     correo: 'sandra.moran@gmail.com',
-    telefono: '315 889 9001'
-  },
-  {
-    documento: '1047123987',
-    nombre: 'Alejandro Shar',
-    cargo: 'Auxiliar Administrativo y Logística',
-    salario: '$2.200.000 COP',
-    salarioLetras: 'DOS MILLONES DOSCIENTOS MIL PESOS M/CTE',
-    tipoContrato: 'Término Fijo',
-    fechaIngreso: '01 de marzo de 2026',
-    fechaRetiro: '30 de septiembre de 2026',
-    estadoLaboral: 'EXTRABAJADOR',
-    correo: 'alejandro.shar@gmail.com',
-    telefono: '300 776 5432'
+    telefono: '315 889 9001',
+    ciudad: 'Sabanagrande, Atlántico',
+    direccion: 'Calle 12 # 8-30, Sabanagrande'
   },
   {
     documento: '10234532121',
@@ -98,21 +95,41 @@ const BASE_DATOS_TRABAJADORES = [
     fechaRetiro: 'Vigente (Activo)',
     estadoLaboral: 'ACTIVO',
     correo: 'min.yongi@frutopical.com',
-    telefono: '320 654 3210'
+    telefono: '320 654 3210',
+    ciudad: 'Sabanagrande, Atlántico',
+    direccion: 'Carrera 6 # 14-12, Sabanagrande'
+  },
+  {
+    documento: '1047123987',
+    nombre: 'Alejandro Shar',
+    cargo: 'Auxiliar Administrativo y Logística',
+    salario: '$2.200.000 COP',
+    salarioLetras: 'DOS MILLONES DOSCIENTOS MIL PESOS M/CTE',
+    tipoContrato: 'Término Fijo',
+    fechaIngreso: '01 de marzo de 2026',
+    fechaRetiro: '30 de septiembre de 2026',
+    estadoLaboral: 'EXTRABAJADOR',
+    correo: 'alejandro.shar@gmail.com',
+    telefono: '300 776 5432',
+    ciudad: 'Sabanagrande, Atlántico',
+    direccion: 'Calle 10 # 5-20, Sabanagrande'
   }
 ];
 
-const CCD_SERIES = [
-  { codigo: '100.1', serie: '100 - HISTORIAS LABORALES', nombre: '100.1 Documento de Identificación y Hoja de Vida', categoria: 'CV' },
-  { codigo: '100.2', serie: '100 - HISTORIAS LABORALES', nombre: '100.2 Contrato Laboral y Afiliaciones (Seguridad Social)', categoria: 'Contrato' },
-  { codigo: '100.3', serie: '100 - HISTORIAS LABORALES', nombre: '100.3 Certificados Académicos y de Formación Técnica', categoria: 'Vinculación' },
-  { codigo: '100.4', serie: '100 - HISTORIAS LABORALES', nombre: '100.4 Evaluaciones de Desempeño y Certificaciones', categoria: 'Otros' },
-  { codigo: '200.1', serie: '200 - SEGURIDAD Y SALUD EN EL TRABAJO', nombre: '200.1 Conceptos Médicos Ocupacionales (Ingreso/Periódico)', categoria: 'SST' },
-  { codigo: '200.2', serie: '200 - SEGURIDAD Y SALUD EN EL TRABAJO', nombre: '200.2 Actas de Entrega de Dotación y EPP', categoria: 'EPP' },
-  { codigo: '200.3', serie: '200 - SEGURIDAD Y SALUD EN EL TRABAJO', nombre: '200.3 Constancias y Evaluaciones de Inducción SST', categoria: 'SST' }
+// LISTADO ESTÁNDAR DE CODIFICACIÓN Y SUBSERIES DEL CCD EXIGIDO POR LA PROFESORA
+const SUBSERIES_CCD_OFICIALES = [
+  { codigo: '100.10.18.01', nombre: '100.10.18.01 Hoja de Vida', categoria: 'Hoja de Vida' },
+  { codigo: '100.10.18.02', nombre: '100.10.18.02 Proceso de Selección', categoria: 'Selección' },
+  { codigo: '100.10.18.03', nombre: '100.10.18.03 Exámenes Médicos', categoria: 'Salud Ocupacional' },
+  { codigo: '100.10.18.04', nombre: '100.10.18.04 Contratación', categoria: 'Contrato Laboral' },
+  { codigo: '100.10.18.05', nombre: '100.10.18.05 Afiliaciones', categoria: 'Seguridad Social' },
+  { codigo: '100.10.18.06', nombre: '100.10.18.06 Inducción y Capacitación', categoria: 'SST e Inducción' },
+  { codigo: '100.10.18.07', nombre: '100.10.18.07 Historial Laboral', categoria: 'Desempeño y Novedades' },
+  { codigo: '100.10.18.08', nombre: '100.10.18.08 Desprendibles / Nómina', categoria: 'Pagos y Comprobantes' },
+  { codigo: '100.10.18.09', nombre: '100.10.18.09 Procesos Disciplinarios', categoria: 'Régimen Disciplinario' },
+  { codigo: '100.10.18.10', nombre: '100.10.18.10 Desvinculación', categoria: 'Retiro y Liquidación' }
 ];
 
-// Función para convertir número de día a texto formal colombiano
 function numeroALetrasDia(num) {
   const dias = [
     '', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez',
@@ -135,12 +152,12 @@ export default function Dashboard({ user, onLogout }) {
   });
   const [savingConvocatoria, setSavingConvocatoria] = useState(false);
 
-  // Postulaciones y Selección Técnica
+  // Postulaciones
   const [postulaciones, setPostulaciones] = useState([]);
   const [selectedPostulation, setSelectedPostulation] = useState(null);
   const [modalHvAspirante, setModalHvAspirante] = useState(null);
-  
-  // Matriz Ponderada Oficial: 30% Técnica, 15% Psicológica, 30% Entrevista, 15% HV, 10% Médicos
+
+  // Matriz Ponderada
   const [puntajeTecnico, setPuntajeTecnico] = useState(85);
   const [puntajePsicologico, setPuntajePsicologico] = useState(80);
   const [puntajeEntrevista, setPuntajeEntrevista] = useState(85);
@@ -155,33 +172,32 @@ export default function Dashboard({ user, onLogout }) {
     (Number(puntajeMedicos) * 0.10)
   );
 
-  // Expedientes CCD
+  // MÓDULO 4: GESTIÓN DOCUMENTAL (CCD)
   const [expedientes, setExpedientes] = useState([]);
-  const [documentos, setDocumentos] = useState([]);
   const [selectedExpediente, setSelectedExpediente] = useState(null);
-  const [documentType, setDocumentType] = useState('');
-  const [selectedCcd, setSelectedCcd] = useState(CCD_SERIES[0].codigo);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [documentosExpediente, setDocumentosExpediente] = useState([]);
+  const [selectedSubserie, setSelectedSubserie] = useState(SUBSERIES_CCD_OFICIALES[0].codigo);
+  const [descripcionDocumento, setDescripcionDocumento] = useState('');
+  const [archivoBase64, setArchivoBase64] = useState(null);
+  const [nombreArchivoSubido, setNombreArchivoSubido] = useState('');
   const [uploadNotice, setUploadNotice] = useState('');
   const [visorDoc, setVisorDoc] = useState(null);
 
-  // PQRS y Certificaciones
+  // PQRS
   const [solicitudes, setSolicitudes] = useState([]);
   const [selectedSolicitud, setSelectedSolicitud] = useState(null);
   const [newSolicitudState, setNewSolicitudState] = useState('RECIBIDA');
   const [solicitudResponse, setSolicitudResponse] = useState('');
   const [modeloCertificado, setModeloCertificado] = useState('modelo1');
   const [solicitudNotice, setSolicitudNotice] = useState('');
-
-  // DATOS DINÁMICOS DEL CERTIFICADO LABORAL (CARGADOS DE LA BASE DE DATOS MAESTRA)
   const [certDatos, setCertDatos] = useState(BASE_DATOS_TRABAJADORES[0]);
 
   useEffect(() => {
-    loadConvocatorias();
-    loadExpedientes();
-    loadPostulaciones();
-    loadSolicitudes();
     sincronizarBaseTrabajadores();
+    loadConvocatorias();
+    loadPostulaciones();
+    loadExpedientes();
+    loadSolicitudes();
   }, []);
 
   function sincronizarBaseTrabajadores() {
@@ -200,6 +216,144 @@ export default function Dashboard({ user, onLogout }) {
       }
     } catch {}
     return BASE_DATOS_TRABAJADORES;
+  }
+
+  // CARGA COMPLETA DE EXPEDIENTES (INCLUYE TODOS LOS TRABAJADORES + NUEVOS CONTRATADOS)
+  function loadExpedientes() {
+    const listaMaestra = getListaEmpleados();
+    const postulados = JSON.parse(localStorage.getItem('frutopical_postulaciones') || '[]');
+
+    const listaUnificada = [...listaMaestra];
+
+    postulados.filter(p => p.estado === 'CONTRATADO').forEach(p => {
+      const doc = p.numero_documento || '104' + Math.floor(Math.random() * 900000);
+      if (!listaUnificada.some(e => String(e.documento) === String(doc))) {
+        listaUnificada.push({
+          documento: doc,
+          nombre: p.candidato || `${p.nombres || ''} ${p.apellidos || ''}`.trim() || 'Nuevo Colaborador',
+          cargo: p.convocatoria || p.cargo || 'Operario de Producción',
+          estadoLaboral: 'ACTIVO',
+          salario: '$2.000.000 COP',
+          tipoContrato: 'Término Indefinido',
+          fechaIngreso: fechaHoy
+        });
+      }
+    });
+
+    setExpedientes(listaUnificada);
+  }
+
+  // AL ABRIR UN EXPEDIENTE, SE CARGAN SUS DOCUMENTOS PERSISTENTES DESDE LOCALSTORAGE
+  function abrirExpedienteCCD(colaborador) {
+    setSelectedExpediente(colaborador);
+    setDescripcionDocumento('');
+    setArchivoBase64(null);
+    setNombreArchivoSubido('');
+
+    const todosDocs = JSON.parse(localStorage.getItem('frutopical_docs_expedientes') || '{}');
+    const docsColaborador = todosDocs[colaborador.documento] || [
+      {
+        id_archivo: 1,
+        nombre_original: `EXP-${colaborador.documento}-100.10.18.01-HOJA_DE_VIDA.pdf`,
+        subserie_codigo: '100.10.18.01',
+        tipo_documento: '100.10.18.01 Hoja de Vida',
+        descripcion: 'Hoja de Vida institucional radicada con soportes',
+        fecha_carga: '2026-02-01',
+        archivo_data: null
+      },
+      {
+        id_archivo: 2,
+        nombre_original: `EXP-${colaborador.documento}-100.10.18.04-CONTRATO_LABORAL.pdf`,
+        subserie_codigo: '100.10.18.04',
+        tipo_documento: '100.10.18.04 Contratación',
+        descripcion: 'Contrato Individual de Trabajo a Término Indefinido firmado',
+        fecha_carga: '2026-02-01',
+        archivo_data: null
+      }
+    ];
+
+    setDocumentosExpediente(docsColaborador);
+  }
+
+  // RADICACIÓN DE DOCUMENTO CON PERSISTENCIA SEGURA EN LOCALSTORAGE
+  function handleRadicarDocumentoCCD(e) {
+    e.preventDefault();
+    if (!selectedExpediente) return;
+    if (!descripcionDocumento.trim()) {
+      alert('Debes ingresar la descripción del soporte.');
+      return;
+    }
+
+    const subserieObj = SUBSERIES_CCD_OFICIALES.find(s => s.codigo === selectedSubserie);
+    const nombreLimpio = descripcionDocumento.trim().toUpperCase().replace(/\s+/g, '_');
+    const nomenclaturaGenerada = `EXP-${selectedExpediente.documento}-${selectedSubserie}-${nombreLimpio}.pdf`;
+
+    const nuevoDoc = {
+      id_archivo: Date.now(),
+      nombre_original: nomenclaturaGenerada,
+      subserie_codigo: selectedSubserie,
+      tipo_documento: subserieObj?.nombre || selectedSubserie,
+      descripcion: descripcionDocumento.trim(),
+      fecha_carga: new Date().toISOString(),
+      archivo_data: archivoBase64 || null
+    };
+
+    const actualizados = [nuevoDoc, ...documentosExpediente];
+    setDocumentosExpediente(actualizados);
+
+    // Guardar en localStorage bajo la cédula del colaborador
+    const todosDocs = JSON.parse(localStorage.getItem('frutopical_docs_expedientes') || '{}');
+    todosDocs[selectedExpediente.documento] = actualizados;
+    localStorage.setItem('frutopical_docs_expedientes', JSON.stringify(todosDocs));
+
+    setDescripcionDocumento('');
+    setArchivoBase64(null);
+    setNombreArchivoSubido('');
+    setUploadNotice('Documento radicado y custodiado exitosamente en el expediente laboral.');
+    setTimeout(() => setUploadNotice(''), 2500);
+  }
+
+  // DESCARGA DEL DOCUMENTO CODIFICADO (DESCARGA EL ARCHIVO REAL SUBIDO O GENERA COPIA FORMAL)
+  function descargarDocumentoCodificado(doc) {
+    const nombreArchivo = doc.nombre_original.endsWith('.pdf') ? doc.nombre_original : `${doc.nombre_original}.pdf`;
+
+    if (doc.archivo_data) {
+      const link = document.createElement('a');
+      link.href = doc.archivo_data;
+      link.download = nombreArchivo;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+
+    // PDF formal de soporte foliado/codificado según estándares del AGN
+    const contenidoPdf = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n` +
+      `2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n` +
+      `3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n` +
+      `4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n` +
+      `5 0 obj\n<< /Length 260 >>\nstream\n` +
+      `BT\n/F1 14 Tf\n50 730 Td\n(FRUTAS DEL ATLANTICO S.A.S. - ARCHIVO CENTRAL) Tj\n` +
+      `/F1 10 Tf\n50 705 Td\n(CUADRO DE CLASIFICACION DOCUMENTAL - SERIE 100.10.18) Tj\n` +
+      `50 670 Td\n(Titular del Expediente: ${selectedExpediente?.nombre || 'Colaborador'}) Tj\n` +
+      `50 650 Td\n(Documento de Identidad: ${selectedExpediente?.documento || 'Sin ID'}) Tj\n` +
+      `50 630 Td\n(Subserie Clasificacion: ${doc.tipo_documento}) Tj\n` +
+      `50 610 Td\n(Nomenclatura AGN: ${doc.nombre_original}) Tj\n` +
+      `50 590 Td\n(Descripcion: ${doc.descripcion || 'Documento archivado en expediente'}) Tj\n` +
+      `50 570 Td\n(Fecha de Radicacion: ${new Date(doc.fecha_carga).toLocaleDateString('es-CO')}) Tj\n` +
+      `50 530 Td\n(ESTADO: DOCUMENTO CODIFICADO Y CUSTODIADO EN EXPEDIENTE LABORAL DIGITAL) Tj\n` +
+      `ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000234 00000 n \n0000000296 00000 n \n` +
+      `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n%%EOF`;
+
+    const blob = new Blob([contenidoPdf], { type: 'application/pdf;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = nombreArchivo;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   function descargarExcelNomina() {
@@ -227,19 +381,16 @@ export default function Dashboard({ user, onLogout }) {
       setConvocatorias(JSON.parse(stored));
       return;
     }
-
     try {
       const response = await fetch(`${api}/convocatorias`);
       const body = await response.json();
       if (body.ok && Array.isArray(body.data) && body.data.length > 0) {
         setConvocatorias(body.data);
         localStorage.setItem('frutopical_convocatorias', JSON.stringify(body.data));
-        return;
       }
     } catch {}
   }
 
-  // CREAR CONVOCATORIA Y SINCRONIZAR DE INMEDIATO CON LOCALSTORAGE Y LA WEB
   async function handleCrearConvocatoria(e) {
     e.preventDefault();
     setSavingConvocatoria(true);
@@ -333,13 +484,7 @@ export default function Dashboard({ user, onLogout }) {
       try {
         const parsed = JSON.parse(local);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const combinadas = [...parsed];
-          base.forEach(b => {
-            if (!combinadas.some(c => String(c.numero_documento) === String(b.numero_documento))) {
-              combinadas.push(b);
-            }
-          });
-          setPostulaciones(combinadas);
+          setPostulaciones(parsed);
           return;
         }
       } catch {}
@@ -347,37 +492,6 @@ export default function Dashboard({ user, onLogout }) {
 
     setPostulaciones(base);
     localStorage.setItem('frutopical_postulaciones', JSON.stringify(base));
-  }
-
-  function loadExpedientes() {
-    const stored = localStorage.getItem('frutopical_expedientes');
-    const base = [
-      { id_expediente: 1, nombres: 'Carlos', apellidos: 'Fontalvo Amaya', tipo_documento: 'CC', numero_documento: '1042890123', cargo: 'Operario de Planta', estado: 'ACTIVO' },
-      { id_expediente: 2, nombres: 'María', apellidos: 'Conrado Jiménez', tipo_documento: 'CC', numero_documento: '1043567890', cargo: 'Auxiliar de Calidad', estado: 'ACTIVO' }
-    ];
-
-    const post = JSON.parse(localStorage.getItem('frutopical_postulaciones') || '[]');
-    let actualizados = stored ? JSON.parse(stored) : base;
-
-    post.filter(p => p.estado === 'CONTRATADO').forEach(p => {
-      const doc = p.numero_documento || '10234532121';
-      if (!actualizados.some(e => String(e.numero_documento) === String(doc))) {
-        const nom = p.candidato || `${p.nombres || ''} ${p.apellidos || ''}`.trim() || 'Colaborador';
-        const partes = nom.split(' ');
-        actualizados.unshift({
-          id_expediente: p.id_postulacion || Date.now(),
-          nombres: partes[0] || nom,
-          apellidos: partes.slice(1).join(' ') || '',
-          tipo_documento: 'CC',
-          numero_documento: doc,
-          cargo: p.convocatoria || p.cargo || 'Operario de Producción',
-          estado: 'ACTIVO'
-        });
-      }
-    });
-
-    setExpedientes(actualizados);
-    localStorage.setItem('frutopical_expedientes', JSON.stringify(actualizados));
   }
 
   function loadSolicitudes() {
@@ -441,12 +555,10 @@ export default function Dashboard({ user, onLogout }) {
     localStorage.setItem('frutopical_solicitudes', JSON.stringify(base));
   }
 
-  // DESCARGA DE LA HOJA DE VIDA REAL SUBIDA POR EL ASPIRANTE
   function descargarHojaDeVida(candidato) {
     const nombreCompleto = candidato.candidato || `${candidato.nombres || ''} ${candidato.apellidos || ''}`.trim() || 'Aspirante';
     const nombreArchivo = candidato.hoja_vida || candidato.hoja_vida_nombre || `HV_${nombreCompleto.replace(/\s+/g, '_')}.pdf`;
 
-    // Si el aspirante subió su archivo real en base64:
     if (candidato.hoja_vida_archivo) {
       const link = document.createElement('a');
       link.href = candidato.hoja_vida_archivo;
@@ -457,19 +569,18 @@ export default function Dashboard({ user, onLogout }) {
       return;
     }
 
-    // PDF formal de respaldo con datos completos del candidato
     const contenidoPdfSimulado = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n` +
       `2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n` +
       `3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n` +
-      `4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n` +
+      `4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n` +
       `5 0 obj\n<< /Length 200 >>\nstream\n` +
       `BT\n/F1 16 Tf\n50 720 Td\n(FRUTOPICAL S.A.S. - HOJA DE VIDA RADICADA) Tj\n` +
-      `/F1 12 Tf\n50 680 Td\n(Aspirante: ${nombreCompleto}) Tj\n` +
+      `/F1 11 Tf\n50 680 Td\n(Aspirante: ${nombreCompleto}) Tj\n` +
       `50 655 Td\n(Documento de Identidad: ${candidato.numero_documento || '1042890123'}) Tj\n` +
-      `50 630 Td\n(Convocatoria a la que aplica: ${candidato.convocatoria || candidato.cargo || 'General'}) Tj\n` +
-      `50 605 Td\n(Correo Electronico: ${candidato.correo || 'aspirante@gmail.com'}) Tj\n` +
-      `50 580 Td\n(Telefono de Contacto: ${candidato.telefono || '300 123 4567'}) Tj\n` +
-      `50 555 Td\n(Ciudad de Residencia: ${candidato.ciudad || 'Sabanagrande, Atlantico'}) Tj\n` +
+      `50 630 Td\n(Convocatoria: ${candidato.convocatoria || candidato.cargo || 'General'}) Tj\n` +
+      `50 605 Td\n(Correo: ${candidato.correo || 'aspirante@gmail.com'}) Tj\n` +
+      `50 580 Td\n(Telefono: ${candidato.telefono || '300 123 4567'}) Tj\n` +
+      `50 555 Td\n(Ciudad: ${candidato.ciudad || 'Sabanagrande, Atlantico'}) Tj\n` +
       `ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000234 00000 n \n0000000291 00000 n \n` +
       `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n%%EOF`;
 
@@ -478,31 +589,6 @@ export default function Dashboard({ user, onLogout }) {
     const link = document.createElement('a');
     link.href = url;
     link.download = nombreArchivo.endsWith('.pdf') ? nombreArchivo : `${nombreArchivo}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-
-  function descargarDocumentoCcd(doc) {
-    const contenidoPdf = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n` +
-      `2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n` +
-      `3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n` +
-      `4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n` +
-      `5 0 obj\n<< /Length 150 >>\nstream\n` +
-      `BT\n/F1 14 Tf\n50 720 Td\n(FRUTOPICAL S.A.S. - ARCHIVO CENTRAL CCD) Tj\n` +
-      `/F1 11 Tf\n50 680 Td\n(Expediente: ${doc.nombre_original}) Tj\n` +
-      `50 655 Td\n(Clasificacion AGN: ${doc.tipo_documento}) Tj\n` +
-      `50 630 Td\n(Fecha de Radicacion: ${new Date(doc.fecha_carga).toLocaleDateString('es-CO')}) Tj\n` +
-      `50 605 Td\n(Estado: Custodiado en Historia Laboral) Tj\n` +
-      `ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000234 00000 n \n0000000291 00000 n \n` +
-      `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n%%EOF`;
-
-    const blob = new Blob([contenidoPdf], { type: 'application/pdf;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = doc.nombre_original.endsWith('.pdf') ? doc.nombre_original : `${doc.nombre_original}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -540,29 +626,15 @@ export default function Dashboard({ user, onLogout }) {
       fechaRetiro: 'Vigente (Activo)',
       estadoLaboral: 'ACTIVO',
       correo: candidatoAprobado.correo || 'colaborador@frutopical.com',
-      telefono: candidatoAprobado.telefono || '300 123 4567'
+      telefono: candidatoAprobado.telefono || '300 123 4567',
+      ciudad: candidatoAprobado.ciudad || 'Sabanagrande, Atlántico',
+      direccion: 'Sabanagrande, Atlántico'
     };
 
     const emps = getListaEmpleados();
     if (!emps.some(e => String(e.documento) === String(doc))) {
       emps.unshift(nuevoColaborador);
       localStorage.setItem('frutopical_empleados', JSON.stringify(emps));
-    }
-
-    const exps = JSON.parse(localStorage.getItem('frutopical_expedientes') || '[]');
-    if (!exps.some(e => String(e.numero_documento) === String(doc))) {
-      const partes = nombreCompleto.split(' ');
-      exps.unshift({
-        id_expediente: Date.now(),
-        nombres: partes[0] || nombreCompleto,
-        apellidos: partes.slice(1).join(' ') || '',
-        tipo_documento: 'CC',
-        numero_documento: doc,
-        cargo: cargo,
-        estado: 'ACTIVO'
-      });
-      localStorage.setItem('frutopical_expedientes', JSON.stringify(exps));
-      setExpedientes(exps);
     }
 
     const actualizadosPost = postulaciones.map(p =>
@@ -572,6 +644,9 @@ export default function Dashboard({ user, onLogout }) {
     );
     setPostulaciones(actualizadosPost);
     localStorage.setItem('frutopical_postulaciones', JSON.stringify(actualizadosPost));
+
+    // Refrescar expedientes CCD automáticamente
+    loadExpedientes();
 
     alert(`¡Candidato ${nombreCompleto} vinculado exitosamente a Nómina, SST y Archivo Central CCD!`);
     setSelectedPostulation(null);
@@ -671,6 +746,7 @@ export default function Dashboard({ user, onLogout }) {
     }
     if (module === 'documentos') {
       loadExpedientes();
+      setSelectedExpediente(null);
     }
     if (module === 'solicitudes') {
       setSelectedSolicitud(null);
@@ -754,6 +830,7 @@ export default function Dashboard({ user, onLogout }) {
           </header>
 
           <div className="th-content">
+            {/* INICIO */}
             {activeModule === 'inicio' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem' }}>
                 <section className="th-welcome" style={{ margin: 0, padding: '2rem 2.5rem', borderRadius: '16px', background: 'linear-gradient(135deg, #143c1d 0%, #1b5328 100%)' }}>
@@ -784,9 +861,9 @@ export default function Dashboard({ user, onLogout }) {
                   <div style={{ backgroundColor: '#ffffff', padding: '1.4rem', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#1d4ed8' }}>📁</div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b' }}>HISTORIAS CCD</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b' }}>EXPEDIENTES CCD</span>
                       <strong style={{ display: 'block', fontSize: '1.5rem', color: '#1e293b' }}>{expedientes.length}</strong>
-                      <small style={{ color: '#1d4ed8', fontWeight: '700' }}>Expedientes Serie 100/200</small>
+                      <small style={{ color: '#1d4ed8', fontWeight: '700' }}>Expedientes Serie 100.10.18</small>
                     </div>
                   </div>
 
@@ -831,7 +908,7 @@ export default function Dashboard({ user, onLogout }) {
                       <span style={{ fontSize: '1.8rem' }}>📁</span>
                       <div>
                         <strong style={{ color: '#b45309', fontSize: '0.95rem', display: 'block' }}>4. Gestión Documental (CCD)</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Cuadro de clasificación series 100/200 e historias laborales.</p>
+                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Cuadro de clasificación Serie 100.10.18 y expedientes laborales.</p>
                       </div>
                     </button>
 
@@ -847,9 +924,10 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             )}
 
+            {/* MÓDULO 1: DIAGNÓSTICO */}
             {activeModule === 'diagnostico' && <Diagnostico onVolver={() => changeModule('inicio')} />}
 
-            {/* MÓDULO 2: SELECCIÓN DE PERSONAL */}
+            {/* MÓDULO 2: SELECCIÓN */}
             {activeModule === 'seleccion' && (
               <section className="th-page-section">
                 <div style={{ display: 'flex', gap: '1rem', borderBottom: '2px solid #e0e0e0', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
@@ -1013,23 +1091,44 @@ export default function Dashboard({ user, onLogout }) {
               </section>
             )}
 
+            {/* MÓDULO 3: VINCULACIÓN Y SG-SST */}
             {activeModule === 'vinculaciones' && (
               <SSTGestion onVolver={() => changeModule('inicio')} />
             )}
 
-            {/* MÓDULO 4: GESTIÓN DOCUMENTAL (CCD) */}
+            {/* MÓDULO 4: GESTIÓN DOCUMENTAL (CCD) - COMPLETAMENTE ACTUALIZADO */}
             {activeModule === 'documentos' && (
               <section className="th-page-section">
                 {!selectedExpediente ? (
                   <>
-                    <div className="th-page-intro">
+                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                       <div>
                         <span className="th-label">EQUIPO 4 · GESTIÓN DOCUMENTAL</span>
                         <h2>Cuadro de Clasificación Documental (CCD)</h2>
-                        <p>Los candidatos contratados abren expediente automáticamente en las Series 100 y 200.</p>
+                        <p>Los colaboradores activos y nuevas contrataciones cuentan con expediente aperturado en la Serie 100.10.18.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={loadExpedientes}
+                        style={{ backgroundColor: '#ffffff', border: '1.5px solid #166534', color: '#166534', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.82rem', cursor: 'pointer' }}
+                      >
+                        🔄 Sincronizar Expedientes
+                      </button>
+                    </div>
+
+                    {/* ESTRUCTURA JERÁRQUICA EXIGIDA POR LA PROFESORA */}
+                    <div style={{ backgroundColor: '#f0fdf4', padding: '1.2rem 1.5rem', borderRadius: '12px', border: '1.5px solid #86efac', marginBottom: '1.6rem' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '0.5px' }}>
+                        ESTRUCTURA JERÁRQUICA DEL CCD PARA TALENTO HUMANO (AGN)
+                      </span>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.8rem', marginTop: '0.6rem', fontSize: '0.85rem' }}>
+                        <div><strong>Fondo (100):</strong> Frutas Del Atlántico S.A.S.</div>
+                        <div><strong>Sección (100.10):</strong> Gestión Humana / Talento Humano</div>
+                        <div><strong>Serie (100.10.18):</strong> Expedientes Laborales</div>
                       </div>
                     </div>
 
+                    {/* TABLA DE TODOS LOS TRABAJADORES ACTIVOS Y NUEVAS CONTRATACIONES */}
                     <div className="th-table-wrapper">
                       <table className="th-table">
                         <thead>
@@ -1042,14 +1141,18 @@ export default function Dashboard({ user, onLogout }) {
                           </tr>
                         </thead>
                         <tbody>
-                          {expedientes.map((item) => (
-                            <tr key={item.id_expediente}>
-                              <td><strong>{item.nombres} {item.apellidos}</strong></td>
-                              <td>{item.tipo_documento} {item.numero_documento}</td>
+                          {expedientes.map((item, idx) => (
+                            <tr key={item.documento ?? idx}>
+                              <td><strong>{item.nombre}</strong></td>
+                              <td>CC {item.documento}</td>
                               <td>{item.cargo}</td>
-                              <td><span className="th-status active">{item.estado}</span></td>
+                              <td><span className="th-status active">{item.estadoLaboral || 'ACTIVO'}</span></td>
                               <td>
-                                <button type="button" className="th-table-action" onClick={() => setSelectedExpediente(item)}>
+                                <button
+                                  type="button"
+                                  className="th-table-action"
+                                  onClick={() => abrirExpedienteCCD(item)}
+                                >
                                   Abrir Expediente CCD
                                 </button>
                               </td>
@@ -1061,62 +1164,105 @@ export default function Dashboard({ user, onLogout }) {
                   </>
                 ) : (
                   <>
-                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                       <div>
-                        <h2>{selectedExpediente.nombres} {selectedExpediente.apellidos}</h2>
-                        <p>Cargo: <strong>{selectedExpediente.cargo}</strong> · C.C. <strong>{selectedExpediente.numero_documento}</strong></p>
+                        <span className="th-label">EXPEDIENTE LABORAL DIGITAL</span>
+                        <h2>{selectedExpediente.nombre}</h2>
+                        <p>Cargo: <strong>{selectedExpediente.cargo}</strong> · C.C. <strong>{selectedExpediente.documento}</strong> · Serie: <strong>100.10.18 (Expedientes Laborales)</strong></p>
                       </div>
-                      <button type="button" className="th-secondary-button" onClick={() => setSelectedExpediente(null)}>← Volver a Expedientes</button>
-                    </div>
-
-                    <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.5rem', maxWidth: '650px', marginBottom: '1.5rem' }}>
-                      <h3 style={{ margin: '0 0 1rem 0' }}>Radicar Documento en Historia Laboral</h3>
-                      <div style={{ marginBottom: '0.8rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>1. Subserie Documental (CCD)</label>
-                        <select value={selectedCcd} onChange={(e) => setSelectedCcd(e.target.value)} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
-                          {CCD_SERIES.map((c) => (
-                            <option key={c.codigo} value={c.codigo}>[{c.codigo}] {c.nombre}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div style={{ marginBottom: '0.8rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>2. Descripción del Soporte</label>
-                        <input
-                          type="text"
-                          placeholder="Ej: Acta de Entrega de Carné Institucional"
-                          value={documentType}
-                          onChange={(e) => setDocumentType(e.target.value)}
-                          style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
-                        />
-                      </div>
-
-                      <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>3. Archivo Digital (PDF o Imagen)</label>
-                        <input type="file" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} style={{ width: '100%' }} />
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!documentType.trim()) return alert('Escribe la descripción del documento.');
-                          const nom = `HL-${selectedExpediente.numero_documento}-${selectedCcd}-${documentType.trim().toUpperCase().replace(/\s+/g, '_')}.pdf`;
-                          setDocumentos((prev) => [{ id_archivo: Date.now(), nombre_original: nom, tipo_documento: `[${selectedCcd}] ${documentType}`, fecha_carga: new Date().toISOString() }, ...prev]);
-                          setDocumentType('');
-                          setSelectedFile(null);
-                          setUploadNotice('Documento archivado exitosamente en historia laboral.');
-                          setTimeout(() => setUploadNotice(''), 2000);
-                        }}
-                        className="th-primary-button"
-                        style={{ width: '100%' }}
-                      >
-                        Archivar en Carpeta Digital CCD
+                      <button type="button" className="th-secondary-button" onClick={() => setSelectedExpediente(null)}>
+                        ← Volver a Expedientes
                       </button>
-                      {uploadNotice && <p style={{ color: '#166534', fontWeight: 'bold', fontSize: '0.82rem', marginTop: '0.5rem' }}>✓ {uploadNotice}</p>}
                     </div>
 
+                    {/* FORMULARIO: RADICAR DOCUMENTO EN EXPEDIENTE LABORAL (CON ESTRUCTURA AGN) */}
+                    <div style={{ backgroundColor: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '12px', padding: '1.8rem', maxWidth: '720px', marginBottom: '2rem' }}>
+                      <h3 style={{ margin: '0 0 0.4rem 0', color: '#166534', fontSize: '1.2rem' }}>
+                        Radicar Documento en Expediente Laboral
+                      </h3>
+                      
+                      {/* INFORMACIÓN JERÁRQUICA DEBAJO DEL TÍTULO EXIGIDA */}
+                      <div style={{ backgroundColor: '#f8fafc', padding: '0.8rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '1.2rem', fontSize: '0.8rem', color: '#475569', lineHeight: 1.5 }}>
+                        <strong>Estructura Jerárquica del CCD para Talento Humano:</strong><br />
+                        Fondo: <strong>100</strong> (Frutas Del Atlántico S.A.S.) · Sección: <strong>100.10</strong> (Gestión Humana) · Serie: <strong>100.10.18</strong> (Expedientes Laborales)
+                      </div>
+
+                      <form onSubmit={handleRadicarDocumentoCCD} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>
+                            1. Subserie Documental (CCD) *
+                          </label>
+                          <select
+                            value={selectedSubserie}
+                            onChange={(e) => setSelectedSubserie(e.target.value)}
+                            style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', fontSize: '0.85rem', fontWeight: 'bold' }}
+                          >
+                            {SUBSERIES_CCD_OFICIALES.map((s) => (
+                              <option key={s.codigo} value={s.codigo}>
+                                [{s.codigo}] {s.nombre.replace(`${s.codigo} `, '')}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>
+                            2. Descripción del Soporte *
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Ej: Acta de Notificación del Reglamento Interno (RIT)"
+                            value={descripcionDocumento}
+                            onChange={(e) => setDescripcionDocumento(e.target.value)}
+                            required
+                            style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', fontSize: '0.85rem' }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>
+                            3. Archivo Digital (Soporte PDF o Imagen)
+                          </label>
+                          <input
+                            type="file"
+                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) {
+                                setNombreArchivoSubido(f.name);
+                                const reader = new FileReader();
+                                reader.onload = () => setArchivoBase64(reader.result);
+                                reader.readAsDataURL(f);
+                              } else {
+                                setArchivoBase64(null);
+                                setNombreArchivoSubido('');
+                              }
+                            }}
+                            style={{ width: '100%', fontSize: '0.82rem' }}
+                          />
+                          {nombreArchivoSubido && (
+                            <small style={{ color: '#166534', fontWeight: 'bold', display: 'block', marginTop: '0.2rem' }}>
+                              ✓ Archivo cargado: {nombreArchivoSubido}
+                            </small>
+                          )}
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="th-primary-button"
+                          style={{ width: '100%', padding: '0.75rem', fontWeight: 'bold', marginTop: '0.4rem' }}
+                        >
+                          Archivar y Codificar en Expediente Laboral
+                        </button>
+                      </form>
+                      {uploadNotice && <p style={{ color: '#166534', fontWeight: 'bold', fontSize: '0.85rem', marginTop: '0.6rem' }}>✓ {uploadNotice}</p>}
+                    </div>
+
+                    {/* TABLA DE DOCUMENTOS EN EXPEDIENTE LABORAL */}
                     <div className="th-table-wrapper">
-                      <h3>Documentos en Historia Laboral ({documentos.length})</h3>
+                      <h3 style={{ margin: '0 0 0.8rem 0', color: '#1e293b' }}>
+                        Documentos en Expediente Laboral ({documentosExpediente.length})
+                      </h3>
                       <table className="th-table">
                         <thead>
                           <tr>
@@ -1127,32 +1273,33 @@ export default function Dashboard({ user, onLogout }) {
                           </tr>
                         </thead>
                         <tbody>
-                          {documentos.map((doc) => (
+                          {documentosExpediente.map((doc) => (
                             <tr key={doc.id_archivo}>
-                              <td><strong>{doc.nombre_original}</strong></td>
+                              <td>
+                                <strong style={{ fontFamily: 'monospace', fontSize: '0.82rem', color: '#0f172a' }}>
+                                  {doc.nombre_original}
+                                </strong>
+                              </td>
                               <td>{doc.tipo_documento}</td>
                               <td>{new Date(doc.fecha_carga).toLocaleDateString('es-CO')}</td>
                               <td style={{ display: 'flex', gap: '0.5rem' }}>
                                 <button
                                   type="button"
                                   onClick={() => setVisorDoc(doc)}
-                                  style={{ padding: '0.3rem 0.6rem', backgroundColor: '#f0fdf4', border: '1px solid #86efac', color: '#166534', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
+                                  style={{ padding: '0.35rem 0.65rem', backgroundColor: '#f0fdf4', border: '1px solid #86efac', color: '#166534', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
                                 >
                                   👁️ Ver Ficha
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => descargarDocumentoCcd(doc)}
-                                  style={{ padding: '0.3rem 0.6rem', backgroundColor: '#166534', border: 'none', color: '#ffffff', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
+                                  onClick={() => descargarDocumentoCodificado(doc)}
+                                  style={{ padding: '0.35rem 0.65rem', backgroundColor: '#166534', border: 'none', color: '#ffffff', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
                                 >
                                   📥 Descargar PDF
                                 </button>
                               </td>
                             </tr>
                           ))}
-                          {!documentos.length && (
-                            <tr><td colSpan="4" style={{ textAlign: 'center', padding: '1.5rem', color: '#64748b' }}>Expediente aperturado. Listo para radicar contratos, actas o afiliaciones.</td></tr>
-                          )}
                         </tbody>
                       </table>
                     </div>
@@ -1161,7 +1308,7 @@ export default function Dashboard({ user, onLogout }) {
               </section>
             )}
 
-            {/* MÓDULO 5: SERVICIO AL CLIENTE */}
+            {/* MÓDULO 5: ATENCIÓN AL CLIENTE (PQRS) */}
             {activeModule === 'solicitudes' && (
               <section className="th-page-section">
                 {!selectedSolicitud ? (
@@ -1244,7 +1391,6 @@ export default function Dashboard({ user, onLogout }) {
                         <button type="button" onClick={() => setSelectedSolicitud(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕ Volver</button>
                       </div>
 
-                      {/* DATOS DE CONTACTO Y VINCULACIÓN */}
                       <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '1rem', fontSize: '0.85rem' }}>
                         <p style={{ margin: '0 0 0.3rem 0' }}><strong>Remitente:</strong> {selectedSolicitud.nombre_remitente}</p>
                         <p style={{ margin: '0 0 0.3rem 0' }}><strong>Cédula / Identificación:</strong> <strong style={{ color: '#166534' }}>{selectedSolicitud.numero_documento || certDatos.documento}</strong></p>
@@ -1272,12 +1418,10 @@ export default function Dashboard({ user, onLogout }) {
                       {solicitudNotice && <p style={{ color: '#166534', fontWeight: 'bold', fontSize: '0.85rem', marginTop: '0.6rem' }}>✓ {solicitudNotice}</p>}
                     </form>
 
-                    {/* EXPEDICIÓN DE CERTIFICADO OFICIAL SEGÚN FORMATO DE LA DOCENTE */}
                     <div style={{ backgroundColor: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '12px', padding: '1.5rem' }}>
                       <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '0.5px' }}>FORMATOS LABORALES</span>
                       <h4 style={{ margin: '0.2rem 0 0.8rem 0', color: '#166534', fontSize: '1.1rem' }}>Expedición de Certificado</h4>
 
-                      {/* SELECTOR MAESTRO DE COLABORADOR EN LA BASE DE DATOS */}
                       <div style={{ marginBottom: '1rem', backgroundColor: '#f0fdf4', padding: '0.8rem', borderRadius: '8px', border: '1.5px solid #86efac' }}>
                         <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 'bold', color: '#166534', marginBottom: '0.3rem' }}>
                           🏢 Registro de Nómina / Colaborador Vinculado:
@@ -1285,7 +1429,7 @@ export default function Dashboard({ user, onLogout }) {
                         <select
                           value={certDatos.documento}
                           onChange={(e) => seleccionarTrabajadorManual(e.target.value)}
-                          style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #166534', fontWeight: 'bold', fontSize: '0.82rem', backgroundColor: '#ffffff', cursor: 'pointer' }}
+                          style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1.5px solid #166534', fontWeight: 'bold', fontSize: '0.82rem', backgroundColor: '#ffffff', cursor: 'pointer' }}
                         >
                           {listaMaestraEmpleados.map((emp) => (
                             <option key={emp.documento} value={emp.documento}>
@@ -1302,7 +1446,6 @@ export default function Dashboard({ user, onLogout }) {
                         <option value="modelo3" disabled>Modelo 3: Extrabajador (En Desarrollo / Muestra Física)</option>
                       </select>
 
-                      {/* RESUMEN DE DATOS AUTOMÁTICOS DEL CERTIFICADO */}
                       <div style={{ backgroundColor: '#f8fafc', padding: '0.9rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', lineHeight: '1.6', marginBottom: '1.2rem' }}>
                         <p style={{ margin: '0 0 0.2rem 0' }}><strong>Titular:</strong> {certDatos.nombre}</p>
                         <p style={{ margin: '0 0 0.2rem 0' }}><strong>C.C.:</strong> {certDatos.documento}</p>
@@ -1374,7 +1517,7 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* MODAL VISOR HOJA DE VIDA: LIMPIO Y SIN EL CUADRO DE PERFIL BLANCO (CORRECCIÓN PROFESORA) */}
+        {/* MODAL HOJA DE VIDA CANDIDATO */}
         {modalHvAspirante && (
           <div className="th-modal-backdrop" onMouseDown={() => setModalHvAspirante(null)}>
             <section
@@ -1485,7 +1628,7 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* MODAL MATRIZ DE EVALUACIÓN OFICIAL (SIN IMPRIMIR ACTA DESCUAJADA, SOLO CALIFICACIÓN Y VINCULACIÓN) */}
+        {/* MODAL MATRIZ DE EVALUACIÓN OFICIAL */}
         {selectedPostulation && (
           <div className="th-modal-backdrop" onMouseDown={() => setSelectedPostulation(null)}>
             <section className="th-postulation-modal" style={{ maxWidth: '640px', width: '92%' }} onMouseDown={(e) => e.stopPropagation()}>
@@ -1580,10 +1723,10 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* MODAL VISOR CCD */}
+        {/* MODAL VISOR CCD (ACTUALIZADO A EXPEDIENTE LABORAL Y DOCUMENTO CODIFICADO) */}
         {visorDoc && (
           <div className="th-modal-backdrop" onMouseDown={() => setVisorDoc(null)}>
-            <section className="th-postulation-modal" style={{ maxWidth: '580px', width: '92%' }} onMouseDown={(e) => e.stopPropagation()}>
+            <section className="th-postulation-modal" style={{ maxWidth: '620px', width: '92%' }} onMouseDown={(e) => e.stopPropagation()}>
               <div className="th-modal-header">
                 <div>
                   <span className="th-label">SOPORTE DE ARCHIVO CENTRAL (AGN)</span>
@@ -1591,24 +1734,36 @@ export default function Dashboard({ user, onLogout }) {
                 </div>
                 <button type="button" className="th-modal-close" onClick={() => setVisorDoc(null)}>×</button>
               </div>
+
               <div style={{ backgroundColor: '#f8fafc', padding: '1.4rem', borderRadius: '10px', border: '1.5px solid #cbd5e1', marginTop: '1rem', fontSize: '0.85rem' }}>
                 <div style={{ borderBottom: '2px solid #166534', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
                   <strong style={{ color: '#166534', fontSize: '1rem' }}>FRUTAS DEL ATLÁNTICO S.A.S.</strong>
-                  <span style={{ display: 'block', color: '#64748b', fontSize: '0.75rem' }}>Sistema de Gestión Documental y Archivo Central</span>
+                  <span style={{ display: 'block', color: '#64748b', fontSize: '0.75rem' }}>
+                    Sistema de Gestión Documental y Archivo Central (Serie 100.10.18)
+                  </span>
                 </div>
-                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Nomenclatura AGN:</strong><br /><code style={{ backgroundColor: '#e2e8f0', padding: '0.2rem 0.4rem', borderRadius: '4px' }}>{visorDoc.nombre_original}</code></p>
+                <p style={{ margin: '0 0 0.4rem 0' }}>
+                  <strong>Nomenclatura AGN:</strong><br />
+                  <code style={{ backgroundColor: '#e2e8f0', padding: '0.2rem 0.4rem', borderRadius: '4px', fontSize: '0.82rem' }}>
+                    {visorDoc.nombre_original}
+                  </code>
+                </p>
                 <p style={{ margin: '0 0 0.4rem 0' }}><strong>Subserie / Clasificación:</strong> {visorDoc.tipo_documento}</p>
                 <p style={{ margin: '0 0 0.4rem 0' }}><strong>Fecha de Radicación:</strong> {new Date(visorDoc.fecha_carga).toLocaleDateString('es-CO')}</p>
-                <p style={{ margin: 0, color: '#166534', fontWeight: 'bold' }}>✓ Estado: Documento indexado y custodiado en el expediente digital del colaborador.</p>
+                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Titular:</strong> {selectedExpediente?.nombre || 'Colaborador'}</p>
+                <p style={{ margin: 0, color: '#166534', fontWeight: 'bold' }}>
+                  ✓ Estado: Documento indexado y custodiado en el expediente digital del colaborador.
+                </p>
               </div>
 
+              {/* TÉRMINO EXACTO EXIGIDO: "DESCARGAR COPIA DEL DOCUMENTO CODIFICADO (PDF)" */}
               <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem' }}>
                 <button
                   type="button"
-                  onClick={() => descargarDocumentoCcd(visorDoc)}
+                  onClick={() => descargarDocumentoCodificado(visorDoc)}
                   style={{ flex: 1, padding: '0.75rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
                 >
-                  📥 Descargar Copia del Documento Foliado (PDF)
+                  📥 Descargar Copia del Documento Codificado (PDF)
                 </button>
                 <button type="button" onClick={() => setVisorDoc(null)} style={{ padding: '0.75rem 1.2rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
                   Cerrar
@@ -1619,11 +1774,10 @@ export default function Dashboard({ user, onLogout }) {
         )}
       </div>
 
-      {/* ÁREA DE IMPRESIÓN OFICIAL DEL CERTIFICADO LABORAL (FORMATO EXACTO ENVIADO POR LA PROFESORA) */}
+      {/* ÁREA OFICIAL DE IMPRESIÓN DEL CERTIFICADO LABORAL */}
       <div className="print-document-area">
         {imprimirTipo === 'certificado' && certDatos && (
           <div style={{ padding: '20mm 20mm', fontFamily: 'Arial, sans-serif', color: '#000000', lineHeight: '1.6' }}>
-            {/* Encabezado membretado */}
             <div style={{ borderBottom: '2px solid #2e7d32', paddingBottom: '12px', marginBottom: '35px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <div style={{ fontSize: '13pt', fontWeight: 'bold', color: '#166534' }}>Frutas Del Atlántico S.A.S.</div>
@@ -1663,7 +1817,6 @@ export default function Dashboard({ user, onLogout }) {
               </p>
             )}
 
-            {/* Párrafo de expedición común */}
             <p style={{ fontSize: '11pt', textAlign: 'justify', textIndent: '25px', marginBottom: '45px' }}>
               Se expide la presente certificación a solicitud de la parte interesada en el municipio de Sabanagrande a los <strong>{diaLetras} ({diaNumero})</strong> días del mes de <strong>{mesNombre}</strong> del año <strong>{anioNumero}</strong>.
             </p>
@@ -1672,7 +1825,6 @@ export default function Dashboard({ user, onLogout }) {
               Cordialmente,
             </p>
 
-            {/* Firma oficial de la Gerente General */}
             <div>
               <div style={{ width: '240px', borderTop: '1.5px solid #000000', marginBottom: '6px' }}></div>
               <strong style={{ fontSize: '11pt', display: 'block' }}>MARIA ISABELA SOTO BOTERO</strong>
@@ -1680,7 +1832,6 @@ export default function Dashboard({ user, onLogout }) {
               <span style={{ fontSize: '9pt', color: '#64748b' }}>FRUTOPICAL S.A.S.</span>
             </div>
 
-            {/* Pie de página */}
             <div style={{ position: 'fixed', bottom: '15mm', left: '20mm', right: '20mm', borderTop: '1px solid #cbd5e1', paddingTop: '8px', fontSize: '8pt', color: '#64748b', textAlign: 'center' }}>
               Dirección: Carrera 2A 20-35, Sabanagrande – Atlántico | Correo Electrónico: frutopical.sas25@gmail.com | Teléfono de Contacto: 3246064388
             </div>

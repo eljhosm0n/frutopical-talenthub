@@ -197,26 +197,13 @@ const CONVOCATORIAS_INICIALES = [
   },
   {
     id_convocatoria: 3,
-    titulo: 'Jefe de Producción',
-    cargo: 'Jefe de Producción',
+    titulo: 'Jefe de Producción y Calidad',
+    cargo: 'Jefe de Producción y Calidad',
     salario: '$3.000.000 + Prestaciones de ley',
     contrato: 'Término indefinido · Tiempo completo',
     horario: 'Lunes a viernes 7:30 am - 5:00 pm | Sábados 7:00 am - 12:30 pm',
-    descripcion: 'Planificar, coordinar y supervisar las actividades de producción. Optimizar uso de recursos humanos y tecnológicos. Monitorear indicadores de rendimiento y Lean Manufacturing.',
-    requisitos: 'Profesional en Ingeniería Industrial, Agroindustrial o afines. Mínimo 2 a 3 años de experiencia en cargos similares. Conocimientos en BPM y control de tiempos.',
-    imagen_afiche: 'convocatorias/convocatoria_jefaturas.jpg',
-    fecha_cierre: '2026-11-30',
-    estado: 'ABIERTA'
-  },
-  {
-    id_convocatoria: 4,
-    titulo: 'Jefe de Calidad',
-    cargo: 'Jefe de Calidad',
-    salario: '$3.000.000 + Prestaciones de ley',
-    contrato: 'Término indefinido · Tiempo completo',
-    horario: 'Lunes a viernes 7:30 am - 5:00 pm | Sábados 7:00 am - 12:30 pm',
-    descripcion: 'Planificar, implementar y mantener el sistema de gestión de calidad. Asegurar cumplimiento de normas de inocuidad. Gestionar no conformidades y capacitar en BPM y HACCP.',
-    requisitos: 'Profesional en Ingeniería de Alimentos, Ingeniería Industrial o afines. Mínimo 2 a 3 años de experiencia. Conocimientos en ISO 9001, BPM, HACCP.',
+    descripcion: 'Planificar, coordinar y supervisar las actividades de producción y el cumplimiento riguroso de normas de inocuidad alimentaria BPM.',
+    requisitos: 'Profesional en Ingeniería Industrial, Agroindustrial o de Alimentos. Mínimo 2 a 3 años de experiencia en cargos similares en plantas.',
     imagen_afiche: 'convocatorias/convocatoria_jefaturas.jpg',
     fecha_cierre: '2026-11-30',
     estado: 'ABIERTA'
@@ -258,34 +245,51 @@ function App() {
     }
   }, []);
 
-  // CARGA SINCRONIZADA DE CONVOCATORIAS (LOCALSTORAGE Y SERVIDOR)
-  useEffect(() => {
-    async function load() {
-      const localConvs = localStorage.getItem('frutopical_convocatorias');
-      if (localConvs) {
-        try {
-          const parsed = JSON.parse(localConvs);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setConvocatorias(parsed);
-            return;
-          }
-        } catch {}
-      }
-
+  // CARGA Y ESCUCHA EN TIEMPO REAL DE CONVOCATORIAS
+  const recargarConvocatorias = () => {
+    const localConvs = localStorage.getItem('frutopical_convocatorias');
+    if (localConvs) {
       try {
-        const res = await fetch(`${api}/convocatorias`);
-        const body = await res.json();
+        const parsed = JSON.parse(localConvs);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setConvocatorias(parsed);
+          return;
+        }
+      } catch (err) {
+        console.error('Error parseando convocatorias locales', err);
+      }
+    }
+
+    fetch(`${api}/convocatorias`)
+      .then((res) => res.json())
+      .then((body) => {
         if (body.ok && Array.isArray(body.data) && body.data.length > 0) {
           setConvocatorias(body.data);
           localStorage.setItem('frutopical_convocatorias', JSON.stringify(body.data));
-          return;
+        } else {
+          setConvocatorias(CONVOCATORIAS_INICIALES);
+          localStorage.setItem('frutopical_convocatorias', JSON.stringify(CONVOCATORIAS_INICIALES));
         }
-      } catch {}
+      })
+      .catch(() => {
+        setConvocatorias(CONVOCATORIAS_INICIALES);
+        localStorage.setItem('frutopical_convocatorias', JSON.stringify(CONVOCATORIAS_INICIALES));
+      });
+  };
 
-      setConvocatorias(CONVOCATORIAS_INICIALES);
-      localStorage.setItem('frutopical_convocatorias', JSON.stringify(CONVOCATORIAS_INICIALES));
-    }
-    load();
+  useEffect(() => {
+    recargarConvocatorias();
+
+    // 1. Escucha cambios si la profesora tiene abierto el Dashboard en otra pestaña
+    window.addEventListener('storage', recargarConvocatorias);
+
+    // 2. Escucha si el cambio ocurre en la misma pestaña
+    window.addEventListener('convocatoriasUpdated', recargarConvocatorias);
+
+    return () => {
+      window.removeEventListener('storage', recargarConvocatorias);
+      window.removeEventListener('convocatoriasUpdated', recargarConvocatorias);
+    };
   }, []);
 
   function handleFormChange(e) {
@@ -303,8 +307,8 @@ function App() {
     e.preventDefault();
     if (!selected) return;
 
-    if (!form.hoja_vida_nombre) {
-      alert('Debes adjuntar tu hoja de vida en formato PDF o Word para completar la postulación.');
+    if (!form.hoja_vida_archivo) {
+      alert('Debes adjuntar tu hoja de vida en formato PDF para completar la postulación.');
       return;
     }
 
@@ -322,7 +326,7 @@ function App() {
       convocatoria: selected.titulo,
       candidato: `${form.nombres} ${form.apellidos}`.trim(),
       hoja_vida: form.hoja_vida_nombre || `HV_${form.nombres.replace(/\s+/g, '_')}.pdf`,
-      hoja_vida_archivo: form.hoja_vida_archivo || null, // Archivo real Base64
+      hoja_vida_archivo: form.hoja_vida_archivo || null,
       telefono: form.telefono,
       correo: form.correo,
       ciudad: form.ciudad,
@@ -1180,7 +1184,7 @@ function App() {
         </div>
       )}
 
-      {/* MODAL PQRS (CON CÉDULA OBLIGATORIA COMO LLAVE PRIMARIA) */}
+      {/* MODAL PQRS */}
       {showPqrsModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowPqrsModal(false)}>
           <section
@@ -1219,7 +1223,6 @@ function App() {
                 </label>
               </div>
 
-              {/* NOMBRE Y CÉDULA (LLAVE PRIMARIA PARA CRUCE DE DATOS) */}
               <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.8rem', width: '100%' }}>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
                   Nombre completo *
@@ -1481,11 +1484,11 @@ function App() {
               {/* CARGA OBLIGATORIA CON ALMACENAMIENTO DEL ARCHIVO REAL */}
               <div style={{ backgroundColor: '#f0fdf4', padding: '0.9rem', borderRadius: '8px', border: '1.5px dashed #86efac', width: '100%', boxSizing: 'border-box' }}>
                 <span style={{ display: 'block', fontWeight: 'bold', color: '#166534', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
-                  📎 Adjuntar Hoja de Vida (Formato PDF o Word) *
+                  📎 Adjuntar Hoja de Vida (Formato PDF) *
                 </span>
                 <input
                   type="file"
-                  accept=".pdf,.doc,.docx"
+                  accept=".pdf"
                   required
                   onChange={(e) => {
                     const f = e.target.files?.[0];
@@ -1495,7 +1498,7 @@ function App() {
                         setForm((prev) => ({ 
                           ...prev, 
                           hoja_vida_nombre: f.name,
-                          hoja_vida_archivo: reader.result // Base64 del archivo real subido
+                          hoja_vida_archivo: reader.result
                         }));
                       };
                       reader.readAsDataURL(f);
@@ -1531,17 +1534,17 @@ function App() {
               <button
                 className="button primary submit"
                 type="submit"
-                disabled={!form.acepta_datos || !form.hoja_vida_nombre}
+                disabled={!form.acepta_datos || !form.hoja_vida_archivo}
                 style={{
                   width: '100%',
                   marginTop: '0.2rem',
                   padding: '0.75rem',
-                  backgroundColor: (form.acepta_datos && form.hoja_vida_nombre) ? '#2e7d32' : '#94a3b8',
+                  backgroundColor: (form.acepta_datos && form.hoja_vida_archivo) ? '#2e7d32' : '#94a3b8',
                   color: '#ffffff',
                   border: 'none',
                   borderRadius: '8px',
                   fontWeight: 'bold',
-                  cursor: (form.acepta_datos && form.hoja_vida_nombre) ? 'pointer' : 'not-allowed',
+                  cursor: (form.acepta_datos && form.hoja_vida_archivo) ? 'pointer' : 'not-allowed',
                   boxSizing: 'border-box'
                 }}
               >

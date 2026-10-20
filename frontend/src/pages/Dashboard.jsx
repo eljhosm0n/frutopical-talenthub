@@ -874,12 +874,9 @@ export default function Dashboard({ user, onLogout }) {
       <div className="th-dashboard">
         <aside className="th-sidebar">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '1.2rem 1.4rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <div style={{ backgroundColor: '#ffffff', padding: '6px 8px', borderRadius: '10px' }}>
-              <svg width="34" height="34" viewBox="0 0 100 100" fill="none">
-                <path d="M38 18C44 26 48 38 42 54C36 70 20 74 14 62C8 50 14 30 26 20C30 16 34 14 38 18Z" stroke="#2E7D32" strokeWidth="6" fill="#f0fdf4" />
-                <path d="M62 26C72 32 82 46 76 66C70 86 48 88 40 74C32 60 40 38 52 28C56 24 60 22 62 26Z" stroke="#EF6C00" strokeWidth="7" fill="#fff7ed" />
-              </svg>
-            </div>
+            <div style={{ backgroundColor: '#ffffff', padding: '4px 6px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img src="/logo-frutopical.png" alt="Frutopical Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+          </div>
             <div>
               <strong style={{ display: 'block', color: '#ffffff', fontSize: '1.05rem', letterSpacing: '1px' }}>FRUTOPICAL</strong>
               <span style={{ color: '#EF6C00', fontSize: '0.75rem', fontWeight: '700' }}>TalentHub</span>

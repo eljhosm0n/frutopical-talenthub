@@ -21,7 +21,7 @@ const LISTA_OFICIAL_EPP = [
   { id: 'epp16', nombre: 'Tapabocas / Kit de bioseguridad', area: 'Inocuidad Alimentaria Integral' }
 ];
 
-// 2. REPOSITORIO DE PLANTILLAS Y FORMULARIOS VIGENTES CON LAS ENTIDADES OFICIALES DE LA EMPRESA
+// 2. REPOSITORIO DE PLANTILLAS Y FORMULARIOS VIGENTES CON LAS ENTIDADES OFICIALES
 const REPOSITORIO_DOCUMENTAL = [
   { id: 'f_arl', entidad: 'ARL COLMENA SEGUROS', tipo: 'Riesgos Laborales', formato: 'Formulario Único de Afiliación y Novedades (Riesgo I a IV)', archivo: 'Formato afiliacion COLMENA.pdf', vigencia: 'Vigente Oficial' },
   { id: 'f_caja', entidad: 'Combarranquilla', tipo: 'Compensación Familiar', formato: 'Formulario de Afiliación Trabajador y Beneficiarios', archivo: 'Formato afiliacion trabajador_Combarranquilla.pdf', vigencia: 'Vigente Oficial' },
@@ -115,7 +115,7 @@ export default function SSTGestion({ onVolver }) {
         {
           documento: '1044123456',
           nombre: 'David Riquett Villalobos',
-          cargo: 'Jefe de Producción',
+          cargo: 'Jefe de Producción y Calidad',
           salario: '$3.000.000 COP',
           salarioLetras: 'TRES MILLONES DE PESOS M/CTE',
           tipoContrato: 'Término Indefinido',
@@ -127,7 +127,7 @@ export default function SSTGestion({ onVolver }) {
         {
           documento: '1048765432',
           nombre: 'Sandra Milena Morán Henríquez',
-          cargo: 'Analista de Gestión Humana',
+          cargo: 'Auxiliar de Talento Humano',
           salario: '$2.400.000 COP',
           salarioLetras: 'DOS MILLONES CUATROCIENTOS MIL PESOS M/CTE',
           tipoContrato: 'Término Indefinido',
@@ -227,7 +227,7 @@ export default function SSTGestion({ onVolver }) {
             table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 9.5pt; font-family: Arial, sans-serif; }
             th, td { border: 1px solid #333; padding: 6px 8px; }
             .firmas { margin-top: 55px; display: flex; justify-content: space-between; text-align: center; }
-            .linea { border-top: 1.5px solid #000; width: 220px; margin: 0 auto 6px auto; }
+            .linea { border-top: 1.5px solid #000; width: 240px; margin: 0 auto 6px auto; }
           </style>
         </head>
         <body>
@@ -262,26 +262,30 @@ export default function SSTGestion({ onVolver }) {
         <tr><td><strong>LUGAR Y CIUDAD:</strong></td><td>Sabanagrande – Atlántico</td></tr>
       </table>
       <p style="text-align: justify;">Entre EL EMPLEADOR y EL TRABAJADOR, identificados al pie de sus firmas, se celebra el presente contrato de trabajo regido por las siguientes cláusulas:</p>
-      <p style="text-align: justify;"><strong>PRIMERA: OBJETO.</strong> EL EMPLEADOR contrata los servicios personales de EL TRABAJADOR para desempeñar las funciones del oficio con exclusividad y confidencialidad.</p>
-      <p style="text-align: justify;"><strong>SEGUNDA: REMUNERACIÓN.</strong> Salario acordado en el encabezado. Se incluye remuneración de descansos dominicales y festivos (C.S.T.).</p>
-      <p style="text-align: justify;"><strong>TERCERA: DURACIÓN DEL CONTRATO.</strong> ${esIndefinido ? 'Será indefinida mientras subsistan las causas que le dieron origen.' : 'Término inicial señalado arriba, prorrogable conforme a la ley.'}</p>
-      <p style="text-align: justify;"><strong>CUARTA: TRABAJO SUPLEMENTARIO.</strong> Horas extras y recargos requerirán autorización previa y por escrito.</p>
+      <p style="text-align: justify;"><strong>PRIMERA: OBJETO.</strong> EL EMPLEADOR contrata los servicios personales de EL TRABAJADOR y este se obliga: a) A poner al servicio de EL EMPLEADOR toda su capacidad normal de trabajo en el desempeño de las funciones propias del oficio mencionado y en las labores anexas y complementarias del mismo; b) A prestar sus servicios en forma exclusiva a EL EMPLEADOR; c) A guardar absoluta reserva sobre los hechos, documentos físicos y/o electrónicos e informaciones corporativas.</p>
+      <p style="text-align: justify;"><strong>SEGUNDA: REMUNERACIÓN.</strong> EL EMPLEADOR pagará a EL TRABAJADOR por la prestación de sus servicios el salario estipulado en el encabezado. PARÁGRAFO PRIMERO: Salario Ordinario incluye descansos dominicales y festivos (C.S.T.). PARÁGRAFO SEGUNDO: En caso de salario integral se incorporará el factor prestacional no inferior al 30%. PARÁGRAFO TERCERO: Beneficios no salariales acordados no constituirán factor de liquidación de acreencias conforme a la Ley 50 de 1990.</p>
+      <p style="text-align: justify;"><strong>TERCERA: DURACIÓN DEL CONTRATO.</strong> ${esIndefinido ? 'El contrato a término indefinido tendrá vigencia mientras subsistan las causas que le dieron origen y la materia del trabajo.' : 'El término inicial será el señalado arriba. Si antes de 30 días ninguna parte avisa su no prórroga, se entenderá renovado sucesivamente conforme a la ley.'}</p>
+      <p style="text-align: justify;"><strong>CUARTA: TRABAJO SUPLEMENTARIO.</strong> Horas extras y recargos requerirán autorización previa y por escrito de EL EMPLEADOR o sus representantes.</p>
       <p style="text-align: justify;"><strong>QUINTA: JORNADA DE TRABAJO.</strong> Se laborará la jornada máxima legal en los turnos fijados por la empresa (Art. 164 C.S.T.).</p>
       <p style="text-align: justify;"><strong>SEXTA: PERIODO DE PRUEBA.</strong> ${esIndefinido ? 'Los dos primeros meses se consideran período de prueba legal.' : 'La quinta parte del término pactado sin exceder dos meses.'}</p>
-      <p style="text-align: justify;"><strong>SÉPTIMA: TERMINACIÓN UNILATERAL.</strong> Justas causas las contempladas en el Art. 62 del C.S.T. y faltas graves al reglamento interno.</p>
-      <p style="text-align: justify;"><strong>OCTAVA: PROPIEDAD INTELECTUAL.</strong> Todo desarrollo o invención pertenece exclusivamente a EL EMPLEADOR.</p>
+      <p style="text-align: justify;"><strong>SÉPTIMA: TERMINACIÓN UNILATERAL.</strong> Son justas causas las contempladas en el Art. 62 del C.S.T. y faltas graves al reglamento interno de trabajo.</p>
+      <p style="text-align: justify;"><strong>OCTAVA: PROPIEDAD INTELECTUAL.</strong> Toda invención, desarrollo o trabajo original concebido en la vigencia del contrato pertenece a EL EMPLEADOR.</p>
       <p style="text-align: justify;"><strong>NOVENA: MODIFICACIONES.</strong> EL TRABAJADOR acepta modificaciones laborales operativas en ejercicio del poder subordinante (Art. 23 C.S.T.).</p>
-      <p style="text-align: justify;"><strong>DÉCIMA: DIRECCIÓN.</strong> Se tendrá como domicilio contractual la última dirección registrada en su hoja de vida (Ley 789/02).</p>
-      <p style="text-align: justify;"><strong>UNDÉCIMA: EFECTOS.</strong> Reemplaza en su integridad cualquier acuerdo previo.</p>
-      <p style="margin-top: 20px;">Para constancia se firma en Sabanagrande a los ${fechaHoyLegal}.</p>
+      <p style="text-align: justify;"><strong>DÉCIMA: DIRECCIÓN.</strong> Se tendrá como domicilio contractual la última dirección registrada en su hoja de vida (Ley 789 de 2002).</p>
+      <p style="text-align: justify;"><strong>UNDÉCIMA: EFECTOS.</strong> Reemplaza en su integridad cualquier acuerdo previo verbal o escrito.</p>
+      <p style="margin-top: 25px;">Para constancia se firma en Sabanagrande a los ${fechaHoyLegal}.</p>
       <div class="firmas">
         <div style="width: 45%;">
           <div class="linea"></div>
-          <strong>SAMY DARIANY RODRÍGUEZ SEÑA</strong><br>Representante Legal<br><strong>EL EMPLEADOR</strong>
+          <strong>MARIA ISABELA SOTO BOTERO</strong><br>
+          Gerente General / Representante Legal<br>
+          <strong>FRUTOPICAL S.A.S. (EL EMPLEADOR)</strong>
         </div>
         <div style="width: 45%;">
           <div class="linea"></div>
-          <strong>${selectedEmp?.nombre}</strong><br>C.C. ${selectedEmp?.documento}<br><strong>EL TRABAJADOR</strong>
+          <strong>${selectedEmp?.nombre}</strong><br>
+          C.C. ${selectedEmp?.documento}<br>
+          <strong>EL TRABAJADOR</strong>
         </div>
       </div>
     `;
@@ -291,8 +295,8 @@ export default function SSTGestion({ onVolver }) {
   function handleImprimirEpp() {
     const marcados = LISTA_OFICIAL_EPP.filter((e) => eppMarcados[e.id]);
     const filasEpp = marcados.length
-      ? marcados.map((m) => `<tr><td>${m.nombre}</td><td style="text-align: center; font-weight: bold;">Entregado</td></tr>`).join('')
-      : '<tr><td colspan="2" style="text-align: center;">No se seleccionaron elementos en esta entrega puntual.</td></tr>';
+      ? marcados.map((m) => `<tr><td>${m.nombre}</td><td style="text-align: center; font-weight: bold; color: #166534;">Entregado / Conforme</td></tr>`).join('')
+      : '<tr><td colspan="2" style="text-align: center; color: #64748b;">No se seleccionaron elementos en esta entrega puntual.</td></tr>';
 
     const htmlEpp = `
       <div class="header">
@@ -303,10 +307,10 @@ export default function SSTGestion({ onVolver }) {
       </div>
       <p><strong>Colaborador:</strong> ${selectedEmp?.nombre} | <strong>C.C.:</strong> ${selectedEmp?.documento} | <strong>Cargo:</strong> ${selectedEmp?.cargo} | <strong>Fecha:</strong> ${fechaHoyLegal}</p>
       <table>
-        <tr style="background-color: #f2f2f2;"><th>Elemento de Protección Personal (EPP) Entregado</th><th style="width: 100px;">Estado</th></tr>
+        <tr style="background-color: #f2f2f2;"><th>Elemento de Protección Personal (EPP) Entregado</th><th style="width: 160px; text-align: center;">Estado de Entrega</th></tr>
         ${filasEpp}
       </table>
-      <p style="font-size: 9pt; text-align: justify;">El colaborador se compromete a usar de forma obligatoria los EPP asignados durante toda su jornada, cuidarlos y reportar cualquier deterioro ante el Responsable del SG-SST.</p>
+      <p style="font-size: 9pt; text-align: justify;">El colaborador certifica que ha recibido los Elementos de Protección Personal relacionados en perfecto estado y se compromete a usarlos de forma permanente durante su jornada, velar por su conservación y solicitar reposición inmediata en caso de deterioro ante el Responsable del SG-SST.</p>
       <div class="firmas">
         <div style="width: 45%;">
           <div class="linea"></div>
@@ -328,7 +332,7 @@ export default function SSTGestion({ onVolver }) {
         <div style="font-size: 9pt; color: #555;">NIT: 900.999.999-1 · Sabanagrande, Atlántico</div>
         <h3 style="margin-top: 8px;">CONSTANCIA DE INDUCCIÓN INSTITUCIONAL Y SG-SST</h3>
       </div>
-      <p style="text-align: justify; text-indent: 30px; margin-top: 30px;">
+      <p style="text-align: justify; text-indent: 30px; margin-top: 30px; line-height: 1.8;">
         Se certifica que el(la) colaborador(a) <strong>${selectedEmp?.nombre}</strong>, identificado(a) con C.C. <strong>${selectedEmp?.documento}</strong>, culminó su proceso de inducción reglamentaria para el cargo de <strong>${selectedEmp?.cargo}</strong> el día <strong>${fechaInduccion}</strong>, obteniendo una calificación de comprensión del <strong>${calificacionInduccion}%</strong> en los módulos de Políticas Institucionales Frutopical, SG-SST (Dec. 1072), Matriz de Peligros en Planta Agroindustrial, Buenas Prácticas de Manufactura (BPM) y Uso Correcto de EPP.
       </p>
       <p style="margin-top: 30px;">La presente constancia se expide en Sabanagrande a los ${fechaHoyLegal}.</p>
@@ -366,7 +370,7 @@ export default function SSTGestion({ onVolver }) {
             Vinculación de Trabajadores y Seguridad Laboral
           </h2>
           <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
-            Auditoría de ingreso, contratación legal, asignación de EPP e inducción institucional.
+            Auditoría de ingreso, formalización contractual, asignación de EPP e inducción institucional.
           </p>
         </div>
 
@@ -598,10 +602,10 @@ export default function SSTGestion({ onVolver }) {
         </div>
       )}
 
-      {/* PESTAÑA 2: CONTRATACIÓN (AQUÍ ESTÁ UBICADO EL BLOQUE 4 Y EL REPOSITORIO) */}
+      {/* PESTAÑA 2: CONTRATACIÓN (BLOQUE 4 Y REPOSITORIO DE PLANTILLAS) */}
       {tabActiva === 'contratacion' && selectedEmp && (
         <div>
-          {/* BLOQUE 4 UBICADO AQUÍ */}
+          {/* BLOQUE 4 FORMATOS INTERNOS */}
           <div style={{ backgroundColor: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '12px', padding: '1.4rem', marginBottom: '1.8rem' }}>
             <h4 style={{ margin: '0 0 0.4rem 0', color: '#166534', fontSize: '1rem', borderBottom: '1.5px solid #dcfce7', paddingBottom: '0.4rem' }}>
               BLOQUE 4: Formatos Internos de Contratación de Frutopical S.A.S.
@@ -663,12 +667,13 @@ export default function SSTGestion({ onVolver }) {
             </h4>
             <div style={{ backgroundColor: '#f8fafc', padding: '0.8rem', border: '1px solid #cbd5e1', margin: '1rem 0', fontSize: '9pt' }}>
               <strong>EMPLEADOR:</strong> FRUTAS DEL ATLÁNTICO S.A.S. | <strong>DIRECCIÓN:</strong> Carrera 2A # 20-35 Sabanagrande (Atl.)<br />
+              <strong>REPRESENTANTE LEGAL:</strong> MARIA ISABELA SOTO BOTERO (Gerente General)<br />
               <strong>TRABAJADOR:</strong> {selectedEmp.nombre} | <strong>CARGO:</strong> {selectedEmp.cargo} | <strong>SALARIO:</strong> {selectedEmp.salario}<br />
               <strong>FECHA DE INICIACIÓN:</strong> {selectedEmp.fechaIngreso} | <strong>CIUDAD:</strong> Sabanagrande – Atlántico
             </div>
             <p><strong>PRIMERA: OBJETO.</strong> EL EMPLEADOR contrata los servicios personales de EL TRABAJADOR para desempeñar las funciones propias del oficio con exclusividad y confidencialidad.</p>
             <p><strong>SEGUNDA: REMUNERACIÓN.</strong> Salario mensual acordado. Incluye descansos dominicales y festivos (C.S.T.).</p>
-            <p><strong>TERCERA: DURACIÓN DEL CONTRATO.</strong> {tipoContratoMinuta === 'indefinido' ? 'Indefinida mientras subsistan las causas.' : 'Término inicial fijo prorrogable conforme a la ley.'}</p>
+            <p><strong>TERCERA: DURACIÓN DEL CONTRATO.</strong> {tipoContratoMinuta === 'indefinido' ? 'Indefinida mientras subsistan las causas que le dieron origen.' : 'Término inicial fijo prorrogable conforme a la ley.'}</p>
             <p><strong>CUARTA a UNDÉCIMA:</strong> Cláusulas sobre trabajo suplementario, jornada ordinaria, período de prueba legal, propiedad intelectual y notificaciones contractuales.</p>
           </div>
 

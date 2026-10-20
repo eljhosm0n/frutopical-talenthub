@@ -116,7 +116,8 @@ const corporate = {
   legalName: 'Frutas Del Atlántico S.A.S.',
   commercialName: 'Frutopical',
   nit: '900.999.999-1',
-  legalRepresentative: 'María Isabela Soto Botero',
+  legalRepresentative: 'Samy Dariany Rodríguez Seña', // Corregido: Samy es la Representante Legal
+  generalManager: 'María Isabela Soto Botero',        // Isabela es la Gerente General
   address: 'Carrera 2A 20-35, Sabanagrande - Atlántico',
   phone: '3246064388',
   email: 'frutopical.sas25@gmail.com',
@@ -169,6 +170,7 @@ const corporate = {
 };
 
 const CONVOCATORIAS_INICIALES = [
+ const CONVOCATORIAS_INICIALES = [
   {
     id_convocatoria: 1,
     titulo: 'Jefe de Talento Humano',
@@ -205,6 +207,18 @@ const CONVOCATORIAS_INICIALES = [
     descripcion: 'Planificar, coordinar y supervisar las actividades de producción y el cumplimiento riguroso de normas de inocuidad alimentaria BPM.',
     requisitos: 'Profesional en Ingeniería Industrial, Agroindustrial o de Alimentos. Mínimo 2 a 3 años de experiencia en cargos similares en plantas.',
     imagen_afiche: 'convocatorias/convocatoria_jefaturas.jpg',
+    fecha_cierre: '2026-11-30',
+    estado: 'ABIERTA'
+  },
+  {
+    id_convocatoria: 4,
+    titulo: 'Mensajero',
+    cargo: 'Mensajero',
+    salario: '$1.423.500 + Auxilio de Transporte',
+    contrato: 'Término fijo inferior a un año · Tiempo completo',
+    horario: 'Lunes a viernes 7:30 am - 5:00 pm | Sábados 7:30 am - 12:00 pm',
+    descripcion: 'Entrega oportuna de documentación, radicación de correspondencia institucional, trámites bancarios y apoyo logístico general de mensajería.',
+    requisitos: 'Bachiller académico con licencia de conducción A2 vigente sin comparendos y motocicleta propia.',
     fecha_cierre: '2026-11-30',
     estado: 'ABIERTA'
   }

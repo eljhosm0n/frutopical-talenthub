@@ -110,6 +110,7 @@ const PERFILES_DPC_OFICIALES = [
 ];
 
 export default function Diagnostico({ onVolver }) {
+  const [activeTab, setActiveTab] = useState('legalizacion');
   const [cargoSeleccionado, setCargoSeleccionado] = useState(null);
 
   function descargarManual(perfil) {
@@ -146,132 +147,297 @@ export default function Diagnostico({ onVolver }) {
         </button>
       </div>
 
-      {/* TARJETA INFORMATIVA DEL ORGANIGRAMA Y MANUAL DPC */}
-      <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '14px', padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.2rem' }}>
-        <div>
-          <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '0.5px' }}>
-            MANUAL DE FUNCIONES Y COMPETENCIAS LABORALES
-          </span>
-          <h3 style={{ margin: '0.2rem 0', color: '#14532d', fontSize: '1.25rem' }}>
-            13 Perfiles Oficiales de Descripción de Puesto de Trabajo (DPC)
-          </h3>
-          <p style={{ margin: 0, fontSize: '0.84rem', color: '#334155' }}>
-            Estructura jerárquica: 1 Directivo, 4 Jefaturas / Tácticos y 8 Cargos Operativos y de Soporte.
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
-          <a
-            href="/docs/0. Organigrama.jpg"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ padding: '0.6rem 1.2rem', backgroundColor: '#ffffff', color: '#166534', border: '1.5px solid #166534', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 'bold', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-          >
-            📊 Ver Organigrama (.jpg)
-          </a>
-          <a
-            href="/docs/0. Perfil De Cargo.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ padding: '0.6rem 1.2rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 'bold', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-          >
-            📑 Manual DPC General (.pdf)
-          </a>
-        </div>
+      {/* PESTAÑAS DE NAVEGACIÓN */}
+      <div style={{ display: 'flex', gap: '1rem', borderBottom: '2px solid #e2e8f0', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={() => setActiveTab('legalizacion')}
+          style={{
+            padding: '0.8rem 1.2rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'legalizacion' ? '3px solid #166534' : 'none',
+            fontWeight: activeTab === 'legalizacion' ? 'bold' : 'normal',
+            color: activeTab === 'legalizacion' ? '#166534' : '#64748b',
+            cursor: 'pointer',
+            fontSize: '0.95rem'
+          }}
+        >
+          🏛️ 1. Legalización y Constitución
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('dofa')}
+          style={{
+            padding: '0.8rem 1.2rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'dofa' ? '3px solid #166534' : 'none',
+            fontWeight: activeTab === 'dofa' ? 'bold' : 'normal',
+            color: activeTab === 'dofa' ? '#166534' : '#64748b',
+            cursor: 'pointer',
+            fontSize: '0.95rem'
+          }}
+        >
+          🎯 2. Matriz DOFA
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('arbol')}
+          style={{
+            padding: '0.8rem 1.2rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'arbol' ? '3px solid #166534' : 'none',
+            fontWeight: activeTab === 'arbol' ? 'bold' : 'normal',
+            color: activeTab === 'arbol' ? '#166534' : '#64748b',
+            cursor: 'pointer',
+            fontSize: '0.95rem'
+          }}
+        >
+          🌳 3. Árbol de Problemas
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('perfiles')}
+          style={{
+            padding: '0.8rem 1.2rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'perfiles' ? '3px solid #166534' : 'none',
+            fontWeight: activeTab === 'perfiles' ? 'bold' : 'normal',
+            color: activeTab === 'perfiles' ? '#166534' : '#64748b',
+            cursor: 'pointer',
+            fontSize: '0.95rem'
+          }}
+        >
+          👥 4. Perfiles de Cargo (DPC)
+        </button>
       </div>
 
-      {/* CUADRÍCULA EXACTA DE LOS 13 PERFILES DE CARGO */}
-      <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1.5px solid #e2e8f0', padding: '2rem' }}>
-        <div style={{ marginBottom: '1.8rem', borderBottom: '2px solid #f1f5f9', paddingBottom: '1rem' }}>
-          <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.3rem' }}>
-            Descripciones de Puesto de Trabajo (13 Perfiles Oficiales DPC)
-          </h3>
-          <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.84rem', color: '#64748b' }}>
-            Haz clic en cualquiera de los cargos para descargar inmediatamente el manual de funciones en Word (.docx) o consultar su misión del cargo.
+      {/* CONTENIDO DE LAS PESTAÑAS */}
+      
+      {/* PESTAÑA 1: LEGALIZACIÓN */}
+      {activeTab === 'legalizacion' && (
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '2rem' }}>
+          <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.3rem' }}>Documentación Legal Constitutiva</h3>
+          <p style={{ color: '#475569', fontSize: '0.9rem', marginBottom: '2rem' }}>
+            Soportes oficiales de constitución de Frutas Del Atlántico S.A.S. registrados ante la Cámara de Comercio de Barranquilla y la DIAN.
           </p>
-        </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.3rem' }}>
-          {PERFILES_DPC_OFICIALES.map((dpc) => (
-            <div
-              key={dpc.codigo}
-              style={{
-                backgroundColor: '#ffffff',
-                border: '1.5px solid #cbd5e1',
-                borderRadius: '12px',
-                padding: '1.3rem',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: '0.9rem',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                transition: 'border-color 0.2s ease'
-              }}
-            >
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '0.74rem', fontWeight: '900', color: '#166534', backgroundColor: '#dcfce7', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
-                    {dpc.codigo}
-                  </span>
-                  <span style={{ fontSize: '0.74rem', color: '#475569', fontWeight: '700' }}>{dpc.area}</span>
-                </div>
-
-                <strong style={{ fontSize: '1.1rem', color: '#1e293b', display: 'block', lineHeight: 1.3 }}>
-                  {dpc.cargo}
-                </strong>
-                <span style={{ fontSize: '0.74rem', color: '#c2410c', fontWeight: 'bold', display: 'block', marginTop: '0.2rem' }}>
-                  Nivel: {dpc.nivel}
-                </span>
-
-                <p style={{ margin: '0.6rem 0 0 0', fontSize: '0.8rem', color: '#556957', lineHeight: 1.45 }}>
-                  {dpc.mision}
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', gap: '0.5rem', borderTop: '1px solid #f1f5f9', paddingTop: '0.8rem' }}>
-                <button
-                  type="button"
-                  onClick={() => setCargoSeleccionado(dpc)}
-                  style={{
-                    flex: 1,
-                    backgroundColor: '#f8fafc',
-                    color: '#1e293b',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    padding: '0.5rem',
-                    fontSize: '0.76rem',
-                    fontWeight: 'bold',
-                    cursor: 'pointer'
-                  }}
-                >
-                  👁️ Ver Detalle
-                </button>
-                <button
-                  type="button"
-                  onClick={() => descargarManual(dpc)}
-                  style={{
-                    flex: 1.4,
-                    backgroundColor: '#166534',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '0.5rem',
-                    fontSize: '0.76rem',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem'
-                  }}
-                >
-                  📥 Descargar Manual (.docx)
-                </button>
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>📄</span>
+              <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Registro Único Tributario (RUT)</h4>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>Soporte de inscripción ante la DIAN para el ejercicio de la actividad económica agroindustrial.</p>
+              <a href="/docs/Simulación Didáctica RUT - Frutas Del Atlántico S.A.S..pdf" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
             </div>
-          ))}
+
+            <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>💳</span>
+              <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Asignación de NIT</h4>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>Certificación de Número de Identificación Tributaria asignado a la empresa.</p>
+              <a href="/docs/Simulación Didáctica NIT - Frutas Del Atlántico S.A.S..pdf" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
+            </div>
+
+            <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>🏛️</span>
+              <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Cámara de Comercio</h4>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>Certificado de Existencia y Representación Legal de la sociedad mercantil.</p>
+              <a href="/docs/Certificado de Existencia y Representacion Legal - FRUTOPICAL SAS.pdf" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
+            </div>
+            
+            <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>🔒</span>
+              <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Política de Habeas Data</h4>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>Políticas de tratamiento de datos personales conforme a la Ley 1581 de 2012.</p>
+              <a href="/docs/Autorizacion Tratamiento Datos Personales - FRUTOPICAL SAS.pdf" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* PESTAÑA 2: MATRIZ DOFA */}
+      {activeTab === 'dofa' && (
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '1.3rem' }}>Análisis Estratégico (DOFA)</h3>
+              <p style={{ color: '#475569', fontSize: '0.9rem', margin: 0 }}>Evaluación de Debilidades, Oportunidades, Fortalezas y Amenazas de Frutopical.</p>
+            </div>
+            <a href="/docs/Matriz DOFA.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: '0.6rem 1.2rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 'bold', textDecoration: 'none' }}>📥 Descargar Matriz (PDF)</a>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+            <img 
+              src="/docs/Matriz DOFA.jpg" 
+              alt="Matriz DOFA Frutopical" 
+              style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }} 
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentNode.innerHTML = '<div style="padding: 3rem; text-align: center; color: #64748b;">No se encontró la imagen de la Matriz DOFA en la carpeta de documentos. Asegúrate de subir el archivo <strong>Matriz DOFA.jpg</strong> a la ruta /public/docs/</div>';
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* PESTAÑA 3: ÁRBOL DE PROBLEMAS */}
+      {activeTab === 'arbol' && (
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '1.3rem' }}>Árbol de Problemas</h3>
+              <p style={{ color: '#475569', fontSize: '0.9rem', margin: 0 }}>Análisis de causas y efectos de la problemática central abordada en el proyecto.</p>
+            </div>
+            <a href="/docs/Arbol de problemas de FRUTOPICAL.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: '0.6rem 1.2rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 'bold', textDecoration: 'none' }}>📥 Descargar Árbol (PDF)</a>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+            <img 
+              src="/docs/Arbol de problemas.jpg" 
+              alt="Árbol de Problemas Frutopical" 
+              style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }} 
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentNode.innerHTML = '<div style="padding: 3rem; text-align: center; color: #64748b;">No se encontró la imagen del Árbol de Problemas en la carpeta de documentos. Asegúrate de subir el archivo <strong>Arbol de problemas.jpg</strong> a la ruta /public/docs/</div>';
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* PESTAÑA 4: PERFILES DPC (LA QUE MOSTRABAS ANTES SOLA) */}
+      {activeTab === 'perfiles' && (
+        <>
+          {/* TARJETA INFORMATIVA DEL ORGANIGRAMA Y MANUAL DPC */}
+          <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '14px', padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.2rem' }}>
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '0.5px' }}>
+                MANUAL DE FUNCIONES Y COMPETENCIAS LABORALES
+              </span>
+              <h3 style={{ margin: '0.2rem 0', color: '#14532d', fontSize: '1.25rem' }}>
+                13 Perfiles Oficiales de Descripción de Puesto de Trabajo (DPC)
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.84rem', color: '#334155' }}>
+                Estructura jerárquica: 1 Directivo, 4 Jefaturas / Tácticos y 8 Cargos Operativos y de Soporte.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+              <a
+                href="/docs/0. Organigrama.jpg"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ padding: '0.6rem 1.2rem', backgroundColor: '#ffffff', color: '#166534', border: '1.5px solid #166534', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 'bold', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+              >
+                📊 Ver Organigrama (.jpg)
+              </a>
+              <a
+                href="/docs/0. Perfil De Cargo.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ padding: '0.6rem 1.2rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 'bold', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+              >
+                📑 Manual DPC General (.pdf)
+              </a>
+            </div>
+          </div>
+
+          {/* CUADRÍCULA EXACTA DE LOS 13 PERFILES DE CARGO */}
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '2rem' }}>
+            <div style={{ marginBottom: '1.8rem', borderBottom: '2px solid #f1f5f9', paddingBottom: '1rem' }}>
+              <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.3rem' }}>
+                Descripciones de Puesto de Trabajo (13 Perfiles Oficiales DPC)
+              </h3>
+              <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.84rem', color: '#64748b' }}>
+                Haz clic en cualquiera de los cargos para descargar inmediatamente el manual de funciones en Word (.docx) o consultar su misión del cargo.
+              </p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.3rem' }}>
+              {PERFILES_DPC_OFICIALES.map((dpc) => (
+                <div
+                  key={dpc.codigo}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: '12px',
+                    padding: '1.3rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '0.9rem',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                    transition: 'border-color 0.2s ease'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span style={{ fontSize: '0.74rem', fontWeight: '900', color: '#166534', backgroundColor: '#dcfce7', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>
+                        {dpc.codigo}
+                      </span>
+                      <span style={{ fontSize: '0.74rem', color: '#475569', fontWeight: '700' }}>{dpc.area}</span>
+                    </div>
+
+                    <strong style={{ fontSize: '1.1rem', color: '#1e293b', display: 'block', lineHeight: 1.3 }}>
+                      {dpc.cargo}
+                    </strong>
+                    <span style={{ fontSize: '0.74rem', color: '#c2410c', fontWeight: 'bold', display: 'block', marginTop: '0.2rem' }}>
+                      Nivel: {dpc.nivel}
+                    </span>
+
+                    <p style={{ margin: '0.6rem 0 0 0', fontSize: '0.8rem', color: '#556957', lineHeight: 1.45 }}>
+                      {dpc.mision}
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.5rem', borderTop: '1px solid #f1f5f9', paddingTop: '0.8rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => setCargoSeleccionado(dpc)}
+                      style={{
+                        flex: 1,
+                        backgroundColor: '#f8fafc',
+                        color: '#1e293b',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '6px',
+                        padding: '0.5rem',
+                        fontSize: '0.76rem',
+                        fontWeight: 'bold',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      👁️ Ver Detalle
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => descargarManual(dpc)}
+                      style={{
+                        flex: 1.4,
+                        backgroundColor: '#166534',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '0.5rem',
+                        fontSize: '0.76rem',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.4rem'
+                      }}
+                    >
+                      📥 Descargar Manual (.docx)
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* MODAL DETALLE DE CARGO DPC */}
       {cargoSeleccionado && (

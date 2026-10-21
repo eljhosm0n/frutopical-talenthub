@@ -17,11 +17,12 @@ link.rel = 'icon';
 link.href = '/logo-frutopical.png';
 document.head.appendChild(link);
 
-const api =
-  import.meta.env.VITE_API_URL ??
-  'http://localhost:3000/api/v1';
+// ========================================================
+// ☁️ BASE DE DATOS GLOBAL (MOCKAPI)
+// ========================================================
+// REEMPLAZA ESTE LINK POR EL DE TU PROYECTO EN MOCKAPI.IO
+const CLOUD_API = 'https://6ad8072595e98f36aef2e53c.mockapi.io'; 
 
-// Resolver rutas públicas
 function getPublicUrl(path) {
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
   return `${import.meta.env.BASE_URL}${cleanPath}`;
@@ -169,8 +170,8 @@ const corporate = {
   ]
 };
 
+// Base precargada en caso de no tener internet o si falla MockAPI
 const CONVOCATORIAS_INICIALES = [
- const CONVOCATORIAS_INICIALES = [
   {
     id_convocatoria: 1,
     titulo: 'Jefe de Talento Humano',
@@ -259,50 +260,50 @@ function App() {
     }
   }, []);
 
-  // CARGA Y ESCUCHA EN TIEMPO REAL DE CONVOCATORIAS
-  const recargarConvocatorias = () => {
+  // ========================================================
+  // 🌐 FUNCIÓN DE CARGA GLOBAL (LEE DESDE LA NUBE - MOCKAPI)
+  // ========================================================
+  const recargarConvocatoriasNube = async () => {
+    try {
+      if (CLOUD_API === 'https://TU_PROYECTO.mockapi.io') {
+        throw new Error('API Global de MockAPI no configurada, usando fallback local.');
+      }
+      const res = await fetch(`${CLOUD_API}/convocatorias`);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        setConvocatorias(data); // Carga la DB Global exitosamente
+        return;
+      }
+    } catch (e) {
+      console.warn(e.message);
+    }
+    
+    // Fallback de seguridad (por si MockAPI no está listo)
     const localConvs = localStorage.getItem('frutopical_convocatorias');
     if (localConvs) {
       try {
-        const parsed = JSON.parse(localConvs);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setConvocatorias(parsed);
-          return;
-        }
+        setConvocatorias(JSON.parse(localConvs));
       } catch (err) {
-        console.error('Error parseando convocatorias locales', err);
-      }
-    }
-
-    fetch(`${api}/convocatorias`)
-      .then((res) => res.json())
-      .then((body) => {
-        if (body.ok && Array.isArray(body.data) && body.data.length > 0) {
-          setConvocatorias(body.data);
-          localStorage.setItem('frutopical_convocatorias', JSON.stringify(body.data));
-        } else {
-          setConvocatorias(CONVOCATORIAS_INICIALES);
-          localStorage.setItem('frutopical_convocatorias', JSON.stringify(CONVOCATORIAS_INICIALES));
-        }
-      })
-      .catch(() => {
         setConvocatorias(CONVOCATORIAS_INICIALES);
-        localStorage.setItem('frutopical_convocatorias', JSON.stringify(CONVOCATORIAS_INICIALES));
-      });
+      }
+    } else {
+      setConvocatorias(CONVOCATORIAS_INICIALES);
+    }
   };
 
   useEffect(() => {
-    recargarConvocatorias();
-
-    // 1. Escucha cambios si la profesora tiene abierto el Dashboard en otra pestaña
-    window.addEventListener('storage', recargarConvocatorias);
-
-    // 2. Escucha si el cambio ocurre en la misma pestaña
-    window.addEventListener('convocatoriasUpdated', recargarConvocatorias);
-
+    recargarConvocatoriasNube();
+    // Pooling: Se actualiza solo automáticamente desde la nube cada 5 segundos
+    const interval = setInterval(recargarConvocatoriasNube, 5000); 
+    
+    // También escuchamos eventos locales instantáneos
+    window.addEventListener('storage', recargarConvocatoriasNube);
+    window.addEventListener('convocatoriasUpdated', recargarConvocatoriasNube);
+    
     return () => {
-      window.removeEventListener('storage', recargarConvocatorias);
-      window.removeEventListener('convocatoriasUpdated', recargarConvocatorias);
+      clearInterval(interval);
+      window.removeEventListener('storage', recargarConvocatoriasNube);
+      window.removeEventListener('convocatoriasUpdated', recargarConvocatoriasNube);
     };
   }, []);
 
@@ -316,7 +317,9 @@ function App() {
     setPqrsForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   }
 
-  // POSTULACIÓN INTEGRAL: ALMACENA ARCHIVO REAL EN BASE64 Y DATOS DE CONTACTO
+  // ========================================================
+  // 🌐 ENVÍO DE POSTULACIÓN A LA NUBE
+  // ========================================================
   async function apply(e) {
     e.preventDefault();
     if (!selected) return;
@@ -331,12 +334,12 @@ function App() {
       return;
     }
 
-    setNotice('Enviando postulación y registrando Hoja de Vida...');
+    setNotice('Registrando postulación en el sistema global...');
 
     const payload = {
       ...form,
       id_postulacion: Date.now(),
-      id_convocatoria: selected.id_convocatoria,
+      id_convocatoria: selected.id_convocatoria || selected.id,
       convocatoria: selected.titulo,
       candidato: `${form.nombres} ${form.apellidos}`.trim(),
       hoja_vida: form.hoja_vida_nombre || `HV_${form.nombres.replace(/\s+/g, '_')}.pdf`,
@@ -349,22 +352,30 @@ function App() {
       estado: 'RECIBIDA'
     };
 
+    // Intento de guardado en Nube Global
     try {
-      await fetch(`${api}/postulaciones`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-    } catch {}
+      if (CLOUD_API !== 'https://TU_PROYECTO.mockapi.io') {
+        await fetch(`${CLOUD_API}/postulaciones`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      }
+    } catch (e) {
+      console.warn("Fallo guardado en nube, usando guardado local");
+    }
 
+    // Guardado local de respaldo
     const prevPost = JSON.parse(localStorage.getItem('frutopical_postulaciones') || '[]');
     localStorage.setItem('frutopical_postulaciones', JSON.stringify([payload, ...prevPost]));
 
-    setNotice(`¡Postulación radicada con éxito para ${payload.candidato}! Tus datos fueron registrados en el Módulo 2.`);
+    setNotice(`¡Postulación radicada con éxito para ${payload.candidato}! Tus datos fueron registrados.`);
     setForm(emptyForm);
   }
 
-  // RADICACIÓN PQRS CON CÉDULA OBLIGATORIA (LLAVE PRIMARIA)
+  // ========================================================
+  // 🌐 ENVÍO DE PQRS A LA NUBE
+  // ========================================================
   async function handleSendPqrs(e) {
     e.preventDefault();
 
@@ -392,14 +403,18 @@ function App() {
       respuesta_observacion: 'Su requerimiento se encuentra en estudio bajo los términos del SLA institucional.'
     };
 
+    // Intento de guardado en Nube Global
     try {
-      await fetch(`${api}/solicitudes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-    } catch {}
+      if (CLOUD_API !== 'https://TU_PROYECTO.mockapi.io') {
+        await fetch(`${CLOUD_API}/solicitudes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      }
+    } catch (e) {}
 
+    // Guardado local de respaldo
     const prevSol = JSON.parse(localStorage.getItem('frutopical_solicitudes') || '[]');
     localStorage.setItem('frutopical_solicitudes', JSON.stringify([payload, ...prevSol]));
 
@@ -408,57 +423,58 @@ function App() {
     setSendingPqrs(false);
   }
 
-  // BÚSQUEDA TOLERANTE Y NORMALIZADA DE RADICADOS
-  function handleBuscarRadicado(e) {
+  // ========================================================
+  // 🌐 BÚSQUEDA GLOBAL DE RADICADOS
+  // ========================================================
+  async function handleBuscarRadicado(e) {
     e.preventDefault();
     if (!searchRadicado.trim()) return;
     setSearchingRadicado(true);
+    setRadicadoResult(null);
 
     const busquedaLimpia = searchRadicado.trim().toUpperCase().replace(/\s+/g, '');
-    const stored = JSON.parse(localStorage.getItem('frutopical_solicitudes') || '[]');
 
-    setTimeout(() => {
-      const match = stored.find((s) => {
-        const radExistente = (s.numero_solicitud || '').trim().toUpperCase().replace(/\s+/g, '');
-        return radExistente === busquedaLimpia || radExistente.includes(busquedaLimpia) || busquedaLimpia.includes(radExistente);
-      });
-
-      if (match) {
-        setRadicadoResult(match);
-      } else if (busquedaLimpia.includes('0001') || busquedaLimpia === 'SOL-2026-0001') {
-        setRadicadoResult({
-          numero_solicitud: 'SOL-2026-0001',
-          nombre_remitente: 'Carlos Fontalvo Amaya',
-          tipo_solicitud: 'PETICION',
-          estado: 'ATENDIDA',
-          fecha: '2026-09-28',
-          descripcion: 'Solicitud de certificado laboral institucional.',
-          respuesta_observacion: 'Se expide la certificación laboral solicitada conforme al registro contractual vigente.'
+    // 1. Buscar en la Nube
+    try {
+      if (CLOUD_API !== 'https://TU_PROYECTO.mockapi.io') {
+        const res = await fetch(`${CLOUD_API}/solicitudes`);
+        const data = await res.json();
+        const match = data.find(s => {
+          const radExistente = (s.numero_solicitud || '').trim().toUpperCase().replace(/\s+/g, '');
+          return radExistente === busquedaLimpia || radExistente.includes(busquedaLimpia);
         });
-      } else if (busquedaLimpia.includes('000692') || busquedaLimpia === 'SOL-2026-000692') {
-        setRadicadoResult({
-          numero_solicitud: 'SOL-2026-000692',
-          nombre_remitente: 'Sandra Milena Morán Henríquez',
-          tipo_solicitud: 'PETICION',
-          estado: 'EN PROCESO',
-          fecha: '2026-10-18',
-          descripcion: 'Necesito mi certificado laboral.',
-          respuesta_observacion: 'Su solicitud está siendo tramitada por la Jefatura de Talento Humano.'
-        });
-      } else if (busquedaLimpia.startsWith('SOL-2026-') || busquedaLimpia.length >= 8) {
-        setRadicadoResult({
-          numero_solicitud: searchRadicado.trim().toUpperCase(),
-          nombre_remitente: 'Colaborador Registrado',
-          tipo_solicitud: 'SUGERENCIA / PETICIÓN',
-          estado: 'ATENDIDA',
-          descripcion: 'Requerimiento institucional radicado a través del canal oficial PQRS.',
-          respuesta_observacion: 'Su solicitud ha sido atendida formalmente por la Jefatura de Talento Humano conforme a la Ley 1755 de 2015.'
-        });
-      } else {
-        setRadicadoResult('NOT_FOUND');
+        
+        if (match) {
+          setRadicadoResult(match);
+          setSearchingRadicado(false);
+          return;
+        }
       }
-      setSearchingRadicado(false);
-    }, 300);
+    } catch (e) {}
+
+    // 2. Si no encuentra en la nube o falla, busca en Local
+    const stored = JSON.parse(localStorage.getItem('frutopical_solicitudes') || '[]');
+    const matchLocal = stored.find((s) => {
+      const radExistente = (s.numero_solicitud || '').trim().toUpperCase().replace(/\s+/g, '');
+      return radExistente === busquedaLimpia || radExistente.includes(busquedaLimpia) || busquedaLimpia.includes(radExistente);
+    });
+
+    if (matchLocal) {
+      setRadicadoResult(matchLocal);
+    } else if (busquedaLimpia.includes('0001') || busquedaLimpia === 'SOL-2026-0001') {
+      setRadicadoResult({
+        numero_solicitud: 'SOL-2026-0001',
+        nombre_remitente: 'Carlos Fontalvo Amaya',
+        tipo_solicitud: 'PETICION',
+        estado: 'ATENDIDA',
+        fecha: '2026-09-28',
+        descripcion: 'Solicitud de certificado laboral institucional.',
+        respuesta_observacion: 'Se expide la certificación laboral solicitada conforme al registro contractual vigente.'
+      });
+    } else {
+      setRadicadoResult('NOT_FOUND');
+    }
+    setSearchingRadicado(false);
   }
 
   async function handleLogin(e) {
@@ -912,8 +928,8 @@ function App() {
           </div>
 
           <div className="opportunities">
-            {convocatorias.map((item) => (
-              <article className="opportunity" key={item.id_convocatoria} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            {convocatorias.filter(c => c.estado === 'ABIERTA').map((item) => (
+              <article className="opportunity" key={item.id_convocatoria || item.id} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
                   <div className="opportunity-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 'bold' }}>
@@ -1198,7 +1214,7 @@ function App() {
         </div>
       )}
 
-      {/* MODAL PQRS */}
+      {/* MODAL PQRS (CON CÉDULA OBLIGATORIA COMO LLAVE PRIMARIA) */}
       {showPqrsModal && (
         <div className="modal-backdrop" onMouseDown={() => setShowPqrsModal(false)}>
           <section
@@ -1237,6 +1253,7 @@ function App() {
                 </label>
               </div>
 
+              {/* NOMBRE Y CÉDULA (LLAVE PRIMARIA PARA CRUCE DE DATOS) */}
               <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.8rem', width: '100%' }}>
                 <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'none' }}>
                   Nombre completo *

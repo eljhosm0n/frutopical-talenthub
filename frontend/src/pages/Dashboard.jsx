@@ -5,9 +5,20 @@ import SSTGestion from './SSTGestion';
 
 const api = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1';
 
-const REQUEST_STATES = ['RECIBIDA', 'EN PROCESO', 'ATENDIDA', 'CERRADA'];
+const REQUEST_STATES = [
+  'RECIBIDA',
+  'EN PROCESO',
+  'ATENDIDA',
+  'CERRADA'
+];
 
-// BASE DE DATOS MAESTRA INSTITUCIONAL DE TRABAJADORES (FRUTAS DEL ATLÁNTICO S.A.S.)
+// ========================================================
+// ☁️ BASE DE DATOS GLOBAL (MOCKAPI CORREGIDA)
+// ========================================================
+const CLOUD_API = 'https://6ad8072595e98f36aef2e53c.mockapi.io';
+
+// BASE DE DATOS MAESTRA INSTITUCIONAL PRECARGADA (NÓMINA)
+// Inyectada aquí para que NO dependa del PC donde se abra.
 const BASE_DATOS_TRABAJADORES = [
   {
     documento: '1042890123',
@@ -113,28 +124,113 @@ const BASE_DATOS_TRABAJADORES = [
     telefono: '300 776 5432',
     ciudad: 'Sabanagrande, Atlántico',
     direccion: 'Calle 10 # 5-20, Sabanagrande'
+  },
+  // INYECCIÓN DE LAURA PEÑATE: CONTRATADA EN CUALQUIER COMPUTADOR
+  {
+    documento: '1046701221',
+    nombre: 'Laura Peñate',
+    cargo: 'Asesor de Ventas',
+    salario: '$1.800.000 COP',
+    salarioLetras: 'UN MILLÓN OCHOCIENTOS MIL PESOS M/CTE',
+    tipoContrato: 'Término Indefinido',
+    fechaIngreso: '19 de octubre de 2026',
+    fechaRetiro: 'Vigente (Activo)',
+    estadoLaboral: 'ACTIVO',
+    correo: 'laura.penate@gmail.com',
+    telefono: '300 123 4567',
+    ciudad: 'Sabanagrande, Atlántico',
+    direccion: 'Calle 14 # 8-22, Sabanagrande'
   }
 ];
 
-// LISTADO ESTÁNDAR DE CODIFICACIÓN Y SUBSERIES DEL CCD EXIGIDO POR LA PROFESORA
+// LISTADO ESTÁNDAR DE CODIFICACIÓN Y SUBSERIES DEL CCD
 const SUBSERIES_CCD_OFICIALES = [
-  { codigo: '100.10.18.01', nombre: '100.10.18.01 Hoja de Vida', categoria: 'Hoja de Vida' },
-  { codigo: '100.10.18.02', nombre: '100.10.18.02 Proceso de Selección', categoria: 'Selección' },
-  { codigo: '100.10.18.03', nombre: '100.10.18.03 Exámenes Médicos', categoria: 'Salud Ocupacional' },
-  { codigo: '100.10.18.04', nombre: '100.10.18.04 Contratación', categoria: 'Contrato Laboral' },
-  { codigo: '100.10.18.05', nombre: '100.10.18.05 Afiliaciones', categoria: 'Seguridad Social' },
-  { codigo: '100.10.18.06', nombre: '100.10.18.06 Inducción y Capacitación', categoria: 'SST e Inducción' },
-  { codigo: '100.10.18.07', nombre: '100.10.18.07 Historial Laboral', categoria: 'Desempeño y Novedades' },
-  { codigo: '100.10.18.08', nombre: '100.10.18.08 Desprendibles / Nómina', categoria: 'Pagos y Comprobantes' },
-  { codigo: '100.10.18.09', nombre: '100.10.18.09 Procesos Disciplinarios', categoria: 'Régimen Disciplinario' },
-  { codigo: '100.10.18.10', nombre: '100.10.18.10 Desvinculación', categoria: 'Retiro y Liquidación' }
+  {
+    codigo: '100.10.18.01',
+    nombre: '100.10.18.01 Hoja de Vida',
+    categoria: 'Hoja de Vida'
+  },
+  {
+    codigo: '100.10.18.02',
+    nombre: '100.10.18.02 Proceso de Selección',
+    categoria: 'Selección'
+  },
+  {
+    codigo: '100.10.18.03',
+    nombre: '100.10.18.03 Exámenes Médicos',
+    categoria: 'Salud Ocupacional'
+  },
+  {
+    codigo: '100.10.18.04',
+    nombre: '100.10.18.04 Contratación',
+    categoria: 'Contrato Laboral'
+  },
+  {
+    codigo: '100.10.18.05',
+    nombre: '100.10.18.05 Afiliaciones',
+    categoria: 'Seguridad Social'
+  },
+  {
+    codigo: '100.10.18.06',
+    nombre: '100.10.18.06 Inducción y Capacitación',
+    categoria: 'SST e Inducción'
+  },
+  {
+    codigo: '100.10.18.07',
+    nombre: '100.10.18.07 Historial Laboral',
+    categoria: 'Desempeño y Novedades'
+  },
+  {
+    codigo: '100.10.18.08',
+    nombre: '100.10.18.08 Desprendibles / Nómina',
+    categoria: 'Pagos y Comprobantes'
+  },
+  {
+    codigo: '100.10.18.09',
+    nombre: '100.10.18.09 Procesos Disciplinarios',
+    categoria: 'Régimen Disciplinario'
+  },
+  {
+    codigo: '100.10.18.10',
+    nombre: '100.10.18.10 Desvinculación',
+    categoria: 'Retiro y Liquidación'
+  }
 ];
 
 function numeroALetrasDia(num) {
   const dias = [
-    '', 'un', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez',
-    'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve', 'veinte',
-    'veintiún', 'veintidós', 'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho', 'veintinueve', 'treinta', 'treinta y un'
+    '',
+    'un',
+    'dos',
+    'tres',
+    'cuatro',
+    'cinco',
+    'seis',
+    'siete',
+    'ocho',
+    'nueve',
+    'diez',
+    'once',
+    'doce',
+    'trece',
+    'catorce',
+    'quince',
+    'dieciséis',
+    'diecisiete',
+    'dieciocho',
+    'diecinueve',
+    'veinte',
+    'veintiún',
+    'veintidós',
+    'veintitrés',
+    'veinticuatro',
+    'veinticinco',
+    'veintiséis',
+    'veintisiete',
+    'veintiocho',
+    'veintinueve',
+    'treinta',
+    'treinta y un'
   ];
   return dias[num] || `${num}`;
 }
@@ -143,105 +239,25 @@ export default function Dashboard({ user, onLogout }) {
   const [activeModule, setActiveModule] = useState('inicio');
   const [tabSeleccion, setTabSeleccion] = useState('convocatorias');
 
-  // CONVOCATORIAS CON INICIALIZACIÓN PERSISTENTE (LAZY STATE)
-  const [convocatorias, setConvocatorias] = useState(() => {
-    try {
-      const stored = localStorage.getItem('frutopical_convocatorias');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch {}
-    return [
-      {
-        id_convocatoria: 1,
-        titulo: 'Jefe de Talento Humano',
-        cargo: 'Jefe de Talento Humano',
-        salario: '$2.550.500 + Prestaciones de ley',
-        descripcion: 'Liderar los procesos de selección, vinculación y retiro del personal. Desarrollar estrategias de bienestar y clima laboral.',
-        requisitos: 'Profesional en Psicología o Administración. Mínimo 3 años de experiencia en cargos similares.',
-        fecha_cierre: '2026-11-30',
-        estado: 'ABIERTA'
-      },
-      {
-        id_convocatoria: 2,
-        titulo: 'Operario de Producción',
-        cargo: 'Operario de Producción',
-        salario: '$2.000.000 + Prestaciones de ley',
-        descripcion: 'Clasificar, seleccionar y lavar fruta según estándares de calidad. Operación de maquinaria de despulpado e inocuidad BPM.',
-        requisitos: 'Técnico en operario de producción. Mínimo 2 años de experiencia en plantas de alimentos.',
-        fecha_cierre: '2026-11-30',
-        estado: 'ABIERTA'
-      },
-      {
-        id_convocatoria: 3,
-        titulo: 'Jefe de Producción y Calidad',
-        cargo: 'Jefe de Producción y Calidad',
-        salario: '$3.000.000 + Prestaciones de ley',
-        descripcion: 'Planificar, coordinar y supervisar las líneas de producción y el cumplimiento de normas de inocuidad alimentaria.',
-        requisitos: 'Ingeniería Industrial o de Alimentos. Experiencia de 2 a 3 años en plantas agroindustriales.',
-        fecha_cierre: '2026-11-30',
-        estado: 'ABIERTA'
-      }
-    ];
-  });
+  const [convocatorias, setConvocatorias] = useState([]);
+  const [postulaciones, setPostulaciones] = useState([]);
+  const [expedientes, setExpedientes] = useState([]);
 
   const [showModalConvocatoria, setShowModalConvocatoria] = useState(false);
   const [nuevaConvocatoria, setNuevaConvocatoria] = useState({
-    titulo: '', cargo: '', descripcion: '', requisitos: '', salario: '', fecha_cierre: ''
+    titulo: '',
+    cargo: '',
+    descripcion: '',
+    requisitos: '',
+    salario: '',
+    fecha_cierre: ''
   });
   const [savingConvocatoria, setSavingConvocatoria] = useState(false);
-
-  // POSTULACIONES CON INICIALIZACIÓN PERSISTENTE
-  const [postulaciones, setPostulaciones] = useState(() => {
-    try {
-      const local = localStorage.getItem('frutopical_postulaciones');
-      if (local) {
-        const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch {}
-    return [
-      {
-        id_postulacion: 1,
-        candidato: 'Carlos Fontalvo Amaya',
-        numero_documento: '1042890123',
-        convocatoria: 'Operario de Producción',
-        correo: 'carlos.fontalvo@gmail.com',
-        telefono: '301 234 5678',
-        ciudad: 'Sabanagrande, Atlántico',
-        estado: 'CONTRATADO',
-        hoja_vida: 'HV_Carlos_Fontalvo.pdf'
-      },
-      {
-        id_postulacion: 2,
-        candidato: 'María Conrado Jiménez',
-        numero_documento: '1043567890',
-        convocatoria: 'Jefe de Calidad',
-        correo: 'maria.conrado@gmail.com',
-        telefono: '310 987 6543',
-        ciudad: 'Sabanagrande, Atlántico',
-        estado: 'PRESELECCIONADA',
-        hoja_vida: 'HV_Maria_Conrado.pdf'
-      },
-      {
-        id_postulacion: 3,
-        candidato: 'David Riquett Villalobos',
-        numero_documento: '1044123456',
-        convocatoria: 'Jefe de Producción y Calidad',
-        correo: 'david.riquett@gmail.com',
-        telefono: '302 345 6789',
-        ciudad: 'Barranquilla, Atlántico',
-        estado: 'EN EVALUACIÓN',
-        hoja_vida: 'HV_David_Riquett.pdf'
-      }
-    ];
-  });
 
   const [selectedPostulation, setSelectedPostulation] = useState(null);
   const [modalHvAspirante, setModalHvAspirante] = useState(null);
 
-  // MATRIZ PONDERADA OFICIAL (30% Téc, 15% Psico, 30% Entr, 15% HV, 10% Méd)
+  // MATRIZ PONDERADA OFICIAL
   const [puntajeTecnico, setPuntajeTecnico] = useState(85);
   const [puntajePsicologico, setPuntajePsicologico] = useState(80);
   const [puntajeEntrevista, setPuntajeEntrevista] = useState(85);
@@ -249,15 +265,14 @@ export default function Dashboard({ user, onLogout }) {
   const [puntajeMedicos, setPuntajeMedicos] = useState(100);
 
   const notaCalculada = Math.round(
-    (Number(puntajeTecnico) * 0.30) +
-    (Number(puntajePsicologico) * 0.15) +
-    (Number(puntajeEntrevista) * 0.30) +
-    (Number(puntajeHv) * 0.15) +
-    (Number(puntajeMedicos) * 0.10)
+    Number(puntajeTecnico) * 0.30 +
+      Number(puntajePsicologico) * 0.15 +
+      Number(puntajeEntrevista) * 0.30 +
+      Number(puntajeHv) * 0.15 +
+      Number(puntajeMedicos) * 0.10
   );
 
-  // MÓDULO 4: GESTIÓN DOCUMENTAL (CCD) CON PERSISTENCIA
-  const [expedientes, setExpedientes] = useState([]);
+  // MÓDULO 4: GESTIÓN DOCUMENTAL (CCD)
   const [selectedExpediente, setSelectedExpediente] = useState(null);
   const [documentosExpediente, setDocumentosExpediente] = useState([]);
   const [selectedSubserie, setSelectedSubserie] = useState(SUBSERIES_CCD_OFICIALES[0].codigo);
@@ -267,61 +282,8 @@ export default function Dashboard({ user, onLogout }) {
   const [uploadNotice, setUploadNotice] = useState('');
   const [visorDoc, setVisorDoc] = useState(null);
 
-  // MÓDULO 5: PQRS CON PERSISTENCIA
-  const [solicitudes, setSolicitudes] = useState(() => {
-    try {
-      const stored = localStorage.getItem('frutopical_solicitudes');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch {}
-    return [
-      {
-        id_solicitud: 1,
-        numero_solicitud: 'SOL-2026-0001',
-        nombre_remitente: 'Carlos Fontalvo Amaya',
-        numero_documento: '1042890123',
-        tipo_remitente: 'TRABAJADOR_ACTIVO',
-        correo: 'carlos.fontalvo@gmail.com',
-        telefono: '301 234 5678',
-        tipo_solicitud: 'PETICION',
-        descripcion: 'Solicitud de certificado laboral institucional con detalle de salario básico para trámite bancario.',
-        fecha: new Date().toISOString(),
-        estado: 'ATENDIDA',
-        respuesta_observacion: 'Se expide la certificación laboral solicitada conforme al registro contractual vigente.'
-      },
-      {
-        id_solicitud: 2,
-        numero_solicitud: 'SOL-2026-000692',
-        nombre_remitente: 'Sandra Milena Morán Henríquez',
-        numero_documento: '1048765432',
-        tipo_remitente: 'TRABAJADOR_ACTIVO',
-        correo: 'sandra.moran@gmail.com',
-        telefono: '315 889 9001',
-        tipo_solicitud: 'PETICION',
-        descripcion: 'Solicito certificación de funciones y salario para crédito de vivienda.',
-        fecha: new Date().toISOString(),
-        estado: 'EN PROCESO',
-        respuesta_observacion: 'Su solicitud está siendo tramitada por la Jefatura de Talento Humano.'
-      },
-      {
-        id_solicitud: 3,
-        numero_solicitud: 'SOL-2026-000468',
-        nombre_remitente: 'Alejandro Shar',
-        numero_documento: '1047123987',
-        tipo_remitente: 'EXTRABAJADOR',
-        correo: 'alejandro.shar@gmail.com',
-        telefono: '300 776 5432',
-        tipo_solicitud: 'PETICION',
-        descripcion: 'Constancia laboral de extrabajador para vinculación en nuevo empleo.',
-        fecha: new Date().toISOString(),
-        estado: 'RECIBIDA',
-        respuesta_observacion: 'En verificación de archivo de historias laborales Serie 100.10.18.'
-      }
-    ];
-  });
-
+  // MÓDULO 5: PQRS
+  const [solicitudes, setSolicitudes] = useState([]);
   const [selectedSolicitud, setSelectedSolicitud] = useState(null);
   const [newSolicitudState, setNewSolicitudState] = useState('RECIBIDA');
   const [solicitudResponse, setSolicitudResponse] = useState('');
@@ -329,252 +291,134 @@ export default function Dashboard({ user, onLogout }) {
   const [solicitudNotice, setSolicitudNotice] = useState('');
   const [certDatos, setCertDatos] = useState(BASE_DATOS_TRABAJADORES[0]);
 
-  // SINCRONIZACIÓN INICIAL Y DE EVENTOS
-  useEffect(() => {
-    sincronizarBaseTrabajadores();
-    loadExpedientes();
-
-    const handleStorageUpdate = () => {
-      loadExpedientes();
-      const updatedConvs = localStorage.getItem('frutopical_convocatorias');
-      if (updatedConvs) {
-        try { setConvocatorias(JSON.parse(updatedConvs)); } catch {}
+  // ==========================================
+  // CARGA GLOBAL DESDE NUBE Y LOCAL
+  // ==========================================
+  const cargarDatosGlobales = async () => {
+    let convosLocal = [];
+    try {
+      const resConvs = await fetch(`${CLOUD_API}/convocatorias`);
+      const dataConvs = await resConvs.json();
+      if (Array.isArray(dataConvs)) {
+        convosLocal = dataConvs;
+        setConvocatorias(dataConvs);
       }
-    };
+    } catch (e) {
+      const c = localStorage.getItem('frutopical_convocatorias');
+      if (c) {
+        convosLocal = JSON.parse(c);
+        setConvocatorias(convosLocal);
+      }
+    }
 
-    window.addEventListener('storage', handleStorageUpdate);
-    window.addEventListener('convocatoriasUpdated', handleStorageUpdate);
+    let postsLocal = [];
+    try {
+      const resPost = await fetch(`${CLOUD_API}/postulaciones`);
+      const dataPost = await resPost.json();
+      if (Array.isArray(dataPost)) {
+        postsLocal = dataPost;
+        setPostulaciones(dataPost);
+      }
+    } catch (e) {
+      const p = localStorage.getItem('frutopical_postulaciones');
+      if (p) {
+        postsLocal = JSON.parse(p);
+        setPostulaciones(postsLocal);
+      }
+    }
+
+    sincronizarExpedientesDinamicos(postsLocal);
+
+    // PQRS sigue local para no llenar MockAPI
+    const sols = localStorage.getItem('frutopical_solicitudes');
+    if (sols) setSolicitudes(JSON.parse(sols));
+  };
+
+  useEffect(() => {
+    cargarDatosGlobales();
+    const interval = setInterval(cargarDatosGlobales, 6000);
+    window.addEventListener('storage', cargarDatosGlobales);
     return () => {
-      window.removeEventListener('storage', handleStorageUpdate);
-      window.removeEventListener('convocatoriasUpdated', handleStorageUpdate);
+      clearInterval(interval);
+      window.removeEventListener('storage', cargarDatosGlobales);
     };
   }, []);
 
-  function sincronizarBaseTrabajadores() {
-    const guardados = localStorage.getItem('frutopical_empleados');
-    if (!guardados) {
-      localStorage.setItem('frutopical_empleados', JSON.stringify(BASE_DATOS_TRABAJADORES));
-    }
-  }
-
-  function getListaEmpleados() {
-    try {
-      const guardados = localStorage.getItem('frutopical_empleados');
-      if (guardados) {
-        const parsed = JSON.parse(guardados);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch {}
-    return BASE_DATOS_TRABAJADORES;
-  }
-
-  // CARGA COMPLETA DE EXPEDIENTES (TODOS LOS ACTIVOS Y NUEVOS CONTRATADOS)
-  function loadExpedientes() {
-    const listaMaestra = getListaEmpleados();
-    let postulados = [];
-    try {
-      postulados = JSON.parse(localStorage.getItem('frutopical_postulaciones') || '[]');
-    } catch {}
-
-    const listaUnificada = [...listaMaestra];
-
-    postulados.filter(p => p.estado === 'CONTRATADO').forEach(p => {
+  function sincronizarExpedientesDinamicos(postulacionesNube) {
+    const listaUnificada = [...BASE_DATOS_TRABAJADORES];
+    postulacionesNube.filter((p) => p.estado === 'CONTRATADO').forEach((p) => {
       const doc = p.numero_documento || '104' + Math.floor(Math.random() * 900000);
-      if (!listaUnificada.some(e => String(e.documento) === String(doc))) {
+      if (!listaUnificada.some((e) => String(e.documento) === String(doc))) {
         listaUnificada.push({
           documento: doc,
           nombre: p.candidato || `${p.nombres || ''} ${p.apellidos || ''}`.trim() || 'Nuevo Colaborador',
-          cargo: p.convocatoria || p.cargo || 'Operario de Producción',
+          cargo: p.convocatoria || p.cargo || 'Operario',
           estadoLaboral: 'ACTIVO',
           salario: '$2.000.000 COP',
+          salarioLetras: 'DOS MILLONES DE PESOS M/CTE',
           tipoContrato: 'Término Indefinido',
-          fechaIngreso: fechaHoy
+          fechaIngreso: new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })
         });
       }
     });
-
     setExpedientes(listaUnificada);
+    localStorage.setItem('frutopical_empleados', JSON.stringify(listaUnificada));
   }
 
-  // ABRIR EXPEDIENTE CON PERSISTENCIA
-  function abrirExpedienteCCD(colaborador) {
-    setSelectedExpediente(colaborador);
-    setDescripcionDocumento('');
-    setArchivoBase64(null);
-    setNombreArchivoSubido('');
-
-    let todosDocs = {};
-    try {
-      todosDocs = JSON.parse(localStorage.getItem('frutopical_docs_expedientes') || '{}');
-    } catch {}
-
-    const docsColaborador = todosDocs[colaborador.documento] || [
-      {
-        id_archivo: 1,
-        nombre_original: `EXP-${colaborador.documento}-100.10.18.01-HOJA_DE_VIDA.pdf`,
-        subserie_codigo: '100.10.18.01',
-        tipo_documento: '100.10.18.01 Hoja de Vida',
-        descripcion: 'Hoja de Vida institucional radicada con soportes',
-        fecha_carga: '2026-02-01',
-        archivo_data: null
-      },
-      {
-        id_archivo: 2,
-        nombre_original: `EXP-${colaborador.documento}-100.10.18.04-CONTRATO_LABORAL.pdf`,
-        subserie_codigo: '100.10.18.04',
-        tipo_documento: '100.10.18.04 Contratación',
-        descripcion: 'Contrato Individual de Trabajo a Término Indefinido firmado',
-        fecha_carga: '2026-02-01',
-        archivo_data: null
-      }
-    ];
-
-    setDocumentosExpediente(docsColaborador);
-  }
-
-  // RADICACIÓN DE DOCUMENTO (RESTRINGIDO A PDF)
-  function handleRadicarDocumentoCCD(e) {
-    e.preventDefault();
-    if (!selectedExpediente) return;
-    if (!descripcionDocumento.trim()) {
-      alert('Debes ingresar la descripción del soporte.');
-      return;
-    }
-
-    const subserieObj = SUBSERIES_CCD_OFICIALES.find(s => s.codigo === selectedSubserie);
-    const nombreLimpio = descripcionDocumento.trim().toUpperCase().replace(/\s+/g, '_');
-    const nomenclaturaGenerada = `EXP-${selectedExpediente.documento}-${selectedSubserie}-${nombreLimpio}.pdf`;
-
-    const nuevoDoc = {
-      id_archivo: Date.now(),
-      nombre_original: nomenclaturaGenerada,
-      subserie_codigo: selectedSubserie,
-      tipo_documento: subserieObj?.nombre || selectedSubserie,
-      descripcion: descripcionDocumento.trim(),
-      fecha_carga: new Date().toISOString(),
-      archivo_data: archivoBase64 || null
-    };
-
-    const actualizados = [nuevoDoc, ...documentosExpediente];
-    setDocumentosExpediente(actualizados);
-
-    // Persistencia por cédula en localStorage
-    let todosDocs = {};
-    try {
-      todosDocs = JSON.parse(localStorage.getItem('frutopical_docs_expedientes') || '{}');
-    } catch {}
-    todosDocs[selectedExpediente.documento] = actualizados;
-    localStorage.setItem('frutopical_docs_expedientes', JSON.stringify(todosDocs));
-
-    setDescripcionDocumento('');
-    setArchivoBase64(null);
-    setNombreArchivoSubido('');
-    setUploadNotice('Documento radicado y custodiado exitosamente en el expediente laboral.');
-    setTimeout(() => setUploadNotice(''), 2500);
-  }
-
-  // DESCARGA DEL DOCUMENTO CODIFICADO REAL
-  function descargarDocumentoCodificado(doc) {
-    const nombreArchivo = doc.nombre_original.endsWith('.pdf') ? doc.nombre_original : `${doc.nombre_original}.pdf`;
-
-    if (doc.archivo_data) {
-      const link = document.createElement('a');
-      link.href = doc.archivo_data;
-      link.download = nombreArchivo;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      return;
-    }
-
-    // PDF formal de contingencia estructurado conforme a la Serie 100.10.18 del AGN
-    const contenidoPdf = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n` +
-      `2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n` +
-      `3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n` +
-      `4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n` +
-      `5 0 obj\n<< /Length 260 >>\nstream\n` +
-      `BT\n/F1 14 Tf\n50 730 Td\n(FRUTAS DEL ATLANTICO S.A.S. - ARCHIVO CENTRAL) Tj\n` +
-      `/F1 10 Tf\n50 705 Td\n(CUADRO DE CLASIFICACION DOCUMENTAL - SERIE 100.10.18) Tj\n` +
-      `50 670 Td\n(Titular del Expediente: ${selectedExpediente?.nombre || 'Colaborador'}) Tj\n` +
-      `50 650 Td\n(Documento de Identidad: ${selectedExpediente?.documento || 'Sin ID'}) Tj\n` +
-      `50 630 Td\n(Subserie Clasificacion: ${doc.tipo_documento}) Tj\n` +
-      `50 610 Td\n(Nomenclatura AGN: ${doc.nombre_original}) Tj\n` +
-      `50 590 Td\n(Descripcion: ${doc.descripcion || 'Documento archivado en expediente'}) Tj\n` +
-      `50 570 Td\n(Fecha de Radicacion: ${new Date(doc.fecha_carga).toLocaleDateString('es-CO')}) Tj\n` +
-      `50 530 Td\n(ESTADO: DOCUMENTO CODIFICADO Y CUSTODIADO EN EXPEDIENTE LABORAL DIGITAL) Tj\n` +
-      `ET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000234 00000 n \n0000000296 00000 n \n` +
-      `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n%%EOF`;
-
-    const blob = new Blob([contenidoPdf], { type: 'application/pdf;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = nombreArchivo;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-
-  function descargarExcelNomina() {
-    const lista = getListaEmpleados();
-    const encabezados = "Cedula;Nombres y Apellidos;Cargo;Tipo Contrato;Salario Mensual;Salario en Letras;Fecha Ingreso;Fecha Retiro;Estado Laboral\n";
-    const filas = lista.map(e => 
-      `"${e.documento}";"${e.nombre}";"${e.cargo}";"${e.tipoContrato || 'Término Indefinido'}";"${e.salario}";"${e.salarioLetras || ''}";"${e.fechaIngreso}";"${e.fechaRetiro || 'Vigente'}";"${e.estadoLaboral || 'ACTIVO'}"`
-    ).join("\n");
-
-    const contenidoBlob = "\uFEFF" + encabezados + filas;
-    const blob = new Blob([contenidoBlob], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "MATRIZ_MAESTRA_NOMINA_FRUTOPICAL_SAS.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-
-  // CREAR CONVOCATORIA CON DISPARO DE EVENTO INMEDIATO (SINCRONIZA MENSAJERO)
+  // ==========================================
+  // CREACIÓN GLOBAL DE CONVOCATORIA (NUBE)
+  // ==========================================
   async function handleCrearConvocatoria(e) {
     e.preventDefault();
     setSavingConvocatoria(true);
 
     const nueva = {
-      id_convocatoria: Date.now(),
       titulo: nuevaConvocatoria.titulo,
       cargo: nuevaConvocatoria.cargo,
       descripcion: nuevaConvocatoria.descripcion,
       requisitos: nuevaConvocatoria.requisitos,
-      salario: nuevaConvocatoria.salario || 'A convenir según escala salarial',
-      fecha_cierre: nuevaConvocatoria.fecha_cierre || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      salario: nuevaConvocatoria.salario || 'A convenir',
+      fecha_cierre: nuevaConvocatoria.fecha_cierre || '2026-11-30',
       estado: 'ABIERTA'
     };
 
-    const actualizadas = [nueva, ...convocatorias];
-    setConvocatorias(actualizadas);
-    localStorage.setItem('frutopical_convocatorias', JSON.stringify(actualizadas));
-
-    // DISPARO DE EVENTO PARA QUE MAIN.JSX SE ENTERE EN TIEMPO REAL
-    window.dispatchEvent(new Event('convocatoriasUpdated'));
+    // Backup Local
+    const arr = [nueva, ...convocatorias];
+    localStorage.setItem('frutopical_convocatorias', JSON.stringify(arr));
+    setConvocatorias(arr);
 
     try {
-      await fetch(`${api}/convocatorias`, {
+      await fetch(`${CLOUD_API}/convocatorias`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(nueva)
       });
-    } catch {}
+      cargarDatosGlobales();
+    } catch (e) {
+      console.warn("Fallo nube");
+    }
 
     setSavingConvocatoria(false);
     setShowModalConvocatoria(false);
-    setNuevaConvocatoria({ titulo: '', cargo: '', descripcion: '', requisitos: '', salario: '', fecha_cierre: '' });
+    setNuevaConvocatoria({
+      titulo: '',
+      cargo: '',
+      descripcion: '',
+      requisitos: '',
+      salario: '',
+      fecha_cierre: ''
+    });
   }
 
   function handleToggleEstadoConvocatoria(id) {
     const actualizadas = convocatorias.map((c) => {
-      if (c.id_convocatoria === id) {
-        return { ...c, estado: c.estado === 'ABIERTA' ? 'CERRADA' : 'ABIERTA' };
+      if (c.id_convocatoria === id || c.id === id) {
+        return {
+          ...c,
+          estado: c.estado === 'ABIERTA' ? 'CERRADA' : 'ABIERTA'
+        };
       }
       return c;
     });
@@ -583,12 +427,16 @@ export default function Dashboard({ user, onLogout }) {
     window.dispatchEvent(new Event('convocatoriasUpdated'));
   }
 
-  function handleEliminarConvocatoria(id, titulo) {
-    if (!window.confirm(`¿Estás seguro de que deseas eliminar la convocatoria "${titulo}"?`)) return;
-    const actualizadas = convocatorias.filter((c) => c.id_convocatoria !== id);
-    setConvocatorias(actualizadas);
-    localStorage.setItem('frutopical_convocatorias', JSON.stringify(actualizadas));
-    window.dispatchEvent(new Event('convocatoriasUpdated'));
+  async function handleEliminarConvocatoria(id, titulo) {
+    if (!window.confirm(`¿Seguro que deseas eliminar la vacante "${titulo}"?`)) return;
+    try {
+      await fetch(`${CLOUD_API}/convocatorias/${id}`, { method: 'DELETE' });
+      cargarDatosGlobales();
+    } catch (e) {
+      const actualizadas = convocatorias.filter((c) => c.id_convocatoria !== id && c.id !== id);
+      setConvocatorias(actualizadas);
+      localStorage.setItem('frutopical_convocatorias', JSON.stringify(actualizadas));
+    }
   }
 
   function descargarHojaDeVida(candidato) {
@@ -631,60 +479,25 @@ export default function Dashboard({ user, onLogout }) {
     URL.revokeObjectURL(url);
   }
 
-  // VINCULAR CANDIDATO A NÓMINA Y ABRIR EXPEDIENTE CCD INMEDIATO
-  function vincularCandidato(candidatoAprobado) {
-    const nombreCompleto = candidatoAprobado.candidato || `${candidatoAprobado.nombres || ''} ${candidatoAprobado.apellidos || ''}`.trim() || 'Aspirante';
-    const doc = candidatoAprobado.numero_documento || '104' + Math.floor(Math.random() * 900000);
-    const cargo = candidatoAprobado.convocatoria || candidatoAprobado.cargo || 'Operario de Producción';
-
-    let salario = '$2.000.000 COP';
-    let salarioLetras = 'DOS MILLONES DE PESOS M/CTE';
-    if (cargo.toLowerCase().includes('talento humano')) {
-      salario = '$2.550.500 COP';
-      salarioLetras = 'DOS MILLONES QUINIENTOS CINCUENTA MIL QUINIENTOS PESOS M/CTE';
+  // ==========================================
+  // CONTRATACIÓN DINÁMICA GLOBAL (PUT A NUBE)
+  // ==========================================
+  async function vincularCandidato(candidatoAprobado) {
+    const nombreCompleto = candidatoAprobado.candidato || 'Aspirante';
+    
+    try {
+      await fetch(`${CLOUD_API}/postulaciones/${candidatoAprobado.id || candidatoAprobado.id_postulacion}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ estado: 'CONTRATADO' })
+      });
+      await cargarDatosGlobales();
+      alert(`¡Candidato ${nombreCompleto} vinculado exitosamente a Nómina, SST y Archivo Central de forma Global!`);
+    } catch (e) {
+      alert("Candidato contratado en sesión local (Sin internet).");
     }
-    if (cargo.toLowerCase().includes('calidad') && cargo.toLowerCase().includes('jefe')) {
-      salario = '$3.000.000 COP';
-      salarioLetras = 'TRES MILLONES DE PESOS M/CTE';
-    }
-    if (cargo.toLowerCase().includes('producción') && cargo.toLowerCase().includes('jefe')) {
-      salario = '$3.000.000 COP';
-      salarioLetras = 'TRES MILLONES DE PESOS M/CTE';
-    }
-
-    const nuevoColaborador = {
-      documento: doc,
-      nombre: nombreCompleto,
-      cargo: cargo,
-      salario: salario,
-      salarioLetras: salarioLetras,
-      tipoContrato: 'Término Indefinido',
-      fechaIngreso: fechaHoy,
-      fechaRetiro: 'Vigente (Activo)',
-      estadoLaboral: 'ACTIVO',
-      correo: candidatoAprobado.correo || 'colaborador@frutopical.com',
-      telefono: candidatoAprobado.telefono || '300 123 4567',
-      ciudad: candidatoAprobado.ciudad || 'Sabanagrande, Atlántico',
-      direccion: 'Sabanagrande, Atlántico'
-    };
-
-    const emps = getListaEmpleados();
-    if (!emps.some(e => String(e.documento) === String(doc))) {
-      emps.unshift(nuevoColaborador);
-      localStorage.setItem('frutopical_empleados', JSON.stringify(emps));
-    }
-
-    const actualizadosPost = postulaciones.map(p =>
-      (p.id_postulacion === candidatoAprobado.id_postulacion || String(p.numero_documento) === String(doc))
-        ? { ...p, estado: 'CONTRATADO' }
-        : p
-    );
-    setPostulaciones(actualizadosPost);
-    localStorage.setItem('frutopical_postulaciones', JSON.stringify(actualizadosPost));
-
-    loadExpedientes();
-
-    alert(`¡Candidato ${nombreCompleto} vinculado exitosamente a Nómina, SST y Archivo Central CCD!`);
     setSelectedPostulation(null);
   }
 
@@ -712,8 +525,13 @@ export default function Dashboard({ user, onLogout }) {
     try {
       await fetch(`${api}/solicitudes/${selectedSolicitud.id_solicitud || selectedSolicitud.numero_solicitud}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ estado: newSolicitudState, respuesta_observacion: solicitudResponse })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          estado: newSolicitudState,
+          respuesta_observacion: solicitudResponse
+        })
       });
     } catch {}
 
@@ -730,13 +548,13 @@ export default function Dashboard({ user, onLogout }) {
     setNewSolicitudState(item.estado || 'RECIBIDA');
     setSolicitudResponse(item.respuesta_observacion || '');
 
-    const emps = getListaEmpleados();
+    const emps = expedientes;
     const docBuscado = (item.numero_documento || '').replace(/\D/g, '');
     const nombreLimpio = (item.nombre_remitente || '').toLowerCase();
 
-    let encontrado = emps.find(e => docBuscado && String(e.documento).replace(/\D/g, '') === docBuscado);
+    let encontrado = emps.find((e) => docBuscado && String(e.documento).replace(/\D/g, '') === docBuscado);
     if (!encontrado) {
-      encontrado = emps.find(e => 
+      encontrado = emps.find((e) => 
         nombreLimpio.includes(e.nombre.toLowerCase()) || 
         e.nombre.toLowerCase().includes(nombreLimpio)
       );
@@ -760,14 +578,16 @@ export default function Dashboard({ user, onLogout }) {
   }
 
   function seleccionarTrabajadorManual(doc) {
-    const emps = getListaEmpleados();
-    const match = emps.find(e => String(e.documento) === String(doc));
+    const emps = expedientes;
+    const match = emps.find((e) => String(e.documento) === String(doc));
     if (match) {
       setCertDatos(match);
     }
   }
 
-  // IMPRESIÓN LIMPIA DE CERTIFICADOS LABORALES (VENTANA NATIVA FORMAL)
+  // ==========================================
+  // IMPRESIÓN LIMPIA DE CERTIFICADOS LABORALES
+  // ==========================================
   function imprimirCertificadoLimpio() {
     const printWindow = window.open('', '_blank', 'width=850,height=1000');
     if (!printWindow) {
@@ -847,13 +667,119 @@ export default function Dashboard({ user, onLogout }) {
     printWindow.document.close();
   }
 
+  function abrirExpedienteCCD(colaborador) {
+    setSelectedExpediente(colaborador);
+    setDescripcionDocumento('');
+    setArchivoBase64(null);
+    setNombreArchivoSubido('');
+
+    let todosDocs = {};
+    try {
+      todosDocs = JSON.parse(localStorage.getItem('frutopical_docs_expedientes') || '{}');
+    } catch {}
+
+    const docsColaborador = todosDocs[colaborador.documento] || [
+      {
+        id_archivo: 1,
+        nombre_original: `EXP-${colaborador.documento}-100.10.18.01-HOJA_DE_VIDA.pdf`,
+        subserie_codigo: '100.10.18.01',
+        tipo_documento: '100.10.18.01 Hoja de Vida',
+        fecha_carga: '2026-02-01',
+        archivo_data: null
+      },
+      {
+        id_archivo: 2,
+        nombre_original: `EXP-${colaborador.documento}-100.10.18.04-CONTRATO_LABORAL.pdf`,
+        subserie_codigo: '100.10.18.04',
+        tipo_documento: '100.10.18.04 Contratación',
+        fecha_carga: '2026-02-01',
+        archivo_data: null
+      }
+    ];
+
+    setDocumentosExpediente(docsColaborador);
+  }
+
+  function handleRadicarDocumentoCCD(e) {
+    e.preventDefault();
+    if (!selectedExpediente) return;
+
+    const subserieObj = SUBSERIES_CCD_OFICIALES.find((s) => s.codigo === selectedSubserie);
+    const nombreLimpio = descripcionDocumento.trim().toUpperCase().replace(/\s+/g, '_');
+    
+    const nuevoDoc = {
+      id_archivo: Date.now(),
+      nombre_original: `EXP-${selectedExpediente.documento}-${selectedSubserie}-${nombreLimpio}.pdf`,
+      subserie_codigo: selectedSubserie,
+      tipo_documento: subserieObj?.nombre || selectedSubserie,
+      fecha_carga: new Date().toISOString(),
+      archivo_data: archivoBase64 || null
+    };
+
+    const actualizados = [nuevoDoc, ...documentosExpediente];
+    setDocumentosExpediente(actualizados);
+
+    let todosDocs = {};
+    try {
+      todosDocs = JSON.parse(localStorage.getItem('frutopical_docs_expedientes') || '{}');
+    } catch {}
+    todosDocs[selectedExpediente.documento] = actualizados;
+    localStorage.setItem('frutopical_docs_expedientes', JSON.stringify(todosDocs));
+
+    setDescripcionDocumento('');
+    setArchivoBase64(null);
+    setNombreArchivoSubido('');
+    setUploadNotice('Documento radicado y custodiado exitosamente.');
+    setTimeout(() => setUploadNotice(''), 2500);
+  }
+
+  function descargarDocumentoCodificado(doc) {
+    const nombreArchivo = doc.nombre_original.endsWith('.pdf') ? doc.nombre_original : `${doc.nombre_original}.pdf`;
+    
+    if (doc.archivo_data) {
+      const link = document.createElement('a');
+      link.href = doc.archivo_data;
+      link.download = nombreArchivo;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+    
+    const contenidoPdf = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>\nendobj\n4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n5 0 obj\n<< /Length 260 >>\nstream\nBT\n/F1 14 Tf\n50 730 Td\n(FRUTAS DEL ATLANTICO S.A.S. - ARCHIVO CENTRAL) Tj\nET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000234 00000 n \n0000000296 00000 n \ntrailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n%%EOF`;
+    
+    const blob = new Blob([contenidoPdf], { type: 'application/pdf;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = nombreArchivo;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  function descargarExcelNomina() {
+    const lista = expedientes;
+    const encabezados = "Cedula;Nombres y Apellidos;Cargo;Tipo Contrato;Salario Mensual;Salario en Letras;Fecha Ingreso;Fecha Retiro;Estado Laboral\n";
+    const filas = lista.map((e) => `"${e.documento}";"${e.nombre}";"${e.cargo}";"${e.tipoContrato || 'Término Indefinido'}";"${e.salario}";"${e.salarioLetras || ''}";"${e.fechaIngreso}";"${e.fechaRetiro || 'Vigente'}";"${e.estadoLaboral || 'ACTIVO'}"`).join("\n");
+    const blob = new Blob(["\uFEFF" + encabezados + filas], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "MATRIZ_MAESTRA_NOMINA.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   function changeModule(module) {
     setActiveModule(module);
     if (module === 'seleccion') {
-      loadExpedientes();
+      cargarDatosGlobales();
     }
     if (module === 'documentos') {
-      loadExpedientes();
+      cargarDatosGlobales();
       setSelectedExpediente(null);
     }
     if (module === 'solicitudes') {
@@ -861,58 +787,118 @@ export default function Dashboard({ user, onLogout }) {
     }
   }
 
-  const hoy = new Date();
-  const diaNumero = hoy.getDate();
-  const diaLetras = numeroALetrasDia(diaNumero);
-  const mesNombre = hoy.toLocaleDateString('es-CO', { month: 'long' });
-  const anioNumero = hoy.getFullYear();
-  const fechaHoy = hoy.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
-  const listaMaestraEmpleados = getListaEmpleados();
-
   return (
     <>
       <div className="th-dashboard">
         <aside className="th-sidebar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '1.2rem 1.4rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <div style={{ backgroundColor: '#ffffff', padding: '4px 6px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img src="/logo-frutopical.png" alt="Frutopical Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
-          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.85rem',
+              padding: '1.2rem 1.4rem',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#ffffff',
+                padding: '4px 6px',
+                borderRadius: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <img
+                src="/logo-frutopical.png"
+                alt="Frutopical Logo"
+                style={{ height: '36px', width: 'auto', objectFit: 'contain' }}
+              />
+            </div>
             <div>
-              <strong style={{ display: 'block', color: '#ffffff', fontSize: '1.05rem', letterSpacing: '1px' }}>FRUTOPICAL</strong>
-              <span style={{ color: '#EF6C00', fontSize: '0.75rem', fontWeight: '700' }}>TalentHub</span>
+              <strong
+                style={{
+                  display: 'block',
+                  color: '#ffffff',
+                  fontSize: '1.05rem',
+                  letterSpacing: '1px'
+                }}
+              >
+                FRUTOPICAL
+              </strong>
+              <span
+                style={{
+                  color: '#EF6C00',
+                  fontSize: '0.75rem',
+                  fontWeight: '700'
+                }}
+              >
+                TalentHub
+              </span>
             </div>
           </div>
 
           <nav className="th-nav">
-            <button type="button" className={activeModule === 'inicio' ? 'th-nav-item active' : 'th-nav-item'} onClick={() => changeModule('inicio')}>
+            <button
+              type="button"
+              className={activeModule === 'inicio' ? 'th-nav-item active' : 'th-nav-item'}
+              onClick={() => changeModule('inicio')}
+            >
               <span className="th-nav-icon">⌂</span> Inicio
             </button>
-            <button type="button" className={activeModule === 'diagnostico' ? 'th-nav-item active' : 'th-nav-item'} onClick={() => changeModule('diagnostico')}>
+            <button
+              type="button"
+              className={activeModule === 'diagnostico' ? 'th-nav-item active' : 'th-nav-item'}
+              onClick={() => changeModule('diagnostico')}
+            >
               <span className="th-nav-icon">🏢</span> 1. Caracterización Org.
             </button>
-            <button type="button" className={activeModule === 'seleccion' ? 'th-nav-item active' : 'th-nav-item'} onClick={() => changeModule('seleccion')}>
+            <button
+              type="button"
+              className={activeModule === 'seleccion' ? 'th-nav-item active' : 'th-nav-item'}
+              onClick={() => changeModule('seleccion')}
+            >
               <span className="th-nav-icon">👥</span> 2. Selección de Personal
             </button>
-            <button type="button" className={activeModule === 'vinculaciones' ? 'th-nav-item active' : 'th-nav-item'} onClick={() => changeModule('vinculaciones')}>
+            <button
+              type="button"
+              className={activeModule === 'vinculaciones' ? 'th-nav-item active' : 'th-nav-item'}
+              onClick={() => changeModule('vinculaciones')}
+            >
               <span className="th-nav-icon">📋</span> 3. Vinculación y SG-SST
             </button>
-            <button type="button" className={activeModule === 'documentos' ? 'th-nav-item active' : 'th-nav-item'} onClick={() => changeModule('documentos')}>
+            <button
+              type="button"
+              className={activeModule === 'documentos' ? 'th-nav-item active' : 'th-nav-item'}
+              onClick={() => changeModule('documentos')}
+            >
               <span className="th-nav-icon">📁</span> 4. Gestión Documental (CCD)
             </button>
-            <button type="button" className={activeModule === 'solicitudes' ? 'th-nav-item active' : 'th-nav-item'} onClick={() => changeModule('solicitudes')}>
+            <button
+              type="button"
+              className={activeModule === 'solicitudes' ? 'th-nav-item active' : 'th-nav-item'}
+              onClick={() => changeModule('solicitudes')}
+            >
               <span className="th-nav-icon">💬</span> 5. Atención al Cliente (PQRS)
             </button>
           </nav>
 
           <div className="th-sidebar-bottom">
             <div className="th-user-mini">
-              <div className="th-avatar">{user?.nombre?.charAt(0) || 'A'}</div>
+              <div className="th-avatar">
+                {user?.nombre?.charAt(0) || 'A'}
+              </div>
               <div>
                 <strong>{user?.nombre}</strong>
                 <span>{user?.rol || 'Administrador'}</span>
               </div>
             </div>
-            <button type="button" className="th-logout" onClick={onLogout}>
+            <button
+              type="button"
+              className="th-logout"
+              onClick={onLogout}
+            >
               <span>↪</span> Cerrar sesión
             </button>
           </div>
@@ -925,7 +911,9 @@ export default function Dashboard({ user, onLogout }) {
               <h1>Ecosistema de Talento Humano · Frutopical S.A.S.</h1>
             </div>
             <div className="th-header-user">
-              <div className="th-header-avatar">{user?.nombre?.charAt(0) || 'A'}</div>
+              <div className="th-header-avatar">
+                {user?.nombre?.charAt(0) || 'A'}
+              </div>
               <div>
                 <strong>{user?.nombre}</strong>
                 <span>{user?.rol || 'Administrador'}</span>
@@ -937,90 +925,484 @@ export default function Dashboard({ user, onLogout }) {
             {/* INICIO */}
             {activeModule === 'inicio' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem' }}>
-                <section className="th-welcome" style={{ margin: 0, padding: '2rem 2.5rem', borderRadius: '16px', background: 'linear-gradient(135deg, #143c1d 0%, #1b5328 100%)' }}>
-                  <span className="th-label" style={{ color: '#fed7aa', fontWeight: '800' }}>PANEL DE CONTROL GENERAL</span>
-                  <h2 style={{ fontSize: '1.8rem', color: '#ffffff', margin: '0.4rem 0' }}>Bienvenido a TalentHub, {user?.nombre || 'Administrador'}.</h2>
-                  <p style={{ color: '#dcfce7', margin: 0, fontSize: '0.95rem' }}>Ecosistema digital de gestión humana, seguridad laboral y atención institucional · Sabanagrande, Atlántico.</p>
+                <section
+                  className="th-welcome"
+                  style={{
+                    margin: 0,
+                    padding: '2rem 2.5rem',
+                    borderRadius: '16px',
+                    background: 'linear-gradient(135deg, #143c1d 0%, #1b5328 100%)'
+                  }}
+                >
+                  <span
+                    className="th-label"
+                    style={{
+                      color: '#fed7aa',
+                      fontWeight: '800'
+                    }}
+                  >
+                    PANEL DE CONTROL GENERAL
+                  </span>
+                  <h2
+                    style={{
+                      fontSize: '1.8rem',
+                      color: '#ffffff',
+                      margin: '0.4rem 0'
+                    }}
+                  >
+                    Bienvenido a TalentHub, {user?.nombre || 'Administrador'}.
+                  </h2>
+                  <p
+                    style={{
+                      color: '#dcfce7',
+                      margin: 0,
+                      fontSize: '0.95rem'
+                    }}
+                  >
+                    Ecosistema digital de gestión humana, seguridad laboral y atención institucional · Sabanagrande, Atlántico.
+                  </p>
                 </section>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.2rem' }}>
-                  <div style={{ backgroundColor: '#ffffff', padding: '1.4rem', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#166534' }}>▣</div>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                    gap: '1.2rem'
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: '#ffffff',
+                      padding: '1.4rem',
+                      borderRadius: '14px',
+                      border: '1px solid #e2e8f0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '12px',
+                        backgroundColor: '#dcfce7',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem',
+                        color: '#166534'
+                      }}
+                    >
+                      ▣
+                    </div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b' }}>CONVOCATORIAS</span>
-                      <strong style={{ display: 'block', fontSize: '1.5rem', color: '#1e293b' }}>{convocatorias.filter(c => c.estado === 'ABIERTA').length}</strong>
-                      <small style={{ color: '#166534', fontWeight: '700' }}>Activas en portal web</small>
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '800',
+                          color: '#64748b'
+                        }}
+                      >
+                        CONVOCATORIAS
+                      </span>
+                      <strong
+                        style={{
+                          display: 'block',
+                          fontSize: '1.5rem',
+                          color: '#1e293b'
+                        }}
+                      >
+                        {convocatorias.filter((c) => c.estado === 'ABIERTA').length}
+                      </strong>
+                      <small
+                        style={{
+                          color: '#166534',
+                          fontWeight: '700'
+                        }}
+                      >
+                        Activas en portal web
+                      </small>
                     </div>
                   </div>
 
-                  <div style={{ backgroundColor: '#ffffff', padding: '1.4rem', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#ffedd5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#c2410c' }}>👥</div>
+                  <div
+                    style={{
+                      backgroundColor: '#ffffff',
+                      padding: '1.4rem',
+                      borderRadius: '14px',
+                      border: '1px solid #e2e8f0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '12px',
+                        backgroundColor: '#ffedd5',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem',
+                        color: '#c2410c'
+                      }}
+                    >
+                      👥
+                    </div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b' }}>CANDIDATOS</span>
-                      <strong style={{ display: 'block', fontSize: '1.5rem', color: '#1e293b' }}>{postulaciones.length}</strong>
-                      <small style={{ color: '#c2410c', fontWeight: '700' }}>Hojas de vida radicadas</small>
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '800',
+                          color: '#64748b'
+                        }}
+                      >
+                        CANDIDATOS
+                      </span>
+                      <strong
+                        style={{
+                          display: 'block',
+                          fontSize: '1.5rem',
+                          color: '#1e293b'
+                        }}
+                      >
+                        {postulaciones.length}
+                      </strong>
+                      <small
+                        style={{
+                          color: '#c2410c',
+                          fontWeight: '700'
+                        }}
+                      >
+                        Hojas de vida radicadas
+                      </small>
                     </div>
                   </div>
 
-                  <div style={{ backgroundColor: '#ffffff', padding: '1.4rem', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#1d4ed8' }}>📁</div>
+                  <div
+                    style={{
+                      backgroundColor: '#ffffff',
+                      padding: '1.4rem',
+                      borderRadius: '14px',
+                      border: '1px solid #e2e8f0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '12px',
+                        backgroundColor: '#dbeafe',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem',
+                        color: '#1d4ed8'
+                      }}
+                    >
+                      📁
+                    </div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b' }}>EXPEDIENTES CCD</span>
-                      <strong style={{ display: 'block', fontSize: '1.5rem', color: '#1e293b' }}>{expedientes.length}</strong>
-                      <small style={{ color: '#1d4ed8', fontWeight: '700' }}>Expedientes Serie 100.10.18</small>
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '800',
+                          color: '#64748b'
+                        }}
+                      >
+                        EXPEDIENTES CCD
+                      </span>
+                      <strong
+                        style={{
+                          display: 'block',
+                          fontSize: '1.5rem',
+                          color: '#1e293b'
+                        }}
+                      >
+                        {expedientes.length}
+                      </strong>
+                      <small
+                        style={{
+                          color: '#1d4ed8',
+                          fontWeight: '700'
+                        }}
+                      >
+                        Expedientes Serie 100.10.18
+                      </small>
                     </div>
                   </div>
 
-                  <div style={{ backgroundColor: '#ffffff', padding: '1.4rem', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#7e22ce' }}>💬</div>
+                  <div
+                    style={{
+                      backgroundColor: '#ffffff',
+                      padding: '1.4rem',
+                      borderRadius: '14px',
+                      border: '1px solid #e2e8f0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '12px',
+                        backgroundColor: '#f3e8ff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem',
+                        color: '#7e22ce'
+                      }}
+                    >
+                      💬
+                    </div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b' }}>PQRS ACTIVAS</span>
-                      <strong style={{ display: 'block', fontSize: '1.5rem', color: '#1e293b' }}>{solicitudes.length}</strong>
-                      <small style={{ color: '#7e22ce', fontWeight: '700' }}>Atención en tiempo real</small>
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '800',
+                          color: '#64748b'
+                        }}
+                      >
+                        PQRS ACTIVAS
+                      </span>
+                      <strong
+                        style={{
+                          display: 'block',
+                          fontSize: '1.5rem',
+                          color: '#1e293b'
+                        }}
+                      >
+                        {solicitudes.length}
+                      </strong>
+                      <small
+                        style={{
+                          color: '#7e22ce',
+                          fontWeight: '700'
+                        }}
+                      >
+                        Atención en tiempo real
+                      </small>
                     </div>
                   </div>
                 </div>
 
-                <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '1.8rem', border: '1px solid #e2e8f0' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '1px' }}>ACCESO RÁPIDO A MÓDULOS</span>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-                    <button type="button" onClick={() => changeModule('diagnostico')} style={{ textAlign: 'left', padding: '1.2rem', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', cursor: 'pointer', display: 'flex', gap: '0.8rem' }}>
+                <div
+                  style={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: '16px',
+                    padding: '1.8rem',
+                    border: '1px solid #e2e8f0'
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      fontWeight: '800',
+                      color: '#166534',
+                      letterSpacing: '1px'
+                    }}
+                  >
+                    ACCESO RÁPIDO A MÓDULOS
+                  </span>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                      gap: '1rem',
+                      marginTop: '1rem'
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => changeModule('diagnostico')}
+                      style={{
+                        textAlign: 'left',
+                        padding: '1.2rem',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        backgroundColor: '#f8fafc',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        gap: '0.8rem'
+                      }}
+                    >
                       <span style={{ fontSize: '1.8rem' }}>🏢</span>
                       <div>
-                        <strong style={{ color: '#166534', fontSize: '0.95rem', display: 'block' }}>1. Caracterización Organizacional</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Estrategia, organigrama y los 13 perfiles DPC.</p>
+                        <strong
+                          style={{
+                            color: '#166534',
+                            fontSize: '0.95rem',
+                            display: 'block'
+                          }}
+                        >
+                          1. Caracterización Organizacional
+                        </strong>
+                        <p
+                          style={{
+                            margin: '0.2rem 0 0 0',
+                            fontSize: '0.8rem',
+                            color: '#64748b'
+                          }}
+                        >
+                          Estrategia, organigrama y los 13 perfiles DPC.
+                        </p>
                       </div>
                     </button>
 
-                    <button type="button" onClick={() => changeModule('seleccion')} style={{ textAlign: 'left', padding: '1.2rem', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', cursor: 'pointer', display: 'flex', gap: '0.8rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => changeModule('seleccion')}
+                      style={{
+                        textAlign: 'left',
+                        padding: '1.2rem',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        backgroundColor: '#f8fafc',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        gap: '0.8rem'
+                      }}
+                    >
                       <span style={{ fontSize: '1.8rem' }}>👥</span>
                       <div>
-                        <strong style={{ color: '#c2410c', fontSize: '0.95rem', display: 'block' }}>2. Selección de Personal</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Matriz técnica ponderada y actas de evaluación.</p>
+                        <strong
+                          style={{
+                            color: '#c2410c',
+                            fontSize: '0.95rem',
+                            display: 'block'
+                          }}
+                        >
+                          2. Selección de Personal
+                        </strong>
+                        <p
+                          style={{
+                            margin: '0.2rem 0 0 0',
+                            fontSize: '0.8rem',
+                            color: '#64748b'
+                          }}
+                        >
+                          Matriz técnica ponderada y actas de evaluación.
+                        </p>
                       </div>
                     </button>
 
-                    <button type="button" onClick={() => changeModule('vinculaciones')} style={{ textAlign: 'left', padding: '1.2rem', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', cursor: 'pointer', display: 'flex', gap: '0.8rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => changeModule('vinculaciones')}
+                      style={{
+                        textAlign: 'left',
+                        padding: '1.2rem',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        backgroundColor: '#f8fafc',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        gap: '0.8rem'
+                      }}
+                    >
                       <span style={{ fontSize: '1.8rem' }}>📋</span>
                       <div>
-                        <strong style={{ color: '#1d4ed8', fontSize: '0.95rem', display: 'block' }}>3. Vinculación y SG-SST</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Lista de chequeo documental y constancias de inducción.</p>
+                        <strong
+                          style={{
+                            color: '#1d4ed8',
+                            fontSize: '0.95rem',
+                            display: 'block'
+                          }}
+                        >
+                          3. Vinculación y SG-SST
+                        </strong>
+                        <p
+                          style={{
+                            margin: '0.2rem 0 0 0',
+                            fontSize: '0.8rem',
+                            color: '#64748b'
+                          }}
+                        >
+                          Lista de chequeo documental y constancias de inducción.
+                        </p>
                       </div>
                     </button>
 
-                    <button type="button" onClick={() => changeModule('documentos')} style={{ textAlign: 'left', padding: '1.2rem', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', cursor: 'pointer', display: 'flex', gap: '0.8rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => changeModule('documentos')}
+                      style={{
+                        textAlign: 'left',
+                        padding: '1.2rem',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        backgroundColor: '#f8fafc',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        gap: '0.8rem'
+                      }}
+                    >
                       <span style={{ fontSize: '1.8rem' }}>📁</span>
                       <div>
-                        <strong style={{ color: '#b45309', fontSize: '0.95rem', display: 'block' }}>4. Gestión Documental (CCD)</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Cuadro de clasificación Serie 100.10.18 y expedientes laborales.</p>
+                        <strong
+                          style={{
+                            color: '#b45309',
+                            fontSize: '0.95rem',
+                            display: 'block'
+                          }}
+                        >
+                          4. Gestión Documental (CCD)
+                        </strong>
+                        <p
+                          style={{
+                            margin: '0.2rem 0 0 0',
+                            fontSize: '0.8rem',
+                            color: '#64748b'
+                          }}
+                        >
+                          Cuadro de clasificación Serie 100.10.18 y expedientes laborales.
+                        </p>
                       </div>
                     </button>
 
-                    <button type="button" onClick={() => changeModule('solicitudes')} style={{ textAlign: 'left', padding: '1.2rem', borderRadius: '12px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', cursor: 'pointer', display: 'flex', gap: '0.8rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => changeModule('solicitudes')}
+                      style={{
+                        textAlign: 'left',
+                        padding: '1.2rem',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        backgroundColor: '#f8fafc',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        gap: '0.8rem'
+                      }}
+                    >
                       <span style={{ fontSize: '1.8rem' }}>💬</span>
                       <div>
-                        <strong style={{ color: '#7e22ce', fontSize: '0.95rem', display: 'block' }}>5. Atención al Cliente (PQRS)</strong>
-                        <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Trámite de radicados y expedición de certificados laborales.</p>
+                        <strong
+                          style={{
+                            color: '#7e22ce',
+                            fontSize: '0.95rem',
+                            display: 'block'
+                          }}
+                        >
+                          5. Atención al Cliente (PQRS)
+                        </strong>
+                        <p
+                          style={{
+                            margin: '0.2rem 0 0 0',
+                            fontSize: '0.8rem',
+                            color: '#64748b'
+                          }}
+                        >
+                          Trámite de radicados y expedición de certificados laborales.
+                        </p>
                       </div>
                     </button>
                   </div>
@@ -1029,20 +1411,33 @@ export default function Dashboard({ user, onLogout }) {
             )}
 
             {/* MÓDULO 1: DIAGNÓSTICO */}
-            {activeModule === 'diagnostico' && <Diagnostico onVolver={() => changeModule('inicio')} />}
+            {activeModule === 'diagnostico' && (
+              <Diagnostico onVolver={() => changeModule('inicio')} />
+            )}
 
             {/* MÓDULO 2: SELECCIÓN */}
             {activeModule === 'seleccion' && (
               <section className="th-page-section">
-                <div style={{ display: 'flex', gap: '1rem', borderBottom: '2px solid #e0e0e0', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    borderBottom: '2px solid #e0e0e0',
+                    marginBottom: '1.5rem',
+                    flexWrap: 'wrap'
+                  }}
+                >
                   <button
                     type="button"
                     onClick={() => setTabSeleccion('convocatorias')}
                     style={{
-                      padding: '0.6rem 1.2rem', background: 'none', border: 'none',
+                      padding: '0.6rem 1.2rem',
+                      background: 'none',
+                      border: 'none',
                       borderBottom: tabSeleccion === 'convocatorias' ? '3px solid #2E7D32' : 'none',
                       fontWeight: tabSeleccion === 'convocatorias' ? 'bold' : 'normal',
-                      color: tabSeleccion === 'convocatorias' ? '#2E7D32' : '#555', cursor: 'pointer'
+                      color: tabSeleccion === 'convocatorias' ? '#2E7D32' : '#555',
+                      cursor: 'pointer'
                     }}
                   >
                     ▣ Convocatorias Laborales
@@ -1051,13 +1446,16 @@ export default function Dashboard({ user, onLogout }) {
                     type="button"
                     onClick={() => {
                       setTabSeleccion('postulaciones');
-                      loadExpedientes();
+                      cargarDatosGlobales();
                     }}
                     style={{
-                      padding: '0.6rem 1.2rem', background: 'none', border: 'none',
+                      padding: '0.6rem 1.2rem',
+                      background: 'none',
+                      border: 'none',
                       borderBottom: tabSeleccion === 'postulaciones' ? '3px solid #EF6C00' : 'none',
                       fontWeight: tabSeleccion === 'postulaciones' ? 'bold' : 'normal',
-                      color: tabSeleccion === 'postulaciones' ? '#EF6C00' : '#555', cursor: 'pointer'
+                      color: tabSeleccion === 'postulaciones' ? '#EF6C00' : '#555',
+                      cursor: 'pointer'
                     }}
                   >
                     ♙ Candidatos y Matriz Ponderada Oficial
@@ -1066,7 +1464,14 @@ export default function Dashboard({ user, onLogout }) {
 
                 {tabSeleccion === 'convocatorias' ? (
                   <>
-                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div
+                      className="th-page-intro"
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
                       <div>
                         <span className="th-label">CONVOCATORIAS ACTIVAS</span>
                         <h2>Ofertas de empleo de Frutopical S.A.S.</h2>
@@ -1075,7 +1480,15 @@ export default function Dashboard({ user, onLogout }) {
                       <button
                         type="button"
                         onClick={() => setShowModalConvocatoria(true)}
-                        style={{ backgroundColor: '#2e7d32', color: '#ffffff', border: 'none', padding: '0.65rem 1.2rem', borderRadius: '8px', fontWeight: '700', cursor: 'pointer' }}
+                        style={{
+                          backgroundColor: '#2e7d32',
+                          color: '#ffffff',
+                          border: 'none',
+                          padding: '0.65rem 1.2rem',
+                          borderRadius: '8px',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
                       >
                         + Nueva Convocatoria
                       </button>
@@ -1083,19 +1496,55 @@ export default function Dashboard({ user, onLogout }) {
 
                     <div className="th-list">
                       {convocatorias.map((item) => (
-                        <article className="th-list-card" key={item.id_convocatoria} style={{ borderLeft: item.estado === 'ABIERTA' ? '5px solid #2e7d32' : '5px solid #94a3b8' }}>
+                        <article
+                          className="th-list-card"
+                          key={item.id_convocatoria || item.id}
+                          style={{
+                            borderLeft: item.estado === 'ABIERTA' ? '5px solid #2e7d32' : '5px solid #94a3b8'
+                          }}
+                        >
                           <div className="th-list-icon">▣</div>
                           <div className="th-list-main">
-                            <div className="th-list-top" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <div
+                              className="th-list-top"
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between'
+                              }}
+                            >
                               <span className={`th-status ${item.estado === 'ABIERTA' ? 'active' : ''}`}>
                                 {item.estado || 'ABIERTA'} · Cierre: {item.fecha_cierre}
                               </span>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button type="button" onClick={() => handleToggleEstadoConvocatoria(item.id_convocatoria)} style={{ padding: '0.2rem 0.6rem', borderRadius: '4px', border: '1px solid #cbd5e1', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleEstadoConvocatoria(item.id_convocatoria || item.id)}
+                                  style={{
+                                    padding: '0.2rem 0.6rem',
+                                    borderRadius: '4px',
+                                    border: '1px solid #cbd5e1',
+                                    cursor: 'pointer',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 'bold'
+                                  }}
+                                >
                                   {item.estado === 'ABIERTA' ? 'Cerrar Vacante' : 'Reabrir'}
                                 </button>
-                                <button type="button" onClick={() => handleEliminarConvocatoria(item.id_convocatoria, item.titulo)} style={{ padding: '0.2rem 0.6rem', borderRadius: '4px', border: '1px solid #fca5a5', color: '#dc2626', background: '#fef2f2', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                                  Eliminar
+                                <button
+                                  type="button"
+                                  onClick={() => handleEliminarConvocatoria(item.id || item.id_convocatoria, item.titulo)}
+                                  style={{
+                                    padding: '0.2rem 0.6rem',
+                                    borderRadius: '4px',
+                                    border: '1px solid #fca5a5',
+                                    color: '#dc2626',
+                                    background: '#fef2f2',
+                                    cursor: 'pointer',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 'bold'
+                                  }}
+                                >
+                                  Eliminar Nube
                                 </button>
                               </div>
                             </div>
@@ -1110,18 +1559,39 @@ export default function Dashboard({ user, onLogout }) {
                   </>
                 ) : (
                   <>
-                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div
+                      className="th-page-intro"
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '1rem'
+                      }}
+                    >
                       <div>
                         <span className="th-label">EQUIPO 2 · SELECCIÓN TÉCNICA</span>
                         <h2>Postulaciones y Calificación de Candidatos</h2>
-                        <p>Los aspirantes que se postulan desde la web aparecen aquí con sus datos de contacto y hoja de vida.</p>
+                        <p>Los aspirantes que se postulan desde la web aparecen aquí. Al contratarlos, se sincronizan con la nómina global.</p>
                       </div>
                       <button
                         type="button"
-                        onClick={loadExpedientes}
-                        style={{ backgroundColor: '#ffffff', border: '1.5px solid #166534', color: '#166534', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                        onClick={cargarDatosGlobales}
+                        style={{
+                          backgroundColor: '#ffffff',
+                          border: '1.5px solid #166534',
+                          color: '#166534',
+                          padding: '0.5rem 1rem',
+                          borderRadius: '8px',
+                          fontWeight: 'bold',
+                          fontSize: '0.82rem',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem'
+                        }}
                       >
-                        🔄 Actualizar Postulaciones en Vivo
+                        🔄 Sincronizar Nube
                       </button>
                     </div>
 
@@ -1144,34 +1614,63 @@ export default function Dashboard({ user, onLogout }) {
                             const nombre = item.candidato || `${item.nombres || ''} ${item.apellidos || ''}`.trim() || 'Aspirante';
                             const estaContratado = item.estado === 'CONTRATADO';
                             return (
-                              <tr key={item.id_postulacion ?? index}>
-                                <td><strong>{nombre}</strong></td>
+                              <tr key={item.id_postulacion || item.id || index}>
+                                <td>
+                                  <strong>{nombre}</strong>
+                                </td>
                                 <td>{item.numero_documento || '—'}</td>
                                 <td>
                                   <div style={{ fontSize: '0.78rem' }}>
-                                    <strong>📞 {item.telefono || 'Sin tel.'}</strong><br />
+                                    <strong>📞 {item.telefono || 'Sin tel.'}</strong>
+                                    <br />
                                     <span style={{ color: '#64748b' }}>✉️ {item.correo || 'Sin correo'}</span>
                                   </div>
                                 </td>
-                                <td><small>{item.ciudad || 'Sabanagrande'}</small></td>
+                                <td>
+                                  <small>{item.ciudad || 'Sabanagrande'}</small>
+                                </td>
                                 <td>{item.convocatoria || item.cargo || 'Operario de Producción'}</td>
                                 <td>
                                   <button
                                     type="button"
                                     onClick={() => setModalHvAspirante(item)}
-                                    style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', color: '#166534', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 'bold', cursor: 'pointer' }}
+                                    style={{
+                                      backgroundColor: '#f0fdf4',
+                                      border: '1.5px solid #86efac',
+                                      color: '#166534',
+                                      padding: '0.35rem 0.75rem',
+                                      borderRadius: '6px',
+                                      fontSize: '0.78rem',
+                                      fontWeight: 'bold',
+                                      cursor: 'pointer'
+                                    }}
                                   >
                                     📄 {item.hoja_vida || item.hoja_vida_nombre || 'HV_Candidato.pdf'}
                                   </button>
                                 </td>
                                 <td>
-                                  <span className={`th-status ${estaContratado ? 'active' : ''}`} style={{ backgroundColor: estaContratado ? '#dcfce7' : '#f1f5f9', color: estaContratado ? '#166534' : '#475569' }}>
+                                  <span
+                                    className={`th-status ${estaContratado ? 'active' : ''}`}
+                                    style={{
+                                      backgroundColor: estaContratado ? '#dcfce7' : '#f1f5f9',
+                                      color: estaContratado ? '#166534' : '#475569'
+                                    }}
+                                  >
                                     {item.estado || 'RECIBIDA'}
                                   </span>
                                 </td>
                                 <td>
                                   {estaContratado ? (
-                                    <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#166534', backgroundColor: '#e2f4e8', padding: '0.3rem 0.6rem', borderRadius: '6px' }}>
+                                    <span
+                                      style={{
+                                        fontSize: '0.75rem',
+                                        fontWeight: 'bold',
+                                        color: '#166534',
+                                        backgroundColor: '#e2f4e8',
+                                        padding: '0.3rem 0.6rem',
+                                        borderRadius: '6px'
+                                      }}
+                                    >
                                       ✓ Contratado
                                     </span>
                                   ) : (
@@ -1205,7 +1704,16 @@ export default function Dashboard({ user, onLogout }) {
               <section className="th-page-section">
                 {!selectedExpediente ? (
                   <>
-                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div
+                      className="th-page-intro"
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '1rem'
+                      }}
+                    >
                       <div>
                         <span className="th-label">EQUIPO 4 · GESTIÓN DOCUMENTAL</span>
                         <h2>Cuadro de Clasificación Documental (CCD)</h2>
@@ -1213,22 +1721,60 @@ export default function Dashboard({ user, onLogout }) {
                       </div>
                       <button
                         type="button"
-                        onClick={loadExpedientes}
-                        style={{ backgroundColor: '#ffffff', border: '1.5px solid #166534', color: '#166534', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.82rem', cursor: 'pointer' }}
+                        onClick={cargarDatosGlobales}
+                        style={{
+                          backgroundColor: '#ffffff',
+                          border: '1.5px solid #166534',
+                          color: '#166534',
+                          padding: '0.5rem 1rem',
+                          borderRadius: '8px',
+                          fontWeight: 'bold',
+                          fontSize: '0.82rem',
+                          cursor: 'pointer'
+                        }}
                       >
                         🔄 Sincronizar Expedientes
                       </button>
                     </div>
 
                     {/* ESTRUCTURA JERÁRQUICA EXIGIDA POR LA PROFESORA */}
-                    <div style={{ backgroundColor: '#f0fdf4', padding: '1.2rem 1.5rem', borderRadius: '12px', border: '1.5px solid #86efac', marginBottom: '1.6rem' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '0.5px' }}>
+                    <div
+                      style={{
+                        backgroundColor: '#f0fdf4',
+                        padding: '1.2rem 1.5rem',
+                        borderRadius: '12px',
+                        border: '1.5px solid #86efac',
+                        marginBottom: '1.6rem'
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '800',
+                          color: '#166534',
+                          letterSpacing: '0.5px'
+                        }}
+                      >
                         ESTRUCTURA JERÁRQUICA DEL CCD PARA TALENTO HUMANO (AGN)
                       </span>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.8rem', marginTop: '0.6rem', fontSize: '0.85rem' }}>
-                        <div><strong>Fondo (100):</strong> Frutas Del Atlántico S.A.S.</div>
-                        <div><strong>Sección (100.10):</strong> Gestión Humana / Talento Humano</div>
-                        <div><strong>Serie (100.10.18):</strong> Expedientes Laborales</div>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                          gap: '0.8rem',
+                          marginTop: '0.6rem',
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        <div>
+                          <strong>Fondo (100):</strong> Frutas Del Atlántico S.A.S.
+                        </div>
+                        <div>
+                          <strong>Sección (100.10):</strong> Gestión Humana / Talento Humano
+                        </div>
+                        <div>
+                          <strong>Serie (100.10.18):</strong> Expedientes Laborales
+                        </div>
                       </div>
                     </div>
 
@@ -1247,10 +1793,14 @@ export default function Dashboard({ user, onLogout }) {
                         <tbody>
                           {expedientes.map((item, idx) => (
                             <tr key={item.documento ?? idx}>
-                              <td><strong>{item.nombre}</strong></td>
+                              <td>
+                                <strong>{item.nombre}</strong>
+                              </td>
                               <td>CC {item.documento}</td>
                               <td>{item.cargo}</td>
-                              <td><span className="th-status active">{item.estadoLaboral || 'ACTIVO'}</span></td>
+                              <td>
+                                <span className="th-status active">{item.estadoLaboral || 'ACTIVO'}</span>
+                              </td>
                               <td>
                                 <button
                                   type="button"
@@ -1268,37 +1818,100 @@ export default function Dashboard({ user, onLogout }) {
                   </>
                 ) : (
                   <>
-                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div
+                      className="th-page-intro"
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '1rem'
+                      }}
+                    >
                       <div>
                         <span className="th-label">EXPEDIENTE LABORAL DIGITAL</span>
                         <h2>{selectedExpediente.nombre}</h2>
-                        <p>Cargo: <strong>{selectedExpediente.cargo}</strong> · C.C. <strong>{selectedExpediente.documento}</strong> · Serie: <strong>100.10.18 (Expedientes Laborales)</strong></p>
+                        <p>
+                          Cargo: <strong>{selectedExpediente.cargo}</strong> · C.C. <strong>{selectedExpediente.documento}</strong> · Serie: <strong>100.10.18 (Expedientes Laborales)</strong>
+                        </p>
                       </div>
-                      <button type="button" className="th-secondary-button" onClick={() => setSelectedExpediente(null)}>
+                      <button
+                        type="button"
+                        className="th-secondary-button"
+                        onClick={() => setSelectedExpediente(null)}
+                      >
                         ← Volver a Expedientes
                       </button>
                     </div>
 
                     {/* FORMULARIO: RADICAR DOCUMENTO EN EXPEDIENTE LABORAL */}
-                    <div style={{ backgroundColor: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '12px', padding: '1.8rem', maxWidth: '720px', marginBottom: '2rem' }}>
-                      <h3 style={{ margin: '0 0 0.4rem 0', color: '#166534', fontSize: '1.2rem' }}>
+                    <div
+                      style={{
+                        backgroundColor: '#ffffff',
+                        border: '1.5px solid #cbd5e1',
+                        borderRadius: '12px',
+                        padding: '1.8rem',
+                        maxWidth: '720px',
+                        marginBottom: '2rem'
+                      }}
+                    >
+                      <h3
+                        style={{
+                          margin: '0 0 0.4rem 0',
+                          color: '#166534',
+                          fontSize: '1.2rem'
+                        }}
+                      >
                         Radicar Documento en Expediente Laboral
                       </h3>
                       
-                      <div style={{ backgroundColor: '#f8fafc', padding: '0.8rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '1.2rem', fontSize: '0.8rem', color: '#475569', lineHeight: 1.5 }}>
-                        <strong>Estructura Jerárquica del CCD para Talento Humano:</strong><br />
+                      <div
+                        style={{
+                          backgroundColor: '#f8fafc',
+                          padding: '0.8rem 1rem',
+                          borderRadius: '8px',
+                          border: '1px solid #e2e8f0',
+                          marginBottom: '1.2rem',
+                          fontSize: '0.8rem',
+                          color: '#475569',
+                          lineHeight: 1.5
+                        }}
+                      >
+                        <strong>Estructura Jerárquica del CCD para Talento Humano:</strong>
+                        <br />
                         Fondo: <strong>100</strong> (Frutas Del Atlántico S.A.S.) · Sección: <strong>100.10</strong> (Gestión Humana) · Serie: <strong>100.10.18</strong> (Expedientes Laborales)
                       </div>
 
-                      <form onSubmit={handleRadicarDocumentoCCD} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                      <form
+                        onSubmit={handleRadicarDocumentoCCD}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.9rem'
+                        }}
+                      >
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>
+                          <label
+                            style={{
+                              display: 'block',
+                              fontSize: '0.82rem',
+                              fontWeight: 'bold',
+                              marginBottom: '0.3rem'
+                            }}
+                          >
                             1. Subserie Documental (CCD) *
                           </label>
                           <select
                             value={selectedSubserie}
                             onChange={(e) => setSelectedSubserie(e.target.value)}
-                            style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', fontSize: '0.85rem', fontWeight: 'bold' }}
+                            style={{
+                              width: '100%',
+                              padding: '0.55rem',
+                              borderRadius: '6px',
+                              border: '1.5px solid #cbd5e1',
+                              fontSize: '0.85rem',
+                              fontWeight: 'bold'
+                            }}
                           >
                             {SUBSERIES_CCD_OFICIALES.map((s) => (
                               <option key={s.codigo} value={s.codigo}>
@@ -1309,7 +1922,14 @@ export default function Dashboard({ user, onLogout }) {
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>
+                          <label
+                            style={{
+                              display: 'block',
+                              fontSize: '0.82rem',
+                              fontWeight: 'bold',
+                              marginBottom: '0.3rem'
+                            }}
+                          >
                             2. Descripción del Soporte *
                           </label>
                           <input
@@ -1318,12 +1938,25 @@ export default function Dashboard({ user, onLogout }) {
                             value={descripcionDocumento}
                             onChange={(e) => setDescripcionDocumento(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1.5px solid #cbd5e1', fontSize: '0.85rem' }}
+                            style={{
+                              width: '100%',
+                              padding: '0.55rem',
+                              borderRadius: '6px',
+                              border: '1.5px solid #cbd5e1',
+                              fontSize: '0.85rem'
+                            }}
                           />
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>
+                          <label
+                            style={{
+                              display: 'block',
+                              fontSize: '0.82rem',
+                              fontWeight: 'bold',
+                              marginBottom: '0.3rem'
+                            }}
+                          >
                             3. Archivo Digital (Soporte en formato PDF) *
                           </label>
                           <input
@@ -1341,10 +1974,20 @@ export default function Dashboard({ user, onLogout }) {
                                 setNombreArchivoSubido('');
                               }
                             }}
-                            style={{ width: '100%', fontSize: '0.82rem' }}
+                            style={{
+                              width: '100%',
+                              fontSize: '0.82rem'
+                            }}
                           />
                           {nombreArchivoSubido && (
-                            <small style={{ color: '#166534', fontWeight: 'bold', display: 'block', marginTop: '0.2rem' }}>
+                            <small
+                              style={{
+                                color: '#166534',
+                                fontWeight: 'bold',
+                                display: 'block',
+                                marginTop: '0.2rem'
+                              }}
+                            >
                               ✓ Archivo PDF verificado: {nombreArchivoSubido}
                             </small>
                           )}
@@ -1353,17 +1996,38 @@ export default function Dashboard({ user, onLogout }) {
                         <button
                           type="submit"
                           className="th-primary-button"
-                          style={{ width: '100%', padding: '0.75rem', fontWeight: 'bold', marginTop: '0.4rem' }}
+                          style={{
+                            width: '100%',
+                            padding: '0.75rem',
+                            fontWeight: 'bold',
+                            marginTop: '0.4rem'
+                          }}
                         >
                           Archivar y Codificar en Expediente Laboral
                         </button>
                       </form>
-                      {uploadNotice && <p style={{ color: '#166534', fontWeight: 'bold', fontSize: '0.85rem', marginTop: '0.6rem' }}>✓ {uploadNotice}</p>}
+                      {uploadNotice && (
+                        <p
+                          style={{
+                            color: '#166534',
+                            fontWeight: 'bold',
+                            fontSize: '0.85rem',
+                            marginTop: '0.6rem'
+                          }}
+                        >
+                          ✓ {uploadNotice}
+                        </p>
+                      )}
                     </div>
 
                     {/* TABLA DE DOCUMENTOS EN EXPEDIENTE LABORAL */}
                     <div className="th-table-wrapper">
-                      <h3 style={{ margin: '0 0 0.8rem 0', color: '#1e293b' }}>
+                      <h3
+                        style={{
+                          margin: '0 0 0.8rem 0',
+                          color: '#1e293b'
+                        }}
+                      >
                         Documentos en Expediente Laboral ({documentosExpediente.length})
                       </h3>
                       <table className="th-table">
@@ -1379,24 +2043,53 @@ export default function Dashboard({ user, onLogout }) {
                           {documentosExpediente.map((doc) => (
                             <tr key={doc.id_archivo}>
                               <td>
-                                <strong style={{ fontFamily: 'monospace', fontSize: '0.82rem', color: '#0f172a' }}>
+                                <strong
+                                  style={{
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.82rem',
+                                    color: '#0f172a'
+                                  }}
+                                >
                                   {doc.nombre_original}
                                 </strong>
                               </td>
                               <td>{doc.tipo_documento}</td>
                               <td>{new Date(doc.fecha_carga).toLocaleDateString('es-CO')}</td>
-                              <td style={{ display: 'flex', gap: '0.5rem' }}>
+                              <td
+                                style={{
+                                  display: 'flex',
+                                  gap: '0.5rem'
+                                }}
+                              >
                                 <button
                                   type="button"
                                   onClick={() => setVisorDoc(doc)}
-                                  style={{ padding: '0.35rem 0.65rem', backgroundColor: '#f0fdf4', border: '1px solid #86efac', color: '#166534', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
+                                  style={{
+                                    padding: '0.35rem 0.65rem',
+                                    backgroundColor: '#f0fdf4',
+                                    border: '1px solid #86efac',
+                                    color: '#166534',
+                                    borderRadius: '4px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer'
+                                  }}
                                 >
                                   👁️ Ver Ficha
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => descargarDocumentoCodificado(doc)}
-                                  style={{ padding: '0.35rem 0.65rem', backgroundColor: '#166534', border: 'none', color: '#ffffff', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}
+                                  style={{
+                                    padding: '0.35rem 0.65rem',
+                                    backgroundColor: '#166534',
+                                    border: 'none',
+                                    color: '#ffffff',
+                                    borderRadius: '4px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer'
+                                  }}
                                 >
                                   📥 Descargar PDF
                                 </button>
@@ -1416,17 +2109,44 @@ export default function Dashboard({ user, onLogout }) {
               <section className="th-page-section">
                 {!selectedSolicitud ? (
                   <>
-                    <div className="th-page-intro" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'gap: 1rem', flexWrap: 'wrap' }}>
+                    <div
+                      className="th-page-intro"
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '1rem'
+                      }}
+                    >
                       <div>
                         <span className="th-label">EQUIPO 5 · SERVICIO AL CLIENTE INTERNO</span>
                         <h2>Gestión de PQRS y Certificaciones Laborales</h2>
                         <p>Atiende radicados y genera certificados con cruce automático de nómina oficial.</p>
                       </div>
-                      <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '0.6rem',
+                          flexWrap: 'wrap'
+                        }}
+                      >
                         <button
                           type="button"
                           onClick={descargarExcelNomina}
-                          style={{ backgroundColor: '#ffffff', border: '1.5px solid #166534', color: '#166534', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                          style={{
+                            backgroundColor: '#ffffff',
+                            border: '1.5px solid #166534',
+                            color: '#166534',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '8px',
+                            fontWeight: 'bold',
+                            fontSize: '0.82rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem'
+                          }}
                         >
                           📊 Descargar Matriz de Nómina (Excel)
                         </button>
@@ -1449,18 +2169,33 @@ export default function Dashboard({ user, onLogout }) {
                         <tbody>
                           {solicitudes.map((item, index) => (
                             <tr key={item.id_solicitud ?? index}>
-                              <td><strong>{item.numero_solicitud || `SOL-2026-000${index + 1}`}</strong></td>
+                              <td>
+                                <strong>{item.numero_solicitud || `SOL-2026-000${index + 1}`}</strong>
+                              </td>
                               <td>{item.nombre_remitente}</td>
-                              <td><strong style={{ color: '#166534' }}>{item.numero_documento || '1042890123'}</strong></td>
+                              <td>
+                                <strong style={{ color: '#166534' }}>
+                                  {item.numero_documento || '1042890123'}
+                                </strong>
+                              </td>
                               <td>
                                 <div style={{ fontSize: '0.78rem' }}>
-                                  <span>✉ {item.correo || 'correo@ejemplo.com'}</span><br />
-                                  <small style={{ color: '#64748b' }}>📞 {item.telefono || 'Sin teléfono'}</small>
+                                  <span>✉ {item.correo || 'correo@ejemplo.com'}</span>
+                                  <br />
+                                  <small style={{ color: '#64748b' }}>
+                                    📞 {item.telefono || 'Sin teléfono'}
+                                  </small>
                                 </div>
                               </td>
                               <td>{item.tipo_solicitud}</td>
                               <td>
-                                <span className={`th-status ${item.estado === 'ATENDIDA' ? 'active' : ''}`} style={{ backgroundColor: item.estado === 'EN PROCESO' ? '#fef3c7' : item.estado === 'ATENDIDA' ? '#dcfce7' : '#f1f5f9', color: item.estado === 'EN PROCESO' ? '#92400e' : item.estado === 'ATENDIDA' ? '#166534' : '#475569' }}>
+                                <span
+                                  className={`th-status ${item.estado === 'ATENDIDA' ? 'active' : ''}`}
+                                  style={{
+                                    backgroundColor: item.estado === 'EN PROCESO' ? '#fef3c7' : item.estado === 'ATENDIDA' ? '#dcfce7' : '#f1f5f9',
+                                    color: item.estado === 'EN PROCESO' ? '#92400e' : item.estado === 'ATENDIDA' ? '#166534' : '#475569'
+                                  }}
+                                >
                                   {item.estado || 'RECIBIDA'}
                                 </span>
                               </td>
@@ -1480,54 +2215,238 @@ export default function Dashboard({ user, onLogout }) {
                     </div>
                   </>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.5rem' }}>
-                    <form onSubmit={updateSolicitud} style={{ backgroundColor: '#ffffff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <h3 style={{ margin: 0 }}>Radicado: {selectedSolicitud.numero_solicitud}</h3>
-                        <button type="button" onClick={() => setSelectedSolicitud(null)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕ Volver</button>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1.2fr 1fr',
+                      gap: '1.5rem'
+                    }}
+                  >
+                    <form
+                      onSubmit={updateSolicitud}
+                      style={{
+                        backgroundColor: '#ffffff',
+                        padding: '1.5rem',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0'
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '1rem'
+                        }}
+                      >
+                        <h3 style={{ margin: 0 }}>
+                          Radicado: {selectedSolicitud.numero_solicitud}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedSolicitud(null)}
+                          style={{
+                            border: 'none',
+                            background: 'none',
+                            cursor: 'pointer',
+                            color: '#64748b',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          ✕ Volver
+                        </button>
                       </div>
 
-                      <div style={{ backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '1rem', fontSize: '0.85rem' }}>
-                        <p style={{ margin: '0 0 0.3rem 0' }}><strong>Remitente:</strong> {selectedSolicitud.nombre_remitente}</p>
-                        <p style={{ margin: '0 0 0.3rem 0' }}><strong>Cédula / Identificación:</strong> <strong style={{ color: '#166534' }}>{selectedSolicitud.numero_documento || certDatos.documento}</strong></p>
-                        <p style={{ margin: '0 0 0.3rem 0' }}><strong>Tipo de Usuario:</strong> {selectedSolicitud.tipo_remitente || 'Trabajador Activo'}</p>
-                        <p style={{ margin: '0 0 0.3rem 0', color: '#166534' }}>
+                      <div
+                        style={{
+                          backgroundColor: '#f8fafc',
+                          padding: '1rem',
+                          borderRadius: '8px',
+                          border: '1px solid #cbd5e1',
+                          marginBottom: '1rem',
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        <p style={{ margin: '0 0 0.3rem 0' }}>
+                          <strong>Remitente:</strong> {selectedSolicitud.nombre_remitente}
+                        </p>
+                        <p style={{ margin: '0 0 0.3rem 0' }}>
+                          <strong>Cédula / Identificación:</strong>{' '}
+                          <strong style={{ color: '#166534' }}>
+                            {selectedSolicitud.numero_documento || certDatos.documento}
+                          </strong>
+                        </p>
+                        <p style={{ margin: '0 0 0.3rem 0' }}>
+                          <strong>Tipo de Usuario:</strong> {selectedSolicitud.tipo_remitente || 'Trabajador Activo'}
+                        </p>
+                        <p
+                          style={{
+                            margin: '0 0 0.3rem 0',
+                            color: '#166534'
+                          }}
+                        >
                           <strong>✉ Correo:</strong> {selectedSolicitud.correo || certDatos.correo || 'correo@ejemplo.com'}
                         </p>
-                        <p style={{ margin: '0 0 0.4rem 0', color: '#166534' }}>
+                        <p
+                          style={{
+                            margin: '0 0 0.4rem 0',
+                            color: '#166534'
+                          }}
+                        >
                           <strong>📞 Celular:</strong> {selectedSolicitud.telefono || certDatos.telefono || '300 000 0000'}
                         </p>
-                        <p style={{ margin: '0.4rem 0 0 0', borderTop: '1px dashed #cbd5e1', paddingTop: '0.4rem' }}>
+                        <p
+                          style={{
+                            margin: '0.4rem 0 0 0',
+                            borderTop: '1px dashed #cbd5e1',
+                            paddingTop: '0.4rem'
+                          }}
+                        >
                           <strong>Requerimiento:</strong> {selectedSolicitud.descripcion}
                         </p>
                       </div>
 
-                      <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '0.3rem' }}>Actualizar Estado (Sincronización Web)</label>
-                      <select value={newSolicitudState} onChange={(e) => setNewSolicitudState(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1rem', fontWeight: 'bold' }}>
-                        {REQUEST_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                      <label
+                        style={{
+                          display: 'block',
+                          fontWeight: 'bold',
+                          fontSize: '0.85rem',
+                          marginBottom: '0.3rem'
+                        }}
+                      >
+                        Actualizar Estado (Sincronización Web)
+                      </label>
+                      <select
+                        value={newSolicitudState}
+                        onChange={(e) => setNewSolicitudState(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.55rem',
+                          borderRadius: '6px',
+                          border: '1px solid #cbd5e1',
+                          marginBottom: '1rem',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {REQUEST_STATES.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
                       </select>
 
-                      <label style={{ display: 'block', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '0.3rem' }}>Respuesta Oficial de Talento Humano</label>
-                      <textarea rows="4" value={solicitudResponse} onChange={(e) => setSolicitudResponse(e.target.value)} placeholder="Redacta la respuesta formal para el usuario..." style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1rem' }} required />
+                      <label
+                        style={{
+                          display: 'block',
+                          fontWeight: 'bold',
+                          fontSize: '0.85rem',
+                          marginBottom: '0.3rem'
+                        }}
+                      >
+                        Respuesta Oficial de Talento Humano
+                      </label>
+                      <textarea
+                        rows="4"
+                        value={solicitudResponse}
+                        onChange={(e) => setSolicitudResponse(e.target.value)}
+                        placeholder="Redacta la respuesta formal para el usuario..."
+                        style={{
+                          width: '100%',
+                          padding: '0.55rem',
+                          borderRadius: '6px',
+                          border: '1px solid #cbd5e1',
+                          marginBottom: '1rem'
+                        }}
+                        required
+                      />
 
-                      <button type="submit" className="th-primary-button" style={{ width: '100%', fontWeight: 'bold' }}>Guardar y Sincronizar en Portal Web</button>
-                      {solicitudNotice && <p style={{ color: '#166534', fontWeight: 'bold', fontSize: '0.85rem', marginTop: '0.6rem' }}>✓ {solicitudNotice}</p>}
+                      <button
+                        type="submit"
+                        className="th-primary-button"
+                        style={{
+                          width: '100%',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        Guardar y Sincronizar en Portal Web
+                      </button>
+                      {solicitudNotice && (
+                        <p
+                          style={{
+                            color: '#166534',
+                            fontWeight: 'bold',
+                            fontSize: '0.85rem',
+                            marginTop: '0.6rem'
+                          }}
+                        >
+                          ✓ {solicitudNotice}
+                        </p>
+                      )}
                     </form>
 
-                    <div style={{ backgroundColor: '#ffffff', border: '1.5px solid #cbd5e1', borderRadius: '12px', padding: '1.5rem' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '0.5px' }}>FORMATOS LABORALES</span>
-                      <h4 style={{ margin: '0.2rem 0 0.8rem 0', color: '#166534', fontSize: '1.1rem' }}>Expedición de Certificado</h4>
+                    <div
+                      style={{
+                        backgroundColor: '#ffffff',
+                        border: '1.5px solid #cbd5e1',
+                        borderRadius: '12px',
+                        padding: '1.5rem'
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '800',
+                          color: '#166534',
+                          letterSpacing: '0.5px'
+                        }}
+                      >
+                        FORMATOS LABORALES
+                      </span>
+                      <h4
+                        style={{
+                          margin: '0.2rem 0 0.8rem 0',
+                          color: '#166534',
+                          fontSize: '1.1rem'
+                        }}
+                      >
+                        Expedición de Certificado
+                      </h4>
 
-                      <div style={{ marginBottom: '1rem', backgroundColor: '#f0fdf4', padding: '0.8rem', borderRadius: '8px', border: '1.5px solid #86efac' }}>
-                        <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 'bold', color: '#166534', marginBottom: '0.3rem' }}>
+                      <div
+                        style={{
+                          marginBottom: '1rem',
+                          backgroundColor: '#f0fdf4',
+                          padding: '0.8rem',
+                          borderRadius: '8px',
+                          border: '1.5px solid #86efac'
+                        }}
+                      >
+                        <label
+                          style={{
+                            display: 'block',
+                            fontSize: '0.78rem',
+                            fontWeight: 'bold',
+                            color: '#166534',
+                            marginBottom: '0.3rem'
+                          }}
+                        >
                           🏢 Registro de Nómina / Colaborador Vinculado:
                         </label>
                         <select
                           value={certDatos.documento}
                           onChange={(e) => seleccionarTrabajadorManual(e.target.value)}
-                          style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1.5px solid #166534', fontWeight: 'bold', fontSize: '0.82rem', backgroundColor: '#ffffff', cursor: 'pointer' }}
+                          style={{
+                            width: '100%',
+                            padding: '0.5rem',
+                            borderRadius: '6px',
+                            border: '1.5px solid #166534',
+                            fontWeight: 'bold',
+                            fontSize: '0.82rem',
+                            backgroundColor: '#ffffff',
+                            cursor: 'pointer'
+                          }}
                         >
-                          {listaMaestraEmpleados.map((emp) => (
+                          {expedientes.map((emp) => (
                             <option key={emp.documento} value={emp.documento}>
                               {emp.nombre} (C.C. {emp.documento}) - {emp.cargo}
                             </option>
@@ -1535,26 +2454,84 @@ export default function Dashboard({ user, onLogout }) {
                         </select>
                       </div>
                       
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>Selecciona el Modelo:</label>
-                      <select value={modeloCertificado} onChange={(e) => setModeloCertificado(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginBottom: '1rem', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                      <label
+                        style={{
+                          display: 'block',
+                          fontSize: '0.8rem',
+                          fontWeight: 'bold',
+                          marginBottom: '0.3rem'
+                        }}
+                      >
+                        Selecciona el Modelo:
+                      </label>
+                      <select
+                        value={modeloCertificado}
+                        onChange={(e) => setModeloCertificado(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.55rem',
+                          borderRadius: '6px',
+                          border: '1px solid #cbd5e1',
+                          marginBottom: '1rem',
+                          fontSize: '0.82rem',
+                          fontWeight: 'bold'
+                        }}
+                      >
                         <option value="modelo1">Modelo 1: Básico con Salario</option>
                         <option value="modelo2">Modelo 2: Básico con Funciones (Anexo DPC)</option>
-                        <option value="modelo3" disabled>Modelo 3: Extrabajador (En Desarrollo / Muestra Física)</option>
+                        <option value="modelo3" disabled>Modelo 3: Extrabajador (En Desarrollo)</option>
                       </select>
 
-                      <div style={{ backgroundColor: '#f8fafc', padding: '0.9rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', lineHeight: '1.6', marginBottom: '1.2rem' }}>
-                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>Titular:</strong> {certDatos.nombre}</p>
-                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>C.C.:</strong> {certDatos.documento}</p>
-                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>Cargo Oficial:</strong> {certDatos.cargo}</p>
-                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>Asignación Mensual:</strong> <strong style={{ color: '#166534' }}>{certDatos.salario}</strong></p>
-                        <p style={{ margin: '0 0 0.2rem 0' }}><strong>Fecha de Vinculación:</strong> {certDatos.fechaIngreso}</p>
-                        <p style={{ margin: 0, color: '#64748b' }}><strong>Firma Oficial:</strong> MARIA ISABELA SOTO BOTERO (Gerente General)</p>
+                      <div
+                        style={{
+                          backgroundColor: '#f8fafc',
+                          padding: '0.9rem',
+                          borderRadius: '8px',
+                          border: '1px solid #cbd5e1',
+                          fontSize: '0.82rem',
+                          lineHeight: '1.6',
+                          marginBottom: '1.2rem'
+                        }}
+                      >
+                        <p style={{ margin: '0 0 0.2rem 0' }}>
+                          <strong>Titular:</strong> {certDatos.nombre}
+                        </p>
+                        <p style={{ margin: '0 0 0.2rem 0' }}>
+                          <strong>C.C.:</strong> {certDatos.documento}
+                        </p>
+                        <p style={{ margin: '0 0 0.2rem 0' }}>
+                          <strong>Cargo Oficial:</strong> {certDatos.cargo}
+                        </p>
+                        <p style={{ margin: '0 0 0.2rem 0' }}>
+                          <strong>Asignación Mensual:</strong>{' '}
+                          <strong style={{ color: '#166534' }}>{certDatos.salario}</strong>
+                        </p>
+                        <p style={{ margin: '0 0 0.2rem 0' }}>
+                          <strong>Fecha de Vinculación:</strong> {certDatos.fechaIngreso}
+                        </p>
+                        <p style={{ margin: 0, color: '#64748b' }}>
+                          <strong>Firma Oficial:</strong> MARIA ISABELA SOTO BOTERO (Gerente General)
+                        </p>
                       </div>
 
                       <button
                         type="button"
                         onClick={imprimirCertificadoLimpio}
-                        style={{ width: '100%', padding: '0.85rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 12px rgba(22, 101, 52, 0.2)' }}
+                        style={{
+                          width: '100%',
+                          padding: '0.85rem',
+                          backgroundColor: '#166534',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          boxShadow: '0 4px 12px rgba(22, 101, 52, 0.2)'
+                        }}
                       >
                         🖨️ Generar / Imprimir Certificado PDF
                       </button>
@@ -1568,45 +2545,212 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* MODAL CREAR CONVOCATORIA */}
         {showModalConvocatoria && (
-          <div className="th-modal-backdrop" onMouseDown={() => setShowModalConvocatoria(false)}>
-            <section className="th-postulation-modal" style={{ maxWidth: '580px', width: '90%' }} onMouseDown={(e) => e.stopPropagation()}>
+          <div
+            className="th-modal-backdrop"
+            onMouseDown={() => setShowModalConvocatoria(false)}
+          >
+            <section
+              className="th-postulation-modal"
+              style={{
+                maxWidth: '580px',
+                width: '90%'
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
               <div className="th-modal-header">
                 <div>
                   <span className="th-label">CREAR NUEVA OFERTA LABORAL</span>
                   <h3 style={{ margin: '0.2rem 0' }}>Publicar Vacante en Landing Institucional</h3>
                 </div>
-                <button type="button" className="th-modal-close" onClick={() => setShowModalConvocatoria(false)}>×</button>
+                <button
+                  type="button"
+                  className="th-modal-close"
+                  onClick={() => setShowModalConvocatoria(false)}
+                >
+                  ×
+                </button>
               </div>
 
-              <form onSubmit={handleCrearConvocatoria} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1rem' }}>
+              <form
+                onSubmit={handleCrearConvocatoria}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.8rem',
+                  marginTop: '1rem'
+                }}
+              >
                 <div>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Título de la Convocatoria *</label>
-                  <input type="text" required placeholder="Ej: Mensajero" value={nuevaConvocatoria.titulo} onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, titulo: e.target.value })} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+                  <label
+                    style={{
+                      fontSize: '0.82rem',
+                      fontWeight: 'bold',
+                      display: 'block',
+                      marginBottom: '0.2rem'
+                    }}
+                  >
+                    Título de la Convocatoria *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej: Mensajero"
+                    value={nuevaConvocatoria.titulo}
+                    onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, titulo: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.55rem',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1'
+                    }}
+                  />
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Cargo / Rol Operativo *</label>
-                  <input type="text" required placeholder="Ej: Mensajero" value={nuevaConvocatoria.cargo} onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, cargo: e.target.value })} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+                  <label
+                    style={{
+                      fontSize: '0.82rem',
+                      fontWeight: 'bold',
+                      display: 'block',
+                      marginBottom: '0.2rem'
+                    }}
+                  >
+                    Cargo / Rol Operativo *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej: Mensajero"
+                    value={nuevaConvocatoria.cargo}
+                    onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, cargo: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.55rem',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1'
+                    }}
+                  />
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Descripción de Funciones *</label>
-                  <textarea rows="2" required placeholder="Entrega y radicación de correspondencia..." value={nuevaConvocatoria.descripcion} onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, descripcion: e.target.value })} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+                  <label
+                    style={{
+                      fontSize: '0.82rem',
+                      fontWeight: 'bold',
+                      display: 'block',
+                      marginBottom: '0.2rem'
+                    }}
+                  >
+                    Descripción de Funciones *
+                  </label>
+                  <textarea
+                    rows="2"
+                    required
+                    placeholder="Entrega y radicación de correspondencia..."
+                    value={nuevaConvocatoria.descripcion}
+                    onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, descripcion: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.55rem',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1'
+                    }}
+                  />
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Requisitos Mínimos Exigidos *</label>
-                  <textarea rows="2" required placeholder="Bachiller con licencia A2..." value={nuevaConvocatoria.requisitos} onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, requisitos: e.target.value })} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+                  <label
+                    style={{
+                      fontSize: '0.82rem',
+                      fontWeight: 'bold',
+                      display: 'block',
+                      marginBottom: '0.2rem'
+                    }}
+                  >
+                    Requisitos Mínimos Exigidos *
+                  </label>
+                  <textarea
+                    rows="2"
+                    required
+                    placeholder="Bachiller con licencia A2..."
+                    value={nuevaConvocatoria.requisitos}
+                    onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, requisitos: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.55rem',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1'
+                    }}
+                  />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '0.8rem'
+                  }}
+                >
                   <div>
-                    <label style={{ fontSize: '0.82rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Asignación Salarial</label>
-                    <input type="text" placeholder="Ej: $1.423.500" value={nuevaConvocatoria.salario} onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, salario: e.target.value })} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+                    <label
+                      style={{
+                        fontSize: '0.82rem',
+                        fontWeight: 'bold',
+                        display: 'block',
+                        marginBottom: '0.2rem'
+                      }}
+                    >
+                      Asignación Salarial
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ej: $1.423.500"
+                      value={nuevaConvocatoria.salario}
+                      onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, salario: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem',
+                        borderRadius: '6px',
+                        border: '1px solid #cbd5e1'
+                      }}
+                    />
                   </div>
                   <div>
-                    <label style={{ fontSize: '0.82rem', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>Fecha Límite *</label>
-                    <input type="date" required value={nuevaConvocatoria.fecha_cierre} onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, fecha_cierre: e.target.value })} style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+                    <label
+                      style={{
+                        fontSize: '0.82rem',
+                        fontWeight: 'bold',
+                        display: 'block',
+                        marginBottom: '0.2rem'
+                      }}
+                    >
+                      Fecha Límite *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={nuevaConvocatoria.fecha_cierre}
+                      onChange={(e) => setNuevaConvocatoria({ ...nuevaConvocatoria, fecha_cierre: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem',
+                        borderRadius: '6px',
+                        border: '1px solid #cbd5e1'
+                      }}
+                    />
                   </div>
                 </div>
-                <button type="submit" disabled={savingConvocatoria} style={{ marginTop: '0.6rem', padding: '0.75rem', backgroundColor: '#2e7d32', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  {savingConvocatoria ? 'Publicando...' : 'Publicar Convocatoria en la Web'}
+                <button
+                  type="submit"
+                  disabled={savingConvocatoria}
+                  style={{
+                    marginTop: '0.6rem',
+                    padding: '0.75rem',
+                    backgroundColor: '#2e7d32',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {savingConvocatoria ? 'Publicando...' : 'Publicar Convocatoria en la Nube'}
                 </button>
               </form>
             </section>
@@ -1615,7 +2759,10 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* MODAL HOJA DE VIDA CANDIDATO */}
         {modalHvAspirante && (
-          <div className="th-modal-backdrop" onMouseDown={() => setModalHvAspirante(null)}>
+          <div
+            className="th-modal-backdrop"
+            onMouseDown={() => setModalHvAspirante(null)}
+          >
             <section
               className="th-postulation-modal"
               style={{
@@ -1628,14 +2775,39 @@ export default function Dashboard({ user, onLogout }) {
               }}
               onMouseDown={(e) => e.stopPropagation()}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', borderBottom: '1px solid rgba(255,255,255,0.15)', paddingBottom: '0.8rem' }}>
-                <span style={{ backgroundColor: '#2e7d32', color: '#fff', padding: '0.25rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: '800' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '1.2rem',
+                  borderBottom: '1px solid rgba(255,255,255,0.15)',
+                  paddingBottom: '0.8rem'
+                }}
+              >
+                <span
+                  style={{
+                    backgroundColor: '#2e7d32',
+                    color: '#fff',
+                    padding: '0.25rem 0.6rem',
+                    borderRadius: '4px',
+                    fontSize: '0.72rem',
+                    fontWeight: '800'
+                  }}
+                >
                   DOCUMENTO DIGITAL
                 </span>
                 <button
                   type="button"
                   onClick={() => setModalHvAspirante(null)}
-                  style={{ background: 'none', border: 'none', color: '#ffffff', fontSize: '1.4rem', cursor: 'pointer', lineHeight: '1' }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#ffffff',
+                    fontSize: '1.4rem',
+                    cursor: 'pointer',
+                    lineHeight: '1'
+                  }}
                 >
                   ×
                 </button>
@@ -1659,23 +2831,63 @@ export default function Dashboard({ user, onLogout }) {
                 >
                   {modalHvAspirante.candidato?.charAt(0) || modalHvAspirante.nombres?.charAt(0) || 'A'}
                 </div>
-                <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1.2rem', color: '#ffffff' }}>
+                <h3
+                  style={{
+                    margin: '0 0 0.3rem 0',
+                    fontSize: '1.2rem',
+                    color: '#ffffff'
+                  }}
+                >
                   {modalHvAspirante.candidato || `${modalHvAspirante.nombres || ''} ${modalHvAspirante.apellidos || ''}`.trim() || 'Aspirante'}
                 </h3>
-                <span style={{ fontSize: '0.82rem', color: '#86efac', fontWeight: 'bold' }}>
+                <span
+                  style={{
+                    fontSize: '0.82rem',
+                    color: '#86efac',
+                    fontWeight: 'bold'
+                  }}
+                >
                   Vacante: {modalHvAspirante.convocatoria || modalHvAspirante.cargo || 'General'}
                 </span>
               </div>
 
-              <div style={{ backgroundColor: 'rgba(255,255,255,0.06)', padding: '1rem', borderRadius: '10px', fontSize: '0.82rem', border: '1px solid rgba(255,255,255,0.1)', marginBottom: '1.2rem' }}>
-                <p style={{ margin: '0 0 0.4rem 0' }}><strong>C.C.:</strong> {modalHvAspirante.numero_documento || '1046701221'}</p>
-                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Email:</strong> {modalHvAspirante.correo || 'aspirante@gmail.com'}</p>
-                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Teléfono:</strong> {modalHvAspirante.telefono || '300 123 4567'}</p>
-                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Ciudad:</strong> {modalHvAspirante.ciudad || 'Sabanagrande, Atlántico'}</p>
-                <p style={{ margin: 0 }}><strong>Archivo Soporte:</strong> <code style={{ color: '#fed7aa' }}>{modalHvAspirante.hoja_vida || modalHvAspirante.hoja_vida_nombre || 'HV_Aspirante.pdf'}</code></p>
+              <div
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.06)',
+                  padding: '1rem',
+                  borderRadius: '10px',
+                  fontSize: '0.82rem',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  marginBottom: '1.2rem'
+                }}
+              >
+                <p style={{ margin: '0 0 0.4rem 0' }}>
+                  <strong>C.C.:</strong> {modalHvAspirante.numero_documento || '1046701221'}
+                </p>
+                <p style={{ margin: '0 0 0.4rem 0' }}>
+                  <strong>Email:</strong> {modalHvAspirante.correo || 'aspirante@gmail.com'}
+                </p>
+                <p style={{ margin: '0 0 0.4rem 0' }}>
+                  <strong>Teléfono:</strong> {modalHvAspirante.telefono || '300 123 4567'}
+                </p>
+                <p style={{ margin: '0 0 0.4rem 0' }}>
+                  <strong>Ciudad:</strong> {modalHvAspirante.ciudad || 'Sabanagrande, Atlántico'}
+                </p>
+                <p style={{ margin: 0 }}>
+                  <strong>Archivo Soporte:</strong>{' '}
+                  <code style={{ color: '#fed7aa' }}>
+                    {modalHvAspirante.hoja_vida || modalHvAspirante.hoja_vida_nombre || 'HV_Aspirante.pdf'}
+                  </code>
+                </p>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.8rem', flexDirection: 'column' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '0.8rem',
+                  flexDirection: 'column'
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => descargarHojaDeVida(modalHvAspirante)}
@@ -1726,81 +2938,252 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* MODAL MATRIZ DE EVALUACIÓN OFICIAL */}
         {selectedPostulation && (
-          <div className="th-modal-backdrop" onMouseDown={() => setSelectedPostulation(null)}>
-            <section className="th-postulation-modal" style={{ maxWidth: '640px', width: '92%' }} onMouseDown={(e) => e.stopPropagation()}>
+          <div
+            className="th-modal-backdrop"
+            onMouseDown={() => setSelectedPostulation(null)}
+          >
+            <section
+              className="th-postulation-modal"
+              style={{
+                maxWidth: '640px',
+                width: '92%'
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
               <div className="th-modal-header">
                 <div>
                   <span className="th-label">EVALUACIÓN TÉCNICA OFICIAL</span>
                   <h3 style={{ margin: '0.2rem 0' }}>Matriz de Calificación Ponderada</h3>
                 </div>
-                <button type="button" className="th-modal-close" onClick={() => setSelectedPostulation(null)}>×</button>
+                <button
+                  type="button"
+                  className="th-modal-close"
+                  onClick={() => setSelectedPostulation(null)}
+                >
+                  ×
+                </button>
               </div>
 
-              <div style={{ backgroundColor: '#f0fdf4', padding: '0.8rem 1rem', borderRadius: '8px', border: '1px solid #bbf7d0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.8rem' }}>
+              <div
+                style={{
+                  backgroundColor: '#f0fdf4',
+                  padding: '0.8rem 1rem',
+                  borderRadius: '8px',
+                  border: '1px solid #bbf7d0',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '0.8rem'
+                }}
+              >
                 <div>
                   <strong style={{ color: '#166534', fontSize: '0.95rem' }}>
                     {selectedPostulation.candidato || `${selectedPostulation.nombres || ''} ${selectedPostulation.apellidos || ''}`.trim() || 'Aspirante'}
                   </strong>
-                  <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748b' }}>Doc: {selectedPostulation.numero_documento || '1042890123'} · Vacante: {selectedPostulation.convocatoria || 'Operario'}</span>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: '0.8rem',
+                      color: '#64748b'
+                    }}
+                  >
+                    Doc: {selectedPostulation.numero_documento || '1042890123'} · Vacante: {selectedPostulation.convocatoria || 'Operario'}
+                  </span>
                 </div>
-                <button type="button" onClick={() => setModalHvAspirante(selectedPostulation)} style={{ backgroundColor: '#166534', color: '#fff', border: 'none', padding: '0.4rem 0.85rem', borderRadius: '6px', fontSize: '0.78rem', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button
+                  type="button"
+                  onClick={() => setModalHvAspirante(selectedPostulation)}
+                  style={{
+                    backgroundColor: '#166534',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: '6px',
+                    fontSize: '0.78rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
                   📄 Ver HV
                 </button>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.8rem',
+                  marginTop: '1rem'
+                }}
+              >
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: '0.82rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
                     <span>1. Prueba técnica y de conocimiento (30%)</span>
                     <span style={{ color: '#166534' }}>{puntajeTecnico} pts</span>
                   </div>
-                  <input type="range" min="0" max="100" value={puntajeTecnico} onChange={(e) => setPuntajeTecnico(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={puntajeTecnico}
+                    onChange={(e) => setPuntajeTecnico(e.target.value)}
+                    style={{ width: '100%', accentColor: '#166534' }}
+                  />
                 </div>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: '0.82rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
                     <span>2. Pruebas psicológicas (15%)</span>
                     <span style={{ color: '#166534' }}>{puntajePsicologico} pts</span>
                   </div>
-                  <input type="range" min="0" max="100" value={puntajePsicologico} onChange={(e) => setPuntajePsicologico(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={puntajePsicologico}
+                    onChange={(e) => setPuntajePsicologico(e.target.value)}
+                    style={{ width: '100%', accentColor: '#166534' }}
+                  />
                 </div>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: '0.82rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
                     <span>3. Entrevista por competencias (30%)</span>
                     <span style={{ color: '#166534' }}>{puntajeEntrevista} pts</span>
                   </div>
-                  <input type="range" min="0" max="100" value={puntajeEntrevista} onChange={(e) => setPuntajeEntrevista(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={puntajeEntrevista}
+                    onChange={(e) => setPuntajeEntrevista(e.target.value)}
+                    style={{ width: '100%', accentColor: '#166534' }}
+                  />
                 </div>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: '0.82rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
                     <span>4. Verificación de hoja de vida (15%)</span>
                     <span style={{ color: '#166534' }}>{puntajeHv} pts</span>
                   </div>
-                  <input type="range" min="0" max="100" value={puntajeHv} onChange={(e) => setPuntajeHv(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={puntajeHv}
+                    onChange={(e) => setPuntajeHv(e.target.value)}
+                    style={{ width: '100%', accentColor: '#166534' }}
+                  />
                 </div>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: '0.82rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
                     <span>5. Exámenes médicos ocupacionales de ingreso (10%)</span>
                     <span style={{ color: '#166534' }}>{puntajeMedicos} pts</span>
                   </div>
-                  <input type="range" min="0" max="100" value={puntajeMedicos} onChange={(e) => setPuntajeMedicos(e.target.value)} style={{ width: '100%', accentColor: '#166534' }} />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={puntajeMedicos}
+                    onChange={(e) => setPuntajeMedicos(e.target.value)}
+                    style={{ width: '100%', accentColor: '#166534' }}
+                  />
                 </div>
               </div>
 
-              <div style={{ backgroundColor: notaCalculada >= 80 ? '#dcfce7' : notaCalculada >= 75 ? '#fef3c7' : '#fee2e2', padding: '0.9rem', borderRadius: '8px', marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: `1.5px solid ${notaCalculada >= 80 ? '#86efac' : notaCalculada >= 75 ? '#fde047' : '#fecaca'}` }}>
+              <div
+                style={{
+                  backgroundColor: notaCalculada >= 80 ? '#dcfce7' : notaCalculada >= 75 ? '#fef3c7' : '#fee2e2',
+                  padding: '0.9rem',
+                  borderRadius: '8px',
+                  marginTop: '1rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  border: `1.5px solid ${notaCalculada >= 80 ? '#86efac' : notaCalculada >= 75 ? '#fde047' : '#fecaca'}`
+                }}
+              >
                 <div>
-                  <span style={{ fontSize: '0.78rem', color: '#64748b', display: 'block' }}>CALIFICACIÓN PONDERADA TOTAL</span>
-                  <strong style={{ fontSize: '1.25rem', color: notaCalculada >= 80 ? '#166534' : notaCalculada >= 75 ? '#92400e' : '#991b1b' }}>{notaCalculada} / 100</strong>
+                  <span
+                    style={{
+                      fontSize: '0.78rem',
+                      color: '#64748b',
+                      display: 'block'
+                    }}
+                  >
+                    CALIFICACIÓN PONDERADA TOTAL
+                  </span>
+                  <strong
+                    style={{
+                      fontSize: '1.25rem',
+                      color: notaCalculada >= 80 ? '#166534' : notaCalculada >= 75 ? '#92400e' : '#991b1b'
+                    }}
+                  >
+                    {notaCalculada} / 100
+                  </strong>
                 </div>
-                <span style={{ fontWeight: 'bold', fontSize: '0.85rem', color: notaCalculada >= 80 ? '#166534' : notaCalculada >= 75 ? '#92400e' : '#991b1b' }}>
+                <span
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: '0.85rem',
+                    color: notaCalculada >= 80 ? '#166534' : notaCalculada >= 75 ? '#92400e' : '#991b1b'
+                  }}
+                >
                   {notaCalculada >= 80 ? '✓ APTO PARA ELEGIBILIDAD' : notaCalculada >= 75 ? '⚡ PRESELECCIONADO(A) RESERVA' : '✕ NO SELECCIONADO(A)'}
                 </span>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '0.8rem',
+                  marginTop: '1.2rem'
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => setSelectedPostulation(null)}
-                  style={{ flex: 1, padding: '0.75rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
                 >
                   Cerrar
                 </button>
@@ -1809,7 +3192,16 @@ export default function Dashboard({ user, onLogout }) {
                   <button
                     type="button"
                     onClick={() => vincularCandidato(selectedPostulation)}
-                    style={{ flex: 2, padding: '0.75rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                    style={{
+                      flex: 2,
+                      padding: '0.75rem',
+                      backgroundColor: '#166534',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
                   >
                     🤝 Contratar y Vincular a Nómina / CCD ➔
                   </button>
@@ -1821,46 +3213,131 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* MODAL VISOR CCD */}
         {visorDoc && (
-          <div className="th-modal-backdrop" onMouseDown={() => setVisorDoc(null)}>
-            <section className="th-postulation-modal" style={{ maxWidth: '620px', width: '92%' }} onMouseDown={(e) => e.stopPropagation()}>
+          <div
+            className="th-modal-backdrop"
+            onMouseDown={() => setVisorDoc(null)}
+          >
+            <section
+              className="th-postulation-modal"
+              style={{
+                maxWidth: '620px',
+                width: '92%'
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
               <div className="th-modal-header">
                 <div>
                   <span className="th-label">SOPORTE DE ARCHIVO CENTRAL (AGN)</span>
                   <h3 style={{ margin: '0.2rem 0' }}>Expediente Laboral Digital</h3>
                 </div>
-                <button type="button" className="th-modal-close" onClick={() => setVisorDoc(null)}>×</button>
+                <button
+                  type="button"
+                  className="th-modal-close"
+                  onClick={() => setVisorDoc(null)}
+                >
+                  ×
+                </button>
               </div>
 
-              <div style={{ backgroundColor: '#f8fafc', padding: '1.4rem', borderRadius: '10px', border: '1.5px solid #cbd5e1', marginTop: '1rem', fontSize: '0.85rem' }}>
-                <div style={{ borderBottom: '2px solid #166534', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
-                  <strong style={{ color: '#166534', fontSize: '1rem' }}>FRUTAS DEL ATLÁNTICO S.A.S.</strong>
-                  <span style={{ display: 'block', color: '#64748b', fontSize: '0.75rem' }}>
+              <div
+                style={{
+                  backgroundColor: '#f8fafc',
+                  padding: '1.4rem',
+                  borderRadius: '10px',
+                  border: '1.5px solid #cbd5e1',
+                  marginTop: '1rem',
+                  fontSize: '0.85rem'
+                }}
+              >
+                <div
+                  style={{
+                    borderBottom: '2px solid #166534',
+                    paddingBottom: '0.5rem',
+                    marginBottom: '1rem'
+                  }}
+                >
+                  <strong style={{ color: '#166534', fontSize: '1rem' }}>
+                    FRUTAS DEL ATLÁNTICO S.A.S.
+                  </strong>
+                  <span
+                    style={{
+                      display: 'block',
+                      color: '#64748b',
+                      fontSize: '0.75rem'
+                    }}
+                  >
                     Sistema de Gestión Documental y Archivo Central (Serie 100.10.18)
                   </span>
                 </div>
                 <p style={{ margin: '0 0 0.4rem 0' }}>
-                  <strong>Nomenclatura AGN:</strong><br />
-                  <code style={{ backgroundColor: '#e2e8f0', padding: '0.2rem 0.4rem', borderRadius: '4px', fontSize: '0.82rem' }}>
+                  <strong>Nomenclatura AGN:</strong>
+                  <br />
+                  <code
+                    style={{
+                      backgroundColor: '#e2e8f0',
+                      padding: '0.2rem 0.4rem',
+                      borderRadius: '4px',
+                      fontSize: '0.82rem'
+                    }}
+                  >
                     {visorDoc.nombre_original}
                   </code>
                 </p>
-                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Subserie / Clasificación:</strong> {visorDoc.tipo_documento}</p>
-                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Fecha de Radicación:</strong> {new Date(visorDoc.fecha_carga).toLocaleDateString('es-CO')}</p>
-                <p style={{ margin: '0 0 0.4rem 0' }}><strong>Titular:</strong> {selectedExpediente?.nombre || 'Colaborador'}</p>
-                <p style={{ margin: 0, color: '#166534', fontWeight: 'bold' }}>
+                <p style={{ margin: '0 0 0.4rem 0' }}>
+                  <strong>Subserie / Clasificación:</strong> {visorDoc.tipo_documento}
+                </p>
+                <p style={{ margin: '0 0 0.4rem 0' }}>
+                  <strong>Fecha de Radicación:</strong> {new Date(visorDoc.fecha_carga).toLocaleDateString('es-CO')}
+                </p>
+                <p style={{ margin: '0 0 0.4rem 0' }}>
+                  <strong>Titular:</strong> {selectedExpediente?.nombre || 'Colaborador'}
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    color: '#166534',
+                    fontWeight: 'bold'
+                  }}
+                >
                   ✓ Estado: Documento indexado y custodiado en el expediente digital del colaborador.
                 </p>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '0.8rem',
+                  marginTop: '1.2rem'
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => descargarDocumentoCodificado(visorDoc)}
-                  style={{ flex: 1, padding: '0.75rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    backgroundColor: '#166534',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
                 >
                   📥 Descargar Copia del Documento Codificado (PDF)
                 </button>
-                <button type="button" onClick={() => setVisorDoc(null)} style={{ padding: '0.75rem 1.2rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <button
+                  type="button"
+                  onClick={() => setVisorDoc(null)}
+                  style={{
+                    padding: '0.75rem 1.2rem',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                  }}
+                >
                   Cerrar
                 </button>
               </div>

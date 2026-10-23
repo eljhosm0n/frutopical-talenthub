@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import '../dashboard.css';
 
+// Función para resolver rutas absolutas a la carpeta public (Evita que te devuelva al inicio)
+function getPublicUrl(path) {
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${baseUrl}${cleanPath}`;
+}
+
 // LOS 13 PERFILES OFICIALES DPC SEGÚN EL ORGANIGRAMA DEL 27/09/2026
 const PERFILES_DPC_OFICIALES = [
   {
@@ -115,7 +122,7 @@ export default function Diagnostico({ onVolver }) {
 
   function descargarManual(perfil) {
     const enlace = document.createElement('a');
-    enlace.href = `/docs/${encodeURIComponent(perfil.archivo)}`;
+    enlace.href = getPublicUrl(`docs/${perfil.archivo}`);
     enlace.download = perfil.archivo;
     enlace.target = '_blank';
     document.body.appendChild(enlace);
@@ -217,100 +224,181 @@ export default function Diagnostico({ onVolver }) {
 
       {/* CONTENIDO DE LAS PESTAÑAS */}
       
-      {/* PESTAÑA 1: LEGALIZACIÓN */}
+      {/* PESTAÑA 1: LEGALIZACIÓN Y CONSTITUCIÓN */}
       {activeTab === 'legalizacion' && (
         <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '2rem' }}>
           <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.3rem' }}>Documentación Legal Constitutiva</h3>
           <p style={{ color: '#475569', fontSize: '0.9rem', marginBottom: '2rem' }}>
-            Soportes oficiales de constitución de Frutas Del Atlántico S.A.S. registrados ante la Cámara de Comercio de Barranquilla y la DIAN.
+            Soportes oficiales de constitución de Frutas Del Atlántico S.A.S. registrados ante la Cámara de Comercio de Barranquilla, la DIAN, y Políticas Organizacionales.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ backgroundColor: '#f0fdf4', padding: '1.5rem', borderRadius: '12px', border: '1.5px solid #86efac' }}>
+              <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>📜</span>
+              <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Políticas Organizacionales</h4>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>Misión, visión, políticas de calidad e inocuidad de Frutopical.</p>
+              <a href={getPublicUrl('docs/Politica organizacionales.pdf')} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Descargar Documento PDF ↗</a>
+            </div>
+
             <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
               <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>📄</span>
               <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Registro Único Tributario (RUT)</h4>
               <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>Soporte de inscripción ante la DIAN para el ejercicio de la actividad económica agroindustrial.</p>
-              <a href="/docs/Simulación Didáctica RUT - Frutas Del Atlántico S.A.S..pdf" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
+              <a href={getPublicUrl('docs/Simulación Didáctica RUT - Frutas Del Atlántico S.A.S..pdf')} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
             </div>
 
             <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
               <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>💳</span>
               <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Asignación de NIT</h4>
               <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>Certificación de Número de Identificación Tributaria asignado a la empresa.</p>
-              <a href="/docs/Simulación Didáctica NIT - Frutas Del Atlántico S.A.S..pdf" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
+              <a href={getPublicUrl('docs/Simulación Didáctica NIT - Frutas Del Atlántico S.A.S..pdf')} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
             </div>
 
             <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
               <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>🏛️</span>
               <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Cámara de Comercio</h4>
               <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>Certificado de Existencia y Representación Legal de la sociedad mercantil.</p>
-              <a href="/docs/Certificado de Existencia y Representacion Legal - FRUTOPICAL SAS.pdf" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
+              <a href={getPublicUrl('docs/Certificado de Existencia y Representacion Legal - FRUTOPICAL SAS.pdf')} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
             </div>
             
             <div style={{ backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
               <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>🔒</span>
               <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534' }}>Política de Habeas Data</h4>
               <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>Políticas de tratamiento de datos personales conforme a la Ley 1581 de 2012.</p>
-              <a href="/docs/Autorizacion Tratamiento Datos Personales - FRUTOPICAL SAS.pdf" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
+              <a href={getPublicUrl('docs/Autorizacion Tratamiento Datos Personales - FRUTOPICAL SAS.pdf')} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '0.6rem 1rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold', textDecoration: 'none' }}>Ver Documento PDF ↗</a>
             </div>
           </div>
         </div>
       )}
 
-      {/* PESTAÑA 2: MATRIZ DOFA */}
+      {/* PESTAÑA 2: MATRIZ DOFA (DISEÑO NATIVO HTML/CSS) */}
       {activeTab === 'dofa' && (
         <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <div>
-              <h3 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '1.3rem' }}>Análisis Estratégico (DOFA)</h3>
-              <p style={{ color: '#475569', fontSize: '0.9rem', margin: 0 }}>Evaluación de Debilidades, Oportunidades, Fortalezas y Amenazas de Frutopical.</p>
-            </div>
-            <a href="/docs/Matriz DOFA.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: '0.6rem 1.2rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 'bold', textDecoration: 'none' }}>📥 Descargar Matriz (PDF)</a>
+          <div style={{ marginBottom: '2rem' }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '1.4rem' }}>Análisis Estratégico Organizacional (DOFA)</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', margin: 0 }}>Evaluación interna y externa estructurada para la gestión del talento y las operaciones de Frutopical S.A.S.</p>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
-            <img 
-              src="/docs/Matriz DOFA.jpg" 
-              alt="Matriz DOFA Frutopical" 
-              style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }} 
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<div style="padding: 3rem; text-align: center; color: #64748b;">No se encontró la imagen de la Matriz DOFA en la carpeta de documentos. Asegúrate de subir el archivo <strong>Matriz DOFA.jpg</strong> a la ruta /public/docs/</div>';
-              }}
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem' }}>
+            {/* Fortalezas */}
+            <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '12px', padding: '1.5rem' }}>
+              <h4 style={{ color: '#166534', margin: '0 0 1rem 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                💪 Fortalezas (Origen Interno)
+              </h4>
+              <ul style={{ color: '#14532d', fontSize: '0.9rem', lineHeight: '1.6', margin: 0, paddingLeft: '1.2rem' }}>
+                <li style={{ marginBottom: '0.5rem' }}>Productos 100% naturales, elaborados sin conservantes artificiales.</li>
+                <li style={{ marginBottom: '0.5rem' }}>Fomento y apoyo directo a los productores agropecuarios locales de la región.</li>
+                <li style={{ marginBottom: '0.5rem' }}>Estricto cumplimiento de los protocolos de inocuidad y Buenas Prácticas de Manufactura (BPM).</li>
+                <li>Ecosistema digital propio (TalentHub) que optimiza el 100% de la gestión documental del talento humano.</li>
+              </ul>
+            </div>
+
+            {/* Debilidades */}
+            <div style={{ backgroundColor: '#fef2f2', border: '1.5px solid #fca5a5', borderRadius: '12px', padding: '1.5rem' }}>
+              <h4 style={{ color: '#991b1b', margin: '0 0 1rem 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                ⚠️ Debilidades (Origen Interno)
+              </h4>
+              <ul style={{ color: '#7f1d1d', fontSize: '0.9rem', lineHeight: '1.6', margin: 0, paddingLeft: '1.2rem' }}>
+                <li style={{ marginBottom: '0.5rem' }}>Capacidad de producción y almacenaje limitada por el tamaño inicial de la planta física.</li>
+                <li style={{ marginBottom: '0.5rem' }}>Dependencia de procesos logísticos manuales en el área de bodega y despachos.</li>
+                <li style={{ marginBottom: '0.5rem' }}>Marca agroindustrial nueva (constituida en 2025), aún en etapa de posicionamiento comercial.</li>
+                <li>Plantilla de personal reducida (18 empleados) ante picos de demanda estacional.</li>
+              </ul>
+            </div>
+
+            {/* Oportunidades */}
+            <div style={{ backgroundColor: '#eff6ff', border: '1px solid #93c5fd', borderRadius: '12px', padding: '1.5rem' }}>
+              <h4 style={{ color: '#1e3a8a', margin: '0 0 1rem 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                🚀 Oportunidades (Origen Externo)
+              </h4>
+              <ul style={{ color: '#1e3a8a', fontSize: '0.9rem', lineHeight: '1.6', margin: 0, paddingLeft: '1.2rem' }}>
+                <li style={{ marginBottom: '0.5rem' }}>Creciente tendencia del mercado hacia el consumo de productos saludables y orgánicos.</li>
+                <li style={{ marginBottom: '0.5rem' }}>Alta demanda no cubierta en el sector HORECA (Hoteles, Restaurantes y Cafeterías) en el Atlántico.</li>
+                <li style={{ marginBottom: '0.5rem' }}>Posibilidad de expansión comercial hacia Barranquilla y municipios aledaños a Sabanagrande.</li>
+                <li>Digitalización del agro a nivel departamental, lo que facilita alianzas tecnológicas.</li>
+              </ul>
+            </div>
+
+            {/* Amenazas */}
+            <div style={{ backgroundColor: '#fffbeb', border: '1.5px solid #fcd34d', borderRadius: '12px', padding: '1.5rem' }}>
+              <h4 style={{ color: '#b45309', margin: '0 0 1rem 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                🛡️ Amenazas (Origen Externo)
+              </h4>
+              <ul style={{ color: '#78350f', fontSize: '0.9rem', lineHeight: '1.6', margin: 0, paddingLeft: '1.2rem' }}>
+                <li style={{ marginBottom: '0.5rem' }}>Fenómenos climáticos extremos (El Niño / La Niña) que afectan directamente las cosechas de fruta.</li>
+                <li style={{ marginBottom: '0.5rem' }}>Competidores fuertemente posicionados y con mayor músculo financiero en el sector agroindustrial.</li>
+                <li style={{ marginBottom: '0.5rem' }}>Fluctuación e inflación constante en los precios de las materias primas y empaques.</li>
+                <li>Cambios en la legislación tributaria y regulaciones sanitarias (INVIMA) que exijan nuevas inversiones.</li>
+              </ul>
+            </div>
           </div>
         </div>
       )}
 
-      {/* PESTAÑA 3: ÁRBOL DE PROBLEMAS */}
+      {/* PESTAÑA 3: ÁRBOL DE PROBLEMAS (DISEÑO NATIVO HTML/CSS) */}
       {activeTab === 'arbol' && (
         <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <div>
-              <h3 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '1.3rem' }}>Árbol de Problemas</h3>
-              <p style={{ color: '#475569', fontSize: '0.9rem', margin: 0 }}>Análisis de causas y efectos de la problemática central abordada en el proyecto.</p>
-            </div>
-            <a href="/docs/Arbol de problemas de FRUTOPICAL.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: '0.6rem 1.2rem', backgroundColor: '#166534', color: '#ffffff', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 'bold', textDecoration: 'none' }}>📥 Descargar Árbol (PDF)</a>
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '1.4rem' }}>Árbol de Problemas del Proyecto</h3>
+            <p style={{ color: '#475569', fontSize: '0.95rem', margin: 0 }}>Esquematización de la problemática central que justificó la creación de Frutopical TalentHub.</p>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', backgroundColor: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
-            <img 
-              src="/docs/Arbol de problemas.jpg" 
-              alt="Árbol de Problemas Frutopical" 
-              style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }} 
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentNode.innerHTML = '<div style="padding: 3rem; text-align: center; color: #64748b;">No se encontró la imagen del Árbol de Problemas en la carpeta de documentos. Asegúrate de subir el archivo <strong>Arbol de problemas.jpg</strong> a la ruta /public/docs/</div>';
-              }}
-            />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0' }}>
+            {/* CONSECUENCIAS (HOJAS) */}
+            <div style={{ display: 'flex', gap: '1.5rem', width: '100%', justifyContent: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+              <div style={{ backgroundColor: '#fee2e2', padding: '1.2rem', borderRadius: '10px', border: '1.5px solid #fca5a5', textAlign: 'center', flex: '1 1 200px', maxWidth: '280px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                <span style={{ display: 'block', fontSize: '1.2rem', marginBottom: '0.5rem' }}>📉</span>
+                <strong style={{ color: '#991b1b', fontSize: '0.9rem' }}>Efecto 1</strong>
+                <p style={{ fontSize: '0.85rem', color: '#7f1d1d', margin: '0.5rem 0 0 0' }}>Incumplimiento de los tiempos legales (SLA) en respuestas a requerimientos y PQRS.</p>
+              </div>
+              <div style={{ backgroundColor: '#fee2e2', padding: '1.2rem', borderRadius: '10px', border: '1.5px solid #fca5a5', textAlign: 'center', flex: '1 1 200px', maxWidth: '280px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                <span style={{ display: 'block', fontSize: '1.2rem', marginBottom: '0.5rem' }}>⚠️</span>
+                <strong style={{ color: '#991b1b', fontSize: '0.9rem' }}>Efecto 2</strong>
+                <p style={{ fontSize: '0.85rem', color: '#7f1d1d', margin: '0.5rem 0 0 0' }}>Pérdida de soportes laborales y desorganización del Cuadro de Clasificación Documental.</p>
+              </div>
+              <div style={{ backgroundColor: '#fee2e2', padding: '1.2rem', borderRadius: '10px', border: '1.5px solid #fca5a5', textAlign: 'center', flex: '1 1 200px', maxWidth: '280px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                <span style={{ display: 'block', fontSize: '1.2rem', marginBottom: '0.5rem' }}>⏳</span>
+                <strong style={{ color: '#991b1b', fontSize: '0.9rem' }}>Efecto 3</strong>
+                <p style={{ fontSize: '0.85rem', color: '#7f1d1d', margin: '0.5rem 0 0 0' }}>Retrasos significativos en los procesos de selección, contratación e inducción de personal.</p>
+              </div>
+            </div>
+
+            {/* TRONCO SUPERIOR */}
+            <div style={{ width: '4px', height: '40px', backgroundColor: '#94a3b8' }}></div>
+
+            {/* PROBLEMA CENTRAL (TRONCO) */}
+            <div style={{ backgroundColor: '#1e293b', color: '#ffffff', padding: '1.8rem', borderRadius: '12px', textAlign: 'center', width: '90%', maxWidth: '700px', border: '3px solid #166534', boxShadow: '0 8px 20px rgba(0,0,0,0.15)', zIndex: 2 }}>
+              <span style={{ color: '#86efac', fontWeight: '800', fontSize: '0.8rem', letterSpacing: '1px', display: 'block', marginBottom: '0.5rem' }}>PROBLEMA CENTRAL DEL PROYECTO</span>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', lineHeight: '1.5' }}>
+                Ineficiencia tecnológica en la trazabilidad de la gestión documental del talento humano y la atención al cliente (PQRS) en la PYME Frutopical S.A.S.
+              </h3>
+            </div>
+
+            {/* TRONCO INFERIOR */}
+            <div style={{ width: '4px', height: '40px', backgroundColor: '#94a3b8' }}></div>
+
+            {/* CAUSAS (RAÍCES) */}
+            <div style={{ display: 'flex', gap: '1.5rem', width: '100%', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+              <div style={{ backgroundColor: '#fef3c7', padding: '1.2rem', borderRadius: '10px', border: '1.5px solid #fde047', textAlign: 'center', flex: '1 1 200px', maxWidth: '280px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                <strong style={{ color: '#b45309', fontSize: '0.9rem' }}>Causa 1</strong>
+                <p style={{ fontSize: '0.85rem', color: '#78350f', margin: '0.5rem 0 0 0' }}>Dependencia absoluta de procesos de archivo físicos, manuales y descentralizados.</p>
+              </div>
+              <div style={{ backgroundColor: '#fef3c7', padding: '1.2rem', borderRadius: '10px', border: '1.5px solid #fde047', textAlign: 'center', flex: '1 1 200px', maxWidth: '280px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                <strong style={{ color: '#b45309', fontSize: '0.9rem' }}>Causa 2</strong>
+                <p style={{ fontSize: '0.85rem', color: '#78350f', margin: '0.5rem 0 0 0' }}>Ausencia de una plataforma digital (Ecosistema) que conecte postulantes, vacantes y administración.</p>
+              </div>
+              <div style={{ backgroundColor: '#fef3c7', padding: '1.2rem', borderRadius: '10px', border: '1.5px solid #fde047', textAlign: 'center', flex: '1 1 200px', maxWidth: '280px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                <strong style={{ color: '#b45309', fontSize: '0.9rem' }}>Causa 3</strong>
+                <p style={{ fontSize: '0.85rem', color: '#78350f', margin: '0.5rem 0 0 0' }}>Falta de canales de comunicación directos y tipificados legalmente para la recepción de PQRS.</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* PESTAÑA 4: PERFILES DPC (LA QUE MOSTRABAS ANTES SOLA) */}
+      {/* PESTAÑA 4: PERFILES DPC */}
       {activeTab === 'perfiles' && (
         <>
-          {/* TARJETA INFORMATIVA DEL ORGANIGRAMA Y MANUAL DPC */}
           <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '14px', padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.2rem' }}>
             <div>
               <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#166534', letterSpacing: '0.5px' }}>
@@ -326,7 +414,7 @@ export default function Diagnostico({ onVolver }) {
 
             <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
               <a
-                href="/docs/0. Organigrama.jpg"
+                href={getPublicUrl('docs/0. Organigrama.jpg')}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ padding: '0.6rem 1.2rem', backgroundColor: '#ffffff', color: '#166534', border: '1.5px solid #166534', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 'bold', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
@@ -334,7 +422,7 @@ export default function Diagnostico({ onVolver }) {
                 📊 Ver Organigrama (.jpg)
               </a>
               <a
-                href="/docs/0. Perfil De Cargo.pdf"
+                href={getPublicUrl('docs/0. Perfil De Cargo.pdf')}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ padding: '0.6rem 1.2rem', backgroundColor: '#166534', color: '#ffffff', border: 'none', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 'bold', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
@@ -344,8 +432,7 @@ export default function Diagnostico({ onVolver }) {
             </div>
           </div>
 
-          {/* CUADRÍCULA EXACTA DE LOS 13 PERFILES DE CARGO */}
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '2rem' }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1.5px solid #e2e8f0', padding: '2rem' }}>
             <div style={{ marginBottom: '1.8rem', borderBottom: '2px solid #f1f5f9', paddingBottom: '1rem' }}>
               <h3 style={{ margin: 0, color: '#0f172a', fontSize: '1.3rem' }}>
                 Descripciones de Puesto de Trabajo (13 Perfiles Oficiales DPC)
@@ -429,7 +516,7 @@ export default function Diagnostico({ onVolver }) {
                         gap: '0.4rem'
                       }}
                     >
-                      📥 Descargar Manual (.docx)
+                      📥 Descargar (.docx)
                     </button>
                   </div>
                 </div>

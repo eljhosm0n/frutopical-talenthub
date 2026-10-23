@@ -345,11 +345,18 @@ export default function Dashboard({ user, onLogout }) {
   }, []);
 
   function sincronizarExpedientesDinamicos(postulacionesNube) {
-    const listaUnificada = [...BASE_DATOS_TRABAJADORES];
+    const mapaEmpleados = new Map();
+    
+    // Primero, agregamos a los fijos oficiales (Así evitamos que se dupliquen)
+    BASE_DATOS_TRABAJADORES.forEach(emp => {
+      mapaEmpleados.set(String(emp.documento), emp);
+    });
+
+    // Luego, revisamos quién fue contratado recientemente en la nube
     postulacionesNube.filter((p) => p.estado === 'CONTRATADO').forEach((p) => {
       const doc = p.numero_documento || '104' + Math.floor(Math.random() * 900000);
-      if (!listaUnificada.some((e) => String(e.documento) === String(doc))) {
-        listaUnificada.push({
+      if (!mapaEmpleados.has(String(doc))) {
+        mapaEmpleados.set(String(doc), {
           documento: doc,
           nombre: p.candidato || `${p.nombres || ''} ${p.apellidos || ''}`.trim() || 'Nuevo Colaborador',
           cargo: p.convocatoria || p.cargo || 'Operario',
@@ -361,6 +368,9 @@ export default function Dashboard({ user, onLogout }) {
         });
       }
     });
+
+    // Extraemos los valores únicos
+    const listaUnificada = Array.from(mapaEmpleados.values());
     setExpedientes(listaUnificada);
     localStorage.setItem('frutopical_empleados', JSON.stringify(listaUnificada));
   }
@@ -484,16 +494,23 @@ export default function Dashboard({ user, onLogout }) {
   // ==========================================
   async function vincularCandidato(candidatoAprobado) {
     const nombreCompleto = candidatoAprobado.candidato || 'Aspirante';
+    const idToUpdate = candidatoAprobado.id || candidatoAprobado.id_postulacion;
+    
+    // 1. Actualización visual instantánea (Evita el error visual del video donde se queda en RECIBIDA)
+    const actualizadosPost = postulaciones.map(p => 
+      (p.id === idToUpdate || p.id_postulacion === idToUpdate) ? { ...p, estado: 'CONTRATADO' } : p
+    );
+    setPostulaciones(actualizadosPost);
+    sincronizarExpedientesDinamicos(actualizadosPost);
     
     try {
-      await fetch(`${CLOUD_API}/postulaciones/${candidatoAprobado.id || candidatoAprobado.id_postulacion}`, {
+      await fetch(`${CLOUD_API}/postulaciones/${idToUpdate}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ estado: 'CONTRATADO' })
       });
-      await cargarDatosGlobales();
       alert(`¡Candidato ${nombreCompleto} vinculado exitosamente a Nómina, SST y Archivo Central de forma Global!`);
     } catch (e) {
       alert("Candidato contratado en sesión local (Sin internet).");
@@ -646,7 +663,7 @@ export default function Dashboard({ user, onLogout }) {
           </div>
           ${cuerpoHtml}
           <p style="font-size: 11pt; text-align: justify; text-indent: 25px; margin-bottom: 45px;">
-            Se expide la presente certificación a solicitud de la parte interesada en el municipio de Sabanagrande a los <strong>${diaLetras} (${diaNumero})</strong> días del mes de <strong>${mesNombre}</strong> del año <strong>${anioNumero}</strong>.
+            Se expide la presente certificación a solicitud de la parte interesada en el municipio de Sabanagrande a los <strong>${numeroALetrasDia(new Date().getDate())} (${new Date().getDate()})</strong> días del mes de <strong>${new Date().toLocaleDateString('es-CO', { month: 'long' })}</strong> del año <strong>${new Date().getFullYear()}</strong>.
           </p>
           <p style="font-size: 11pt; margin-bottom: 60px;">Cordialmente,</p>
           <div class="firmas">
@@ -659,7 +676,8 @@ export default function Dashboard({ user, onLogout }) {
             Dirección: Carrera 2A 20-35, Sabanagrande – Atlántico | Correo Electrónico: frutopical.sas25@gmail.com | Teléfono de Contacto: 3246064388
           </div>
           <script>
-            window.onload = function() { window.print(); window.close(); };
+            // El setTimeout evita el pantallazo blanco forzando al navegador a renderizar el HTML primero
+            setTimeout(function() { window.print(); window.close(); }, 400);
           </script>
         </body>
       </html>
@@ -1942,7 +1960,7 @@ export default function Dashboard({ user, onLogout }) {
                               width: '100%',
                               padding: '0.55rem',
                               borderRadius: '6px',
-                              border: '1.5px solid #cbd5e1',
+                              border: '1px solid #cbd5e1',
                               fontSize: '0.85rem'
                             }}
                           />
@@ -2418,7 +2436,7 @@ export default function Dashboard({ user, onLogout }) {
                           backgroundColor: '#f0fdf4',
                           padding: '0.8rem',
                           borderRadius: '8px',
-                          border: '1.5px solid #86efac'
+                          border: '1px solid #86efac'
                         }}
                       >
                         <label
@@ -3244,7 +3262,7 @@ export default function Dashboard({ user, onLogout }) {
                   backgroundColor: '#f8fafc',
                   padding: '1.4rem',
                   borderRadius: '10px',
-                  border: '1.5px solid #cbd5e1',
+                  border: '1px solid #cbd5e1',
                   marginTop: '1rem',
                   fontSize: '0.85rem'
                 }}
